@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>dengbojing&#39;s blog</title>
+  
+  <subtitle>Keep farmed and carry hard</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2020-01-14T12:09:48.956Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>dengbojing</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用hexo+gitpages建立静态blog</title>
+    <link href="http://yoursite.com/2020/01/14/first/"/>
+    <id>http://yoursite.com/2020/01/14/first/</id>
+    <published>2020-01-14T11:32:51.000Z</published>
+    <updated>2020-01-14T12:09:48.956Z</updated>
+    
+    <content type="html"><![CDATA[<p>拥有自己的博客是一件很cool的事情</p><a id="more"></a><p>拥有自己的博客是一件非常非常cool的事情</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;拥有自己的博客是一件很cool的事情&lt;/p&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="git" scheme="http://yoursite.com/tags/git/"/>
+    
+      <category term="hexo" scheme="http://yoursite.com/tags/hexo/"/>
+    
+  </entry>
+  
+</feed>
