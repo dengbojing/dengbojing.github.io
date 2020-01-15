@@ -50,16 +50,20 @@
 <li><p>打开看看, 在<code>git bash</code>中使用 <code>hexo g</code> 命令生成文章,<code>hexo s</code>命令启动服务,下面提示访问<a href="http://localhost:4000" target="_blank" rel="noopener">localhost:4000</a>,访问一下看到使用默认主题的网站  </p>
 </li>
 </ol>
-<h1 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h1><p>  使用<code>hexo new post \&lt;filename&gt;</code> 创建自己的第一篇文章<br>  找到source–&gt;_post,打开&lt;filename&gt;.md  </p>
+<h1 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h1><p>  使用<code>hexo new post &lt;filename&gt;</code> 创建自己的第一篇文章<br>  找到source–&gt;_post,打开<code>&lt;filename&gt;.md</code>  </p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: 使用hexo+github pages建立静态blog</span><br><span class="line">date: 2020-01-14 19:32:51</span><br><span class="line">tags: [git,hexo]</span><br><span class="line">categories: hexo</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
-<p>  在date下面添加分类和标签,可选<br>  在—下面写正文内容,可以使用&lt;!–more–&gt;分割  </p>
+<p>  在date下面添加分类和标签,可选<br>  在—下面写正文内容,可以使用<code>&lt;!--more--&gt;</code>分割  </p>
 <blockquote>
 <p>比如:   </p>
 </blockquote>
 <pre><code>简介  
-\&lt;!--more--&gt;  
-正文  </code></pre><h1 id="本地预览"><a href="#本地预览" class="headerlink" title="本地预览"></a>本地预览</h1>  <figure class="highlight plain"><figcaption><span>g``` 生成  </span></figcaption><table><tr><td class="code"><pre><span class="line">  &#96;&#96;&#96;hexo s&#96;&#96;&#96; 启动  </span><br><span class="line">  打开浏览器,输入localhost:4000看看吧  </span><br><span class="line"></span><br><span class="line"># 部署到服务器</span><br><span class="line">  安装一键部署</span><br><span class="line">  &gt; npm install hexo-deployer-git --save  </span><br><span class="line"></span><br><span class="line">  执行 &#96;&#96;&#96;hexo clean&#96;&#96;&#96;(可选,正常情况不需要)   </span><br><span class="line">  &#96;&#96;&#96;hexo d&#96;&#96;&#96; 部署到&#96;&#96;&#96;&lt;username&gt;.github.io</span><br></pre></td></tr></table></figure>
-
+&lt;!--more--&gt;
+正文  </code></pre><h1 id="本地预览"><a href="#本地预览" class="headerlink" title="本地预览"></a>本地预览</h1><p>hexo g生成<br>hexo s启动<br>打开浏览器,输入<a href="localhost:4000">localhost:4000</a>看看吧  </p>
+<h1 id="部署到服务器"><a href="#部署到服务器" class="headerlink" title="部署到服务器"></a>部署到服务器</h1><p>  安装一键部署</p>
+<blockquote>
+<p>npm install hexo-deployer-git –save  </p>
+</blockquote>
+<p>  执行 <code>hexo clean</code>(可选,正常情况不需要)<br>  <code>hexo d</code> 部署到<code>&lt;username&gt;.github.io</code></p>
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>  使用过程中遇到很多问题,目前都没有解决,<br>  比如有些主题莫名看不到tegs和categories仓库,最后选来选去只能使用next主题<br>  还有写modules(比如七牛云)安装之后即使你不启用你也得写配置  </p>
 ]]></content>
       <categories>
