@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://denbgojing.com/about/index.html</loc>
+    
+    <lastmod>2020-01-15T11:38:07.653Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://denbgojing.com/2020/01/14/first/</loc>
     
     <lastmod>2020-01-15T09:58:54.641Z</lastmod>
@@ -12,13 +19,6 @@
     <loc>http://denbgojing.com/404.html</loc>
     
     <lastmod>2020-01-15T03:33:52.175Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://denbgojing.com/about/index.html</loc>
-    
-    <lastmod>2020-01-15T02:32:15.979Z</lastmod>
     
   </url>
   
