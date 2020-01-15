@@ -16,7 +16,7 @@
 <li><a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git</a>根据自己电脑下载相应版本,本人是win10电脑使用git bash.</li>
 <li>安装完成打开git bash, 输入git –version测试是否安装成功</li>
 <li>注册<a href="https://github.com/" target="_blank" rel="noopener">github</a>账号(全球最大的同性交友网站,你值得拥有).</li>
-<li>新建<username>.github.io仓库.</li>
+<li>新建&lt;username&gt;.github.io仓库.</li>
 </ol>
 <h1 id="node"><a href="#node" class="headerlink" title="node"></a>node</h1><ol>
 <li><a href="http://nodejs.cn/download/]" target="_blank" rel="noopener">node</a>根据自己电脑下载相应版本</li>
@@ -27,7 +27,7 @@
 <blockquote>
 <p>npm install hexo-cli -g</p>
 </blockquote>
-<p> ps: 可能安装失败,如果失败,安装cmpm,然后在安装hexo;或者挂代理,走梯子</p>
+<p> ps: 可能安装失败,如果失败,安装cnpm,然后在安装hexo;或者挂代理,走梯子</p>
 <blockquote>
 <p>npm install -g cnpm –registry=<a href="https://registry.npm.taobao.org" target="_blank" rel="noopener">https://registry.npm.taobao.org</a></p>
 </blockquote>
