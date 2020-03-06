@@ -36,7 +36,7 @@
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">zookeeper:</span></span><br><span class="line">      <span class="attr">connect-string:</span> <span class="string">zookeeper:2181</span></span><br></pre></td></tr></table></figure>
 <p>ps: <code>gateway</code> 项目为<code>spring-cloud-gateway</code> 项目, 使用了 <code>zookeeper</code> 作为注册中心和配置中心, 所以需要访问 <code>zookeeper</code>.  </p>
 </li>
-<li><p>写到这里,简单的使用 <code>docker-compose</code> 就完成了, 不难发现对于微服务来说这种方式是非常有用的, 我们可以把我们几个服务包装成一个 <code>docker-compose</code> 项目,然后进行部署,它还支持从一个镜像启动多个容器示例–毕竟容器示例就是类的对象,有对个对象当然是没问题的; 这样以来那么一个文件里面就可以包含多个相同功能的服务,一个注册中心,一个配置中心,完美实现了集群功能.<br>当然在实际生产过程中,注册中心和配置中心肯定之后一个,而且在不同的服务器上, 所以这种方式有一定的局限性.</p>
+<li><p>写到这里,简单的使用 <code>docker-compose</code> 就完成了, 不难发现对于微服务来说这种方式是非常有用的, 我们可以把我们几个服务包装成一个 <code>docker-compose</code> 项目,然后进行部署,它还支持从一个镜像启动多个容器实例–毕竟容器实例就是类的对象,有对个对象当然是没问题的; 这样以来那么一个文件里面就可以包含多个相同功能的服务,一个注册中心,一个配置中心,完美实现了集群功能.<br>当然在实际生产过程中,注册中心和配置中心肯定在不同的服务器上, 所以这种方式有一定的局限性.</p>
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>简单的学习了一下 <code>docker-compose</code> , 其中有很多配置和命令之后实战的时候才会真的用到. 怎么说呢:    </p>
 <blockquote>
 <p>路漫漫其修远兮, 吾将上下而求索</p>
