@@ -5,9 +5,9 @@
   <subtitle>Keep farmed and carry hard</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://denbgojing.com/"/>
+  <link href="http://dengbojing.com/"/>
   <updated>2020-03-06T08:13:49.304Z</updated>
-  <id>http://denbgojing.com/</id>
+  <id>http://dengbojing.com/</id>
   
   <author>
     <name>Dengbojing</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>docker-compose</title>
-    <link href="http://denbgojing.com/2020/02/11/docker-compose/"/>
-    <id>http://denbgojing.com/2020/02/11/docker-compose/</id>
+    <link href="http://dengbojing.com/2020/02/11/docker-compose/"/>
+    <id>http://dengbojing.com/2020/02/11/docker-compose/</id>
     <published>2020-02-11T09:36:28.000Z</published>
     <updated>2020-03-06T08:13:49.304Z</updated>
     
@@ -33,18 +33,18 @@
     
     
     
-      <category term="docker" scheme="http://denbgojing.com/tags/docker/"/>
+      <category term="docker" scheme="http://dengbojing.com/tags/docker/"/>
     
-      <category term="springboot" scheme="http://denbgojing.com/tags/springboot/"/>
+      <category term="springboot" scheme="http://dengbojing.com/tags/springboot/"/>
     
-      <category term="gradle" scheme="http://denbgojing.com/tags/gradle/"/>
+      <category term="gradle" scheme="http://dengbojing.com/tags/gradle/"/>
     
   </entry>
   
   <entry>
     <title>dockerfile构建自己的应用</title>
-    <link href="http://denbgojing.com/2020/02/01/dockerfile/"/>
-    <id>http://denbgojing.com/2020/02/01/dockerfile/</id>
+    <link href="http://dengbojing.com/2020/02/01/dockerfile/"/>
+    <id>http://dengbojing.com/2020/02/01/dockerfile/</id>
     <published>2020-02-01T03:45:08.000Z</published>
     <updated>2020-02-02T08:33:29.825Z</updated>
     
@@ -58,18 +58,18 @@
     
     
     
-      <category term="docker" scheme="http://denbgojing.com/tags/docker/"/>
+      <category term="docker" scheme="http://dengbojing.com/tags/docker/"/>
     
-      <category term="springboot" scheme="http://denbgojing.com/tags/springboot/"/>
+      <category term="springboot" scheme="http://dengbojing.com/tags/springboot/"/>
     
-      <category term="gradle" scheme="http://denbgojing.com/tags/gradle/"/>
+      <category term="gradle" scheme="http://dengbojing.com/tags/gradle/"/>
     
   </entry>
   
   <entry>
     <title>docker入门学习</title>
-    <link href="http://denbgojing.com/2020/01/25/docker-new/"/>
-    <id>http://denbgojing.com/2020/01/25/docker-new/</id>
+    <link href="http://dengbojing.com/2020/01/25/docker-new/"/>
+    <id>http://dengbojing.com/2020/01/25/docker-new/</id>
     <published>2020-01-25T13:12:50.000Z</published>
     <updated>2020-02-01T03:57:17.636Z</updated>
     
@@ -83,14 +83,14 @@
     
     
     
-      <category term="docker" scheme="http://denbgojing.com/tags/docker/"/>
+      <category term="docker" scheme="http://dengbojing.com/tags/docker/"/>
     
   </entry>
   
   <entry>
     <title>使用hexo+github pages建立静态blog</title>
-    <link href="http://denbgojing.com/2020/01/14/first/"/>
-    <id>http://denbgojing.com/2020/01/14/first/</id>
+    <link href="http://dengbojing.com/2020/01/14/first/"/>
+    <id>http://dengbojing.com/2020/01/14/first/</id>
     <published>2020-01-14T11:32:51.000Z</published>
     <updated>2020-01-16T01:56:33.076Z</updated>
     
@@ -106,12 +106,12 @@
     </summary>
     
     
-      <category term="hexo" scheme="http://denbgojing.com/categories/hexo/"/>
+      <category term="hexo" scheme="http://dengbojing.com/categories/hexo/"/>
     
     
-      <category term="git" scheme="http://denbgojing.com/tags/git/"/>
+      <category term="git" scheme="http://dengbojing.com/tags/git/"/>
     
-      <category term="hexo" scheme="http://denbgojing.com/tags/hexo/"/>
+      <category term="hexo" scheme="http://dengbojing.com/tags/hexo/"/>
     
   </entry>
   
