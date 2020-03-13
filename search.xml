@@ -45,7 +45,7 @@
 </ol>
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>网络这块真的是比较重要,也比较难的一块,还可以创建<code>overlay</code>类型的网络,有待研究.官方说法生产环境最好不要使用默认的<code>docker0</code>网桥,所以使用<code>docker-compose</code>管理容器还是一个比较好的方式.或者努力学习k8s吧.</p>
 <blockquote>
-<p>积土成山,风雨兴焉,积水成,渊蛟龙生</p>
+<p>积土成山,风雨兴焉;积水成,渊蛟龙生</p>
 </blockquote>
 ]]></content>
       <tags>
