@@ -46,23 +46,27 @@
   };
 </script>
 
-  <meta name="description" content="docker入门">
+  <meta name="description" content="docker-network学习">
 <meta property="og:type" content="article">
-<meta property="og:title" content="docker入门学习">
-<meta property="og:url" content="http://dengbojing.com/2020/01/25/docker-new/index.html">
+<meta property="og:title" content="docker-network">
+<meta property="og:url" content="http://dengbojing.com/2020/03/13/docker-network/index.html">
 <meta property="og:site_name" content="生活不易,砥砺前行">
-<meta property="og:description" content="docker入门">
+<meta property="og:description" content="docker-network学习">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://i.ibb.co/jw20qkm/docker-com.png">
-<meta property="og:image" content="https://i.ibb.co/myY1D6q/docker-images.png">
-<meta property="article:published_time" content="2020-01-25T13:12:50.000Z">
-<meta property="article:modified_time" content="2020-02-01T03:57:17.636Z">
+<meta property="og:image" content="https://i.ibb.co/3T4TcbS/docker-network-ls.png">
+<meta property="og:image" content="https://i.ibb.co/vPfGqyY/docker-ifconfig.png">
+<meta property="og:image" content="https://i.ibb.co/rwWrLFq/docker-host-ifconfig.png">
+<meta property="og:image" content="https://i.ibb.co/ng5tgwZ/docker-network-inspect-my-network.png">
+<meta property="og:image" content="https://i.ibb.co/VLVnHbk/docker-run-network-my-network.png">
+<meta property="article:published_time" content="2020-03-13T02:12:37.000Z">
+<meta property="article:modified_time" content="2020-03-13T07:58:10.461Z">
 <meta property="article:author" content="Dengbojing">
 <meta property="article:tag" content="docker">
+<meta property="article:tag" content="docker-network">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i.ibb.co/jw20qkm/docker-com.png">
+<meta name="twitter:image" content="https://i.ibb.co/3T4TcbS/docker-network-ls.png">
 
-<link rel="canonical" href="http://dengbojing.com/2020/01/25/docker-new/">
+<link rel="canonical" href="http://dengbojing.com/2020/03/13/docker-network/">
 
 
 <script id="page-configurations">
@@ -74,7 +78,7 @@
   };
 </script>
 
-  <title>docker入门学习 | 生活不易,砥砺前行</title>
+  <title>docker-network | 生活不易,砥砺前行</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288627-1"></script>
     <script>
@@ -232,7 +236,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://dengbojing.com/2020/01/25/docker-new/">
+    <link itemprop="mainEntityOfPage" href="http://dengbojing.com/2020/03/13/docker-network/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/avatar.jpg">
@@ -245,7 +249,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          docker入门学习
+          docker-network
         </h1>
 
         <div class="post-meta">
@@ -254,16 +258,10 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-01-25 21:12:50" itemprop="dateCreated datePublished" datetime="2020-01-25T21:12:50+08:00">2020-01-25</time>
+              <time title="创建时间：2020-03-13 10:12:37 / 修改时间：15:58:10" itemprop="dateCreated datePublished" datetime="2020-03-13T10:12:37+08:00">2020-03-13</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-02-01 11:57:17" itemprop="dateModified" datetime="2020-02-01T11:57:17+08:00">2020-02-01</time>
-              </span>
 
           
 
@@ -276,67 +274,40 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>docker入门</p>
+        <p>docker-network学习</p>
 <a id="more"></a>
-<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>  作于2020年春节大年初一晚,此时疫情真的是猛于虎,为了避免给我媳妇她们医院带来不必要的麻烦,老实在家呆着学学新知识,提升自我.  </p>
-<blockquote>
-<h1 id="Talk-is-cheap-show-me-the-code"><a href="#Talk-is-cheap-show-me-the-code" class="headerlink" title="Talk is cheap, show me the code"></a>Talk is cheap, show me the code</h1></blockquote>
-<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><blockquote>
-<p>Docker 使用 Google 公司推出的 Go 语言 进行开发实现,基于 Linux 内核的<br>   cgroup,namespace,以及 AUFS 类的 Union FS 等技术,对进程进行封装隔离,属于操作<br>   系统层面的虚拟化技术  </p>
-</blockquote>
-<p>   个人理解就是一种虚拟化技术,类似之前接触过的lvm(linux virtual machine),但是有很大的不同,lvm是有一套完整的系统,虚拟出一套硬件系统和操作系统,然后在该系统之上又有很多的应用;而容器技术里面的应用直接是运行在容器宿主的内核之上,也没有虚拟除一套硬件,一套操作系统;所以容器很轻便小巧.<br>   ps: 从以上描述可以看出,容器技术更适用于持续集成和devOps,有点 <code>java--Complie Once,Run Anywhere</code> 的意思,只需要打包一次,在任何地方,任何系统之上都能使用,不存在之前 <code>各种环境</code> (开发环境,测试环境,灰度环境,正式环境)导致的[这段代码在我机器上好好的啊,怎么可能有问题]</p>
-<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><ol>
-<li><p>注册docker hub 账号  </p>
-</li>
-<li><p>在<a href="https://docs.docker.com/" target="_blank" rel="noopener">docker</a>官方文档上找到对应操作系统的下载地址<img src="https://i.ibb.co/jw20qkm/docker-com.png" alt=""><br>ps: 文件还是有点大,建议使用迅雷等p2p工具下载.  </p>
-</li>
-<li><p>本人使用<code>windows专业版系统</code>,选择<code>docker desktop for windows</code>按照官网提示下载,完成之后不着急安装,此时需要先启动<code>hyper-v</code>,<code>docker desktop</code>是依赖<code>hyper-v</code>的,开启<code>hype-v</code>之后需要重启电脑,重启之后安装<code>docker desktop</code>,安装过程省略,下一步下一步即可.<br>ps: 如果你是<code>windows 家庭版</code>,请参考<a href="https://www.jianshu.com/p/1329954aa329/" target="_blank" rel="noopener">这篇文章</a>  </p>
-</li>
-<li><p>启动<code>docker desktop</code>,在系统托盘图标<code>右键-&gt;setting</code>,找到<code>resources-&gt;file sharing</code>,选择你要共享的盘符,因为<code>docker desktop</code>默认是使用<code>hyper-v</code>虚拟机,而<code>hyper-v</code>虚拟机默认的镜像地址都是在<code>C盘</code>,也就是系统盘,这会导致<code>c盘</code>不够用,可以直接在<code>resources-&gt;advanced</code>下面找到<code>disak image location</code>修改镜像位置,本人是没有修改,这里本人是开启了共享盘符,把之后镜像使用的存储空间映射到本地其他磁盘上,这样解决了大部分存储空间的问题,镜像存储就不管了    </p>
-</li>
-</ol>
-<h1 id="入门"><a href="#入门" class="headerlink" title="入门"></a>入门</h1><ol>
-<li><p>打开<code>power shell</code>,这里最好是不要使用其他命令终端,本人之前学习时候使用cmd,使用cmd是有坑的,后面会讲到,输入<code>docker login</code>,按照提示输入之前在<code>docker hub</code>上注册的用户名,密码,第一次需要输入,后续可以不用,也可使用图像化界面登录,右键<code>docker desktop</code>系统托盘图标-&gt;login.  </p>
-</li>
-<li><p>登录之后我们就可以是用<code>docker search</code>命令来搜索我们感兴趣的仓库了,比如我们安装一个mysql吧,<code>docker search mysql</code>,可以看到有很多的<code>mysql</code>镜像,还有<code>star数</code>和<code>official</code><br>ps: 根据是否是官方提供,可将镜像资源分为两类.一种是类似 <code>mysql</code> 这样的镜像,被称为基础镜像或根镜像.这些基础镜像由 Docker 公司创建、验证、支持、提供.这样的镜像往往使用单个单词作为名字.还有一种类型,比如 <code>bitnami/mysql</code> 镜像,它是由 Docker 的用户创建并维护的,往往带有用户名称前缀.  </p>
-</li>
-<li><p>使用<code>docker pull</code>拉去镜像,具体命令如下  </p>
-<blockquote>
-<p>docker pull [选项] [Docker Registry 地址[:端口号]/]仓库名[:标签]   </p>
-</blockquote>
-</li>
-</ol>
-<pre><code>具体选项可以通过`docker pull --help` 来查看,  
 
-- docker registry地址: 默认是docker hub,一般不需要指定
-- 仓库名: 前文提到镜像名称分为两段,`&lt;username&gt;/&lt;soft name&gt;`如果不指定默认是library,即docker官方的镜像.
-- tag: 标签,如果不指定默认为latest,当然可以指定需要的版本,查询tag目前本人没有找到相应的命令,只能去[docker hub](https://hub.docker.com/)搜索镜像然后查看tag    
-
-综上所述,此时只需使用`docker pull mysql`就可以了  </code></pre><ol start="4">
-<li><p>可以是用<code>docker image ls</code>或者<code>docker images</code> 查看本地镜像<img src="https://i.ibb.co/myY1D6q/docker-images.png" alt=""><br>此时可以看到镜像的大小和在<code>docker hub</code>大小是不一样的,这是因为,在<code>docker hub</code>显示的是压缩大小,<code>docker hub</code>作为一个中央镜像仓库,关心的是流量大小,而不是体积大小,所以会尽可能的压缩镜像体积;而且在这里,显示的大小可能和实际占用磁盘空间大小还不一样,这是因为,镜像是有很多文件层组成,而文件层之间又存在继承,复用的关系,如果不同的镜像使用相同的基础层,那么只需要保存一份该基础层就可以了,不同镜像的其他层可以直接引用该基础层,可以使用<code>docker system df -v</code>来查看具体的占用情况,同时可以使用<code>docker system prune</code>来清理磁盘空间.<br><code>docker image ls</code> 支持通配符,如 <code>docker images my*</code> 可以将所有my开头的镜像都列出<br><code>docker image ls -q</code> 可以只显示镜像的 <code>ID</code><br>此外还支持 <code>-f(--filter)</code> 过滤模式, 比如: <code>docker images -f since=mysql</code> 会列出在 <code>mysql</code>之后的所有镜像,将 <code>since</code> 换成 <code>before</code> 可以列出之前的镜像  </p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>阶段性的记录一下docker学习,docker-network里面还有很多问题很搞明白,亟待解决.</p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><ol>
+<li><p><code>docker</code> 官方有5种网络模式,<code>none,bridge,host,overlay</code>.<br> 1.1 <code>none</code> 模式,参数 <code>--network=none</code>,无网络模式,这种模式一般很少用,官方说法是和自定义网络驱动时使用.<br> 1.2 <code>birdge</code> 模式,参数 <code>--network ${bridge_name}</code>.该模式是默认模式,在安装<code>docker</code>会创建一个默认的<code>docker0</code>的linux网桥,如果启动容器时不指定网络,就会默认连接到<code>docker0</code>网桥   </p>
+<p> ps: </p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    &#96;docker desktop for windows&#96;看不见&#96;docker0&#96;,这是因为,&#96;docker desktop for windows&#96;实际上是把Docker装在Hyper-v虚拟机上,打开Hyper-v虚拟机管理,可以看到&#96;DockerDesktopVM&#96;这个虚拟机,Docker实际是运行在这个里面,而&#96;docker0&#96;就在这个里面,但是你如果连接这个虚拟机,发现连接不上.</span><br><span class="line">&#96;&#96;&#96;  </span><br><span class="line"></span><br><span class="line">1.3 &#96;host&#96; 模式,参数&#96;--network&#x3D;host&#96;,该模式下,容器和宿主机共用一个网络,在指定&#96;--privileged&#x3D;true&#96; 时候,如果你不小心修改了网络参数,那么就会造成不必要的麻烦,所以一般不推荐这中做法,上面说到&#96;docker desktop for windows&#96; 无法查看虚拟机里面的&#96;docker0&#96;网桥,此时如果你以&#96;--network&#x3D;host&#96;启动一个容器,此时你就可以执行&#96;ifconfig&#96;看到&#96;docker0&#96;网桥.  </span><br><span class="line">ps:</span><br></pre></td></tr></table></figure>
+<pre><code>另一个查看命令`docker run -it --rm --privileged --pid=host justincormack/nsenter1`,启动之后,执行 `ifconfig`,指定 `--pid=host` 参数就是说,让当前启动的容器可以看到宿主机上所有的进程.  </code></pre><pre><code>
+1.4 `overlay` 模式, 参数 `network=container:${conatiner_id}`,该模式下,容器1和容器2共用一个网络.  
+</code></pre></li>
+</ol>
+<h1 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h1><ol>
+<li><p><code>docker network ls</code>查看网络,<br><img src="https://i.ibb.co/3T4TcbS/docker-network-ls.png" alt=""><br>可以看到上面讲到的3种类型的网络,至于<code>overlay</code>呢,是需要依赖别的容器,所以取决与别的容器的网络模式,主要学习一下桥接模式的内容.  </p>
 </li>
-<li><p>启动容器,每一个容器都是一个镜像实例,这个就像<code>java里面的oop思想</code>一样,一个镜像就是一个类,一个类的对象对应一个容器,java 里面使用<code>new</code>关键字实例化对象,这里我们使用<code>docker run</code>来启动一个容器,具体命令参数:  </p>
-<blockquote>
-<p>docker run [OPTIONS] IMAGE [COMMAND] [ARG…]   </p>
-</blockquote>
-<p>此处常用的 <code>options</code> 有 <code>-p</code> 指定端口号, <code>-P</code> 指定端口号映射为本机随机端口号; <code>-e</code> 指定容器内部的环境变量;<code>-d</code> 指定为后台启动;<code>-i</code> 保持stdin标准的输入流打开状态,即使没有链接; <code>-t</code> 分配一个伪终端, <code>-v</code> 指定文件映射,即讲本地的一个目录或者文件映射到容器内部;具体启动命令:  </p>
-<blockquote>
-<p>docker run -d -p 3305:3306 –privileged=true -e MYSQL_ROOT_PASSWORD=xxxx –name   mysqltest -v /f/mysql/data:/var/lib/mysql -v /f/mysql/conf/my.cnf:/etc/mysql/my.cnf </p>
-</blockquote>
+<li><p><code>bridge</code> 网桥模式的原理, 当创建一个容器的时候,<code>Docker</code> 会创建两个网络模块,一个是在容器里面叫<code>eth0</code>, 另一个则在宿主机里面,名字为<code>vethxxxx</code>,<code>Docker</code> 这个网络模块桥街道容器里面的<code>eth0</code>.<br> 2.1 首先我们以<code>bridge</code>启动一个<code>ubuntu</code> 容器,执行: <code>docker run  -ti --rm ubuntu:14.04 bash</code>, 启动一个一次性容器并进入<br> 2.2  在容器中执行<code>ifconfig</code>, 看到如下图所示:<br> <img src="https://i.ibb.co/vPfGqyY/docker-ifconfig.png" alt=""><br> <code>lo</code>: loopback 回环网络接口,也就是执行<code>localhost</code>或者<code>127.0.0.1</code>时候会走这个网络接口<br> <code>eth0</code>: 所有来自外部的流量都会通过这个网络接口  </p>
+<p> 2.2 新开一个终端窗口,执行<code>docker run -it --rm --privileged --pid=host justincormack/nsenter1</code> , 进入容器之后,执行<code>ifconfig</code> 可以看到如图所示:<br> <img src="https://i.ibb.co/rwWrLFq/docker-host-ifconfig.png" alt=""><br> 其中一个<code>vethxxx</code>是桥接到上面<code>ubuntu</code> 容器的网络接口,另一个是当前这个容器的网络接口(因为当前网络没有指定网络模式,所以以默认桥接模式启动,所以也会给当前容器创建一个网络接口).  </p>
+</li>
+<li><p>自定义网桥,之前使用<code>docker-compose</code> 创建了一个<code>compose</code>, 里面包含了一个<code>gateway</code>和一个<code>zookeeper</code>, 里面还定义了一个<code>network</code> ,让两个容器能够以容器名称相互访问, 了解了<code>docker network</code>之后,其实里面<code>network</code> 节点就是创建了一个<code>bridge</code> 网桥, 此时容器就可以通过名称相互访问, 官方名称叫 <code>automatic service discovery</code> 服务自动发现(瞎鸡巴翻译的).<br> 3.1 执行<code>docker network create -d bridge my-network</code>创建一个<code>bridge</code> 类型网络, 执行<code>docker inspect my-network</code> 看一下里面都有什么,  如图:<br> <img src="https://i.ibb.co/ng5tgwZ/docker-network-inspect-my-network.png" alt=""><br> 可以看到,子网掩码是<code>172,19.0.0/16</code>,网关是<code>172,19.0.1</code>,可以使用<code>--subnet=192.168.0.0/16</code> 来指定子网掩码,另外还可以使用<code>--gateway=192.168.0.1</code> 指定网关, <code>--ip-range=192.168.2.0/25</code>指定ip范围  </p>
+<p> 3.2 最好是指定子网掩码,免得网络冲突.如果不指定网关,会从地址范围内自动选择一个出来作为网关,目前测试结论默认是xxx.xxx.xxx.1.  </p>
+</li>
+<li><p>使用<code>docker run --network=my-network</code> 来启动一个容器,执行ifconfig:<br><img src="https://i.ibb.co/VLVnHbk/docker-run-network-my-network.png" alt=""><br>可以看到此时ip地址为我们创建的桥接网络借口的ip地址范围  </p>
+</li>
+<li><p>一个容器可以同时连接两个网络,使用<code>docker network connect ${networkid|networkname} ${containerid|containername}</code>, 如图:<br>!()[<a href="https://i.ibb.co/6W3CPRX/docker-network-connect.png]" target="_blank" rel="noopener">https://i.ibb.co/6W3CPRX/docker-network-connect.png]</a><br>会有两个网络接口一个<code>eth0</code>,另一个<code>eth1</code>, 这样该容器就可以同时访问两个网路  </p>
+</li>
+<li><p><code>docker network disconnect ${networkid|networkname} ${containerid|containername}</code> 取消容器和网络的链接  </p>
+</li>
+<li><p><code>--icc</code>高级参数, 如果网络该参数为禁止,则两个容器之间是无法访问的.  </p>
 </li>
 </ol>
-<p>   -v //f/mysql/mysql-files:/var/lib/mysql-files/ mysql:latest –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci  </p>
-<pre><code>解释一下,此时我们就把容器内部的3306端口映射为宿主机的3305端口,并且设置了mysql的配置,数据存储位置,并且进行了一系列的mysql参数设置,指定了 `msyql root` 的密码为xxx,--privileged是让容器内部的用户获取宿主机特殊权限,此处一定要把文件映射在你已经共享的盘符,不然会失败  </code></pre><ol start="6">
-<li>查看容器状态, <code>docker container ls -a</code> 或 <code>docker ps -a</code> 可以看到容器的状态,映射端口,名字等;<br>使用 <code>docker stop &lt;container name\id&gt;</code> 停止容器, 使用 <code>docker start &lt;container name\id&gt;</code> 再次启动容器,注意第一次启动容器使用 <code>docker  run</code> 命令,该命令会创建并启动一个容器, 之后并不需要在run,只需要执行start就可以了,此外 <code>docker run</code> 执行时,如果指定镜像不存在,该命令会自动拉去默认仓库所匹配的镜像  </li>
-</ol>
-<ol start="7">
-<li>删除镜像和容器<br>删除镜像使用 <code>docker image rm</code> 或 <code>docker rmi</code> 加上镜像的 <code>ID</code> 来删除镜像<br>删除容器使用 <code>docker container rm</code> 或 <code>docker rm</code> 加上容器 <code>ID</code> 删除容器,可以添加 <code>-f</code> 强制删除一个正在运行的容器;<br>此外如果只是想清理未被容器使用的镜像可以使用 <code>docker image prune</code><br>同理,可以使用  <code>docker container prune</code> 清理未运行的容器<br>如果需要删除的容器或者镜像太多,手动一个个输入就显得有点智障了,此时可以使用 <code>docker image ls -q</code> 来配合批量删除,比如:<br><code>docker rmi $(docker image ls -q -f since=mysql)</code><br>此时就会将mysql之前所有的镜像都删除<br>ps: 此处有之前说的 <code>cmd</code> 的坑,使用 <code>cmd</code> 会报错,改用 <code>power shell</code> 就不会</li>
-</ol>
-<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>基础入门就这些,后续根据自身所学内容,会陆陆续续的记录更多的东西,比如如何创建一个docker容器啊,导入导出镜像啊,私有仓库的搭建等等.  </p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>网络这块真的是比较重要,也比较难的一块,还可以创建<code>overlay</code>类型的网络,有待研究.官方说法生产环境最好不要使用默认的<code>docker0</code>网桥,所以使用<code>docker-compose</code>管理容器还是一个比较好的方式.或者努力学习k8s吧.</p>
 <blockquote>
-<p>不积跬步，无以至千里；不积小流，无以成江海</p>
+<p>积土成山,风雨兴焉,积水成,渊蛟龙生</p>
 </blockquote>
-<hr>
 
     </div>
 
@@ -352,7 +323,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://dengbojing.com/2020/01/25/docker-new/" title="docker入门学习">http://dengbojing.com/2020/01/25/docker-new/</a>
+    <a href="http://dengbojing.com/2020/03/13/docker-network/" title="docker-network">http://dengbojing.com/2020/03/13/docker-network/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -365,6 +336,7 @@
           
           <div class="post-tags">
               <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+              <a href="/tags/docker-network/" rel="tag"><i class="fa fa-tag"></i> docker-network</a>
           </div>
 
         
@@ -373,13 +345,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/01/14/first/" rel="prev" title="使用hexo+github pages建立静态blog">
-      <i class="fa fa-chevron-left"></i> 使用hexo+github pages建立静态blog
+    <a href="/2020/02/11/docker-compose/" rel="prev" title="docker-compose">
+      <i class="fa fa-chevron-left"></i> docker-compose
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/02/01/dockerfile/" rel="next" title="dockerfile构建自己的应用">
-      dockerfile构建自己的应用 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -439,7 +408,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Talk-is-cheap-show-me-the-code"><span class="nav-number">2.</span> <span class="nav-text">Talk is cheap, show me the code</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">3.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">4.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#入门"><span class="nav-number">5.</span> <span class="nav-text">入门</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后记"><span class="nav-number">6.</span> <span class="nav-text">后记</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实战"><span class="nav-number">3.</span> <span class="nav-text">实战</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后记"><span class="nav-number">4.</span> <span class="nav-text">后记</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
