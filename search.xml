@@ -7,6 +7,9 @@
 <a id="more"></a>
 
 <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>阶段性的记录一下docker学习,docker-network里面还有很多问题很搞明白,亟待解决.</p>
+<blockquote>
+<p>以下操作都是基于<code>docker desktop for windows</code>的<code>linux container</code>模式下</p>
+</blockquote>
 <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><ol>
 <li><p><code>docker</code> 官方有5种网络模式,<code>none,bridge,macvlan,host,overlay</code>.  </p>
 <p> 1.1 <code>none</code> 模式,参数 <code>--network=none</code>,无网络模式,这种模式一般很少用,官方说法是和自定义网络驱动时使用.  </p>
