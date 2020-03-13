@@ -8,14 +8,19 @@
 
 <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>阶段性的记录一下docker学习,docker-network里面还有很多问题很搞明白,亟待解决.</p>
 <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><ol>
-<li><p><code>docker</code> 官方有5种网络模式,<code>none,bridge,macvlan,host,overlay</code>.<br> 1.1 <code>none</code> 模式,参数 <code>--network=none</code>,无网络模式,这种模式一般很少用,官方说法是和自定义网络驱动时使用.<br> 1.2 <code>birdge</code> 模式,参数 <code>--network ${bridge_name}</code>.该模式是默认模式,在安装<code>docker</code>会创建一个默认的<code>docker0</code>的linux网桥,如果启动容器时不指定网络,就会默认连接到<code>docker0</code>网桥   </p>
-<p> ps: </p>
- <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">    &#96;docker desktop for windows&#96;看不见&#96;docker0&#96;,这是因为,&#96;docker desktop for windows&#96;实际上是把Docker装在Hyper-v虚拟机上,打开Hyper-v虚拟机管理,可以看到&#96;DockerDesktopVM&#96;这个虚拟机,Docker实际是运行在这个里面,而&#96;docker0&#96;就在这个里面,但是你如果连接这个虚拟机,发现连接不上.</span><br><span class="line">&#96;&#96;&#96;  </span><br><span class="line"></span><br><span class="line">1.3 &#96;host&#96; 模式,参数&#96;--network&#x3D;host&#96;,该模式下,容器和宿主机共用一个网络,在指定&#96;--privileged&#x3D;true&#96; 时候,如果你不小心修改了网络参数,那么就会造成不必要的麻烦,所以一般不推荐这中做法,上面说到&#96;docker desktop for windows&#96; 无法查看虚拟机里面的&#96;docker0&#96;网桥,此时如果你以&#96;--network&#x3D;host&#96;启动一个容器,此时你就可以执行&#96;ifconfig&#96;看到&#96;docker0&#96;网桥.  </span><br><span class="line">ps:</span><br></pre></td></tr></table></figure>
-<pre><code>另一个查看命令`docker run -it --rm --privileged --pid=host justincormack/nsenter1`,启动之后,执行 `ifconfig`,指定 `--pid=host` 参数就是说,让当前启动的容器可以看到宿主机上所有的进程.  </code></pre><pre><code>
-1.4 `overlay` 模式, 参数 `network=container:${conatiner_id}`,该模式下,容器1和容器2共用一个网络.  
-
-1.5 `macvlan` 指定网络的mac地址.
-</code></pre></li>
+<li><p><code>docker</code> 官方有5种网络模式,<code>none,bridge,macvlan,host,overlay</code>.  </p>
+<p> 1.1 <code>none</code> 模式,参数 <code>--network=none</code>,无网络模式,这种模式一般很少用,官方说法是和自定义网络驱动时使用.  </p>
+<p> 1.2 <code>birdge</code> 模式,参数 <code>--network ${bridge_name}</code>.该模式是默认模式,在安装<code>docker</code>会创建一个默认的<code>docker0</code>的linux网桥,如果启动容器时不指定网络,就会默认连接到<code>docker0</code>网桥   </p>
+<blockquote>
+<p><code>docker desktop for windows</code>看不见<code>docker0</code>,这是因为,<code>docker desktop for windows</code>实际上是把Docker装在Hyper-v虚拟机上,打开Hyper-v虚拟机管理,可以看到<code>DockerDesktopVM</code>这个虚拟机,Docker实际是运行在这个里面,而<code>docker0</code>就在这个里面,但是你如果连接这个虚拟机,发现连接不上.  </p>
+</blockquote>
+<p> 1.3 <code>host</code> 模式,参数<code>--network=host</code>,该模式下,容器和宿主机共用一个网络,在指定<code>--privileged=true</code> 时候,如果你不小心修改了网络参数,那么就会造成不必要的麻烦,所以一般不推荐这中做法,上面说到<code>docker desktop for windows</code> 无法查看虚拟机里面的<code>docker0</code>网桥,此时如果你以<code>--network=host</code>启动一个容器,此时你就可以执行<code>ifconfig</code>看到<code>docker0</code>网桥.    </p>
+<blockquote>
+<p>另一个查看命令<code>docker run -it --rm --privileged --pid=host justincormack/nsenter1</code>,启动之后,执行 <code>ifconfig</code>,指定 <code>--pid=host</code> 参数就是说,让当前启动的容器可以看到宿主机上所有的进程.  </p>
+</blockquote>
+<p> 1.4 <code>overlay</code> 模式, 参数 <code>network=container:${conatiner_id}</code>,该模式下,容器1和容器2共用一个网络.  </p>
+<p> 1.5 <code>macvlan</code> 指定网络的mac地址.</p>
+</li>
 </ol>
 <h1 id="实战bridge模式"><a href="#实战bridge模式" class="headerlink" title="实战bridge模式"></a>实战<code>bridge</code>模式</h1><ol>
 <li><p><code>docker network ls</code>查看网络,<br><img src="https://i.ibb.co/3T4TcbS/docker-network-ls.png" alt=""><br>可以看到上面讲到的3种类型的网络,至于<code>overlay</code>呢,是需要依赖别的容器,所以取决与别的容器的网络模式,主要学习一下桥接模式的内容.  </p>
