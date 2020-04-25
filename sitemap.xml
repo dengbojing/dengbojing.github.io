@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://dengbojing.com/2020/01/25/docker-new/</loc>
+    
+    <lastmod>2020-04-25T06:25:30.249Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://dengbojing.com/2020/03/13/docker-network/</loc>
     
     <lastmod>2020-03-13T08:27:49.045Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>http://dengbojing.com/2020/02/01/dockerfile/</loc>
     
     <lastmod>2020-02-02T08:33:29.825Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://dengbojing.com/2020/01/25/docker-new/</loc>
-    
-    <lastmod>2020-02-01T03:57:17.636Z</lastmod>
     
   </url>
   

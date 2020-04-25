@@ -270,13 +270,12 @@
 </blockquote>
 <p>此处常用的 <code>options</code> 有 <code>-p</code> 指定端口号, <code>-P</code> 指定端口号映射为本机随机端口号; <code>-e</code> 指定容器内部的环境变量;<code>-d</code> 指定为后台启动;<code>-i</code> 保持stdin标准的输入流打开状态,即使没有链接; <code>-t</code> 分配一个伪终端, <code>-v</code> 指定文件映射,即讲本地的一个目录或者文件映射到容器内部;具体启动命令:  </p>
 <blockquote>
-<p>docker run -d -p 3305:3306 –privileged=true -e MYSQL_ROOT_PASSWORD=xxxx –name   mysqltest -v /f/mysql/data:/var/lib/mysql -v /f/mysql/conf/my.cnf:/etc/mysql/my.cnf </p>
+<p>docker run -d -p 3305:3306 –privileged=true -e MYSQL_ROOT_PASSWORD=xxxx –name   mysqltest -v /f/mysql/data:/var/lib/mysql -v /f/mysql/conf/my.cnf:/etc/mysql/my.cnf -v //f/mysql/mysql-files:/var/lib mysql-files/ mysql:latest –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci  </p>
 </blockquote>
+<p>解释一下,此时我们就把容器内部的3306端口映射为宿主机的3305端口,并且设置了mysql的配置,数据存储位置,并且进行了一系列的mysql参数设置,指定了 <code>msyql root</code> 的密码为xxx,–privileged是让容器内部的用户获取宿主机特殊权限,此处一定要把文件映射在你已经共享的盘符,不然会失败  </p>
 </li>
-</ol>
-<p>   -v //f/mysql/mysql-files:/var/lib/mysql-files/ mysql:latest –character-set-server=utf8mb4 –collation-server=utf8mb4_unicode_ci  </p>
-<pre><code>解释一下,此时我们就把容器内部的3306端口映射为宿主机的3305端口,并且设置了mysql的配置,数据存储位置,并且进行了一系列的mysql参数设置,指定了 `msyql root` 的密码为xxx,--privileged是让容器内部的用户获取宿主机特殊权限,此处一定要把文件映射在你已经共享的盘符,不然会失败  </code></pre><ol start="6">
-<li>查看容器状态, <code>docker container ls -a</code> 或 <code>docker ps -a</code> 可以看到容器的状态,映射端口,名字等;<br>使用 <code>docker stop &lt;container name\id&gt;</code> 停止容器, 使用 <code>docker start &lt;container name\id&gt;</code> 再次启动容器,注意第一次启动容器使用 <code>docker  run</code> 命令,该命令会创建并启动一个容器, 之后并不需要在run,只需要执行start就可以了,此外 <code>docker run</code> 执行时,如果指定镜像不存在,该命令会自动拉去默认仓库所匹配的镜像  </li>
+<li><p>查看容器状态, <code>docker container ls -a</code> 或 <code>docker ps -a</code> 可以看到容器的状态,映射端口,名字等;<br>使用 <code>docker stop &lt;container name\id&gt;</code> 停止容器, 使用 <code>docker start &lt;container name\id&gt;</code> 再次启动容器,注意第一次启动容器使用 <code>docker  run</code> 命令,该命令会创建并启动一个容器, 之后并不需要在run,只需要执行start就可以了,此外 <code>docker run</code> 执行时,如果指定镜像不存在,该命令会自动拉去默认仓库所匹配的镜像  </p>
+</li>
 </ol>
 <ol start="7">
 <li>删除镜像和容器<br>删除镜像使用 <code>docker image rm</code> 或 <code>docker rmi</code> 加上镜像的 <code>ID</code> 来删除镜像<br>删除容器使用 <code>docker container rm</code> 或 <code>docker rm</code> 加上容器 <code>ID</code> 删除容器,可以添加 <code>-f</code> 强制删除一个正在运行的容器;<br>此外如果只是想清理未被容器使用的镜像可以使用 <code>docker image prune</code><br>同理,可以使用  <code>docker container prune</code> 清理未运行的容器<br>如果需要删除的容器或者镜像太多,手动一个个输入就显得有点智障了,此时可以使用 <code>docker image ls -q</code> 来配合批量删除,比如:<br><code>docker rmi $(docker image ls -q -f since=mysql)</code><br>此时就会将mysql之前所有的镜像都删除<br>ps: 此处有之前说的 <code>cmd</code> 的坑,使用 <code>cmd</code> 会报错,改用 <code>power shell</code> 就不会</li>
