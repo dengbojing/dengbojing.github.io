@@ -1,6 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>how_to_write_good_tests</title>
+    <url>/2020/06/04/how-to-write-good-tests/</url>
+    <content><![CDATA[<p>译文: <a href="https://github.com/mockito/mockito/wiki/How-to-write-good-tests" target="_blank" rel="noopener">How to write good tests</a></p>
+<a id="more"></a>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>  代码测试是一件非常重要的工作,在之前的工作中总是找各种借口(时间不够,写起来太繁琐,有些场景无法测试)等等原因做的不够完善.有时甚至不做,无心之中发现一篇非常好的代码测试文章.花些时间来翻译一下,提高一下英文水平,顺便也学习一下正经的代码测试该是什么样的.</p>
+<hr>
+<h1 id="译文"><a href="#译文" class="headerlink" title="译文"></a>译文</h1><p>  <a href="https://github.com/mockito/mockito/wiki/How-to-write-good-tests" target="_blank" rel="noopener">原文地址</a></p>
+<p>  为我们的软件定制一个测试用例是件好事,但是实际上,一个<strong>好的</strong>的测试用例也是非常重要的.</p>
+<p>  遵循一些固有的原则来热爱测试代码 </p>
+<hr>
+<h2 id="保持测试代码简洁和可读"><a href="#保持测试代码简洁和可读" class="headerlink" title="保持测试代码简洁和可读"></a>保持测试代码简洁和可读</h2><p>  要做到这一点,需要像对生产代码那样进行<em>无情的重构</em>.否则,让事情发展下去测试代码就会变成恐怖的<code>祖传代码</code>.如果测试代码不能轻松重构,那么意味着生产代码也不能重构,从而导致<code>祖传代码</code>.<strong>总是要勇于重构.</strong>  </p>
+<hr>
+<h2 id="避免编码重复"><a href="#避免编码重复" class="headerlink" title="避免编码重复"></a>避免编码重复</h2><p>  例如, 测试代码与parser使用完全相同的<code>正则表达式</code>来生成内容.  </p>
+<p>  通常来说人们不愿意重复测试与代码的逻辑,所以在测试中重复<code>正则表达式</code>或者其他代码是不可取的.设想以下测试情况,输入/输出结果<code>(f(input)-&gt;(output))</code>,例如,如果代码要处理模版,不要添加固定值,相反,应该根据计算结果添加值. </p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// use</span></span><br><span class="line">Assertions.assertThat(processTemplate(<span class="string">"param1"</span>, <span class="string">"param2"</span>)).isEqualTo(<span class="string">"this is 'param1', and this is 'param2'"</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// instead of</span></span><br><span class="line">Assertions.assertThat(processTemplate(<span class="string">"param1"</span>, <span class="string">"param2"</span>)).isEqualTo(String.format(<span class="string">"this is '%s', and this is '%s'"</span>, param1, param2));</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="覆盖尽可能多的情况-来显示正向的用例-特别是错误的代码位置"><a href="#覆盖尽可能多的情况-来显示正向的用例-特别是错误的代码位置" class="headerlink" title="覆盖尽可能多的情况,来显示正向的用例,特别是错误的代码位置"></a>覆盖尽可能多的情况,来显示正向的用例,特别是错误的代码位置</h2><p>  通常使用<code>测试驱动开发(TDD--Test Dirven Development)</code>是最佳的实践方式. 使用<code>TDD</code>人们能在设计阶段就找出什么地方会被破坏. 不要认为为一个小的代码片段编写简单的测试不值得，你永远不知道什么时候、因为什么而修改这段代码.</p>
+<p>  可与使用PIT(<a href="http://pitest.org/" target="_blank" rel="noopener">突变检测系统</a>)来对测试代码的有效性进行检测. </p>
+<hr>
+<h2 id="不要Mock一个你不拥有的类型"><a href="#不要Mock一个你不拥有的类型" class="headerlink" title="不要Mock一个你不拥有的类型"></a>不要Mock一个你不拥有的类型</h2><p>  这并非一条硬性规定,但是如果不遵循该条规定会有影响(很可能会有). </p>
+<blockquote>
+<p><code>TDD</code>的设计方面和测试方面同样重要.在模拟外部API时,无法使用测试来驱动设计,该API属于其他人;因此第三方也将可以更改API的方法签名和行为. </p>
+</blockquote>
+<ol>
+<li><p>设想一下代码mocks了一个第三方库,在更新了第三方库之后,三方库的逻辑可能改变了一点,但是测试代码依然能够执行成功,因为他被mock了.所以在这之后,所有的事情看起来很美好,构建也成功了,但是软件部署到正式环境–爆炸! </p>
+</li>
+<li><p>这也可能导致当前的设计和第三方库不够松耦合. </p>
+</li>
+<li><p>另一个问是第三方库可能非常复杂需要mock许多东西才能运行,这就导致了大量的特定测试和复杂的测试装置, 而这本身就损害了简洁性和可读性的目标.或者由于模拟外部系统的复杂性而没有充分覆盖代码的测试. </p>
+<p>相反,最常见的方式是创建一个第三方库的<code>warpper</code>来包装他们,不过应该注意<code>抽象泄漏</code>(<a href="https://zhuanlan.zhihu.com/p/26803553" target="_blank" rel="noopener">什么是abstraction leakage?</a>)的风险,因为太多的底层API,概念或者异常超过了<code>warpper</code>的边界.为了验证第三方提供API的可用性,请使用<code>集成测试</code>,并尽可能的是它们简洁可读. </p>
+<p>下面是其他人在mock了非他所有的类型库遇到的痛苦和总结的经验: </p>
+</li>
+</ol>
+<ul>
+<li><a href="http://davesquared.net/2011/04/dont-mock-types-you-dont-own.html" target="_blank" rel="noopener">http://davesquared.net/2011/04/dont-mock-types-you-dont-own.html</a></li>
+<li><a href="http://www.markhneedham.com/blog/2009/12/13/tdd-only-mock-types-you-own" target="_blank" rel="noopener">http://www.markhneedham.com/blog/2009/12/13/tdd-only-mock-types-you-own</a></li>
+<li><a href="http://blog.8thlight.com/eric-smith/2011/10/27/thats-not-yours.html" target="_blank" rel="noopener">http://blog.8thlight.com/eric-smith/2011/10/27/thats-not-yours.html</a></li>
+<li><a href="http://stackoverflow.com/questions/1906344/should-you-only-mock-types-you-own" target="_blank" rel="noopener">http://stackoverflow.com/questions/1906344/should-you-only-mock-types-you-own</a></li>
+</ul>
+<hr>
+<h2 id="反模式-Mock一切"><a href="#反模式-Mock一切" class="headerlink" title="反模式: Mock一切"></a>反模式: Mock一切</h2><p>  如果所有的代码都mock了,那么我们怎么测试业务代码?不要害怕不使用Mock的方法. </p>
+<hr>
+<h2 id="不要Mock值对象"><a href="#不要Mock值对象" class="headerlink" title="不要Mock值对象"></a>不要Mock值对象</h2><p>  为什么会有人要这么做呢? </p>
+<blockquote>
+<p>因为实例化一个对象非常痛苦? =&gt; 不是一个很好的理由</p>
+</blockquote>
+<p>  如果创建一个对象非常困难,那么这是代码需要严重重构的一个信号.一种可行的方法就是为你的<code>值对象</code>构造一个<code>builder</code>(构造者模式)–有很多工具可以使用比如<code>IDE 插件</code>,<code>Lombok</code>等等. 还可以在测试环境中创建有意义的工厂方法.<br>  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomerCreations</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Customer <span class="title">customer_with_a_single_item_in_the_basket</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="comment">// long init sequence</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>  <a href="https://github.com/mockito" target="_blank" rel="noopener"><code>Mockito</code></a>更加关注对象交互,这也是<code>面向对象</code>的重要要素. </p>
+<hr>
+<h2 id="原文-推荐阅读Growing-Object-Oriented-Software-Guided-by-Tests"><a href="#原文-推荐阅读Growing-Object-Oriented-Software-Guided-by-Tests" class="headerlink" title="(原文)推荐阅读Growing Object Oriented Software Guided by Tests"></a>(原文)推荐阅读<a href="https://book.douban.com/subject/4156589/" target="_blank" rel="noopener"><code>Growing Object Oriented Software Guided by Tests</code></a></h2><p>必读,这本书阐释了功能完整的应用程序在从无到有过程中, 开发的许多方面以及如何在项目生命周期的各个阶段实现测试.</p>
+<p>如果遇到一些不理解不确定的事情,可以发邮件给作者.</p>
+]]></content>
+      <tags>
+        <tag>mockito</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>docker-network</title>
     <url>/2020/03/13/docker-network/</url>
     <content><![CDATA[<p>docker-network学习</p>
@@ -237,7 +294,7 @@
 <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><ol>
 <li><p>注册docker hub 账号  </p>
 </li>
-<li><p>在<a href="https://docs.docker.com/" target="_blank" rel="noopener">docker</a>官方文档上找到对应操作系统的下载地址<img src="https://i.ibb.co/jw20qkm/docker-com.png" alt=""><br>ps: 文件还是有点大,建议使用迅雷等p2p工具下载.  </p>
+<li><p>在<a href="https://docs.docker.com/" target="_blank" rel="noopener">docker</a>官方文档上找到对应操作系统的<a href="https://i.ibb.co/jw20qkm/docker-com.png" target="_blank" rel="noopener">下载地址!</a><br>ps: 文件还是有点大,建议使用迅雷等p2p工具下载.  </p>
 </li>
 <li><p>本人使用<code>windows专业版系统</code>,选择<code>docker desktop for windows</code>按照官网提示下载,完成之后不着急安装,此时需要先启动<code>hyper-v</code>,<code>docker desktop</code>是依赖<code>hyper-v</code>的,开启<code>hype-v</code>之后需要重启电脑,重启之后安装<code>docker desktop</code>,安装过程省略,下一步下一步即可.<br>ps: 如果你是<code>windows 家庭版</code>,请参考<a href="https://www.jianshu.com/p/1329954aa329/" target="_blank" rel="noopener">这篇文章</a>  </p>
 </li>
