@@ -2,9 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://dengbojing.com/2020/01/14/first/</loc>
+    
+    <lastmod>2020-08-04T12:41:31.060Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://dengbojing.com/2020/03/13/docker-network/</loc>
+    
+    <lastmod>2020-08-04T12:36:28.596Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://dengbojing.com/2020/01/25/docker-new/</loc>
+    
+    <lastmod>2020-08-04T12:29:38.239Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://dengbojing.com/2020/02/01/dockerfile/</loc>
     
-    <lastmod>2020-07-01T01:53:31.680Z</lastmod>
+    <lastmod>2020-08-04T12:27:43.844Z</lastmod>
     
   </url>
   
@@ -19,27 +40,6 @@
     <loc>http://dengbojing.com/2020/06/04/how-to-write-good-tests/</loc>
     
     <lastmod>2020-06-09T15:02:43.098Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://dengbojing.com/2020/01/25/docker-new/</loc>
-    
-    <lastmod>2020-06-04T14:38:22.030Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://dengbojing.com/2020/03/13/docker-network/</loc>
-    
-    <lastmod>2020-03-13T08:27:49.045Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://dengbojing.com/2020/01/14/first/</loc>
-    
-    <lastmod>2020-01-16T01:56:33.076Z</lastmod>
     
   </url>
   
