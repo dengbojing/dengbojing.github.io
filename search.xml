@@ -1,6 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>java_11_new_http</title>
+    <url>/2020/12/10/java-11-new-http/</url>
+    <content><![CDATA[<p><code>java.net.http</code>模块使用</p>
+<a id="more"></a>
+
+
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>写代码的时候难免会远程调用别人的api,之前用<code>httpclient</code>,在接着是<code>okhttp</code>,也都是跟着项目上用的,其实<code>java 9</code>就出现了一个http模块,只是当时是孵化版本,<code>java 11</code>正式推出了.</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><h2 id="主要类和接口"><a href="#主要类和接口" class="headerlink" title="主要类和接口"></a>主要类和接口</h2><ul>
+<li>类<ul>
+<li><code>java.net.http.HttpClient</code></li>
+<li><code>java.net.http.HttpHeaders</code></li>
+<li><code>java.net.http.HttpRequest</code></li>
+<li><code>java.net.http.HttpRequest.BodyPublishers</code></li>
+<li><code>java.net.http.HttpRequest.BodyHanler</code></li>
+<li><code>java.net.http.HttpRequest.BodySubscribers</code></li>
+</ul>
+</li>
+<li>接口<ul>
+<li><code>java.net.http.HttpClient.Builder</code></li>
+<li><code>java.net.http.HttpRequest.BodyPublisher</code></li>
+<li><code>java.net.http.HttpRequest.Builder</code></li>
+<li><code>java.net.http.HttpResponse&lt;T&gt;</code></li>
+<li><code>java.net.http.HttpResponse.BodyHandler&lt;T&gt;</code></li>
+<li><code>java.net.http.HttpResponse.BodySubscriber&lt;T&gt;</code></li>
+<li><code>java.net.http.HttpResponse.PushPromiseHandler&lt;T&gt;</code></li>
+<li><code>java.net.http.HttpResponse.ResponseInfo</code></li>
+<li><code>java.net.http.WebSocket</code></li>
+<li><code>java.net.http.WebSocket.Builder</code></li>
+<li><code>java.net.http.WebSocket.Listener</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><ol>
+<li><p><code>jdk 9</code>之后都是使用模块化组织代码,所以创建一个模块化的项目让后引入<code>java.net.http</code>模块. </p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">module</span> com.dbj.httpClient&#123;</span><br><span class="line">    <span class="keyword">requires</span> java.net.http</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建<code>httpClient</code>  </p>
+<blockquote>
+<p>使用<code>builder</code>模式创建对象, 基本上该包下面所有的对象都使用<code>builder</code>模式创建对象, 这么做的好处参见<code>effect java</code>一书</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> httpClient = HttpClient.newBuilder()</span><br><span class="line">            .authenticator(<span class="keyword">new</span> BasicAuthenticator(<span class="string">"user"</span>, <span class="string">"password"</span>))</span><br><span class="line">            <span class="comment">//.authenticator(Authenticator.getDefault()</span></span><br><span class="line">            .connectTimeout(Duration.ofSeconds(<span class="number">10</span>))</span><br><span class="line">            .cookieHandler(CookieHandler.getDefault())</span><br><span class="line">            .executor(Executors.newFixedThreadPool(<span class="number">2</span>))</span><br><span class="line">            .followRedirects(HttpClient.Redirect.NEVER)</span><br><span class="line">            .priority(<span class="number">1</span>)</span><br><span class="line">            .proxy(ProxySelector.getDefault())</span><br><span class="line">            .sslContext(SSLContext.getDefault())</span><br><span class="line">            .sslParameters(<span class="keyword">new</span> SSLParameters())</span><br><span class="line">            .version(HttpClient.Version.HTTP_2)</span><br><span class="line">            .build();</span><br></pre></td></tr></table></figure>
+<p> or  </p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> httpClient = HttpClient.newHttpClient();</span><br></pre></td></tr></table></figure>
+<p> equivalent  </p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> httpCLient = HttpClient.newBuilder().build();</span><br></pre></td></tr></table></figure>
+</blockquote>
+<ul>
+<li><code>httpClient</code> 类似<code>String</code> 设计模式是不变的,所以没有提供方法改变创建时候的参数.  </li>
+<li>如果使用<code>http2</code>创建链接,但是服务端不支持,那么会自动降级成为<code>http1.1</code>,如果没有指定,默认也是使用<code>http2</code>  </li>
+<li><code>excutor()</code> 在使用异步请求时候使用,默认是使用线程池技术</li>
+<li><code>connectionTimeout()</code> 默认没有超时时间  </li>
+<li><code>priority()</code> 优先级,范围[1-256],不在此范围会抛出异常  </li>
+<li><code>connectTimeouto()</code> 链接超时设置,在设定的时间内没有连接上则抛出<code>HttpConnectTimeoutException</code>  </li>
+<li><code>executor()</code> 用于异步任务执行,如果未指定,则会为每个<code>HttpClient</code>实例创建一个.</li>
+<li><code>followRedirects()</code> 当服务器返回<code>302</code>时,是否跳转,默认不跳转</li>
+<li><code>authenticator()</code> 验证参数,<code>Authenticator.getDefault()</code>获取当前验证规则,可以使用<code>BasicAuthenticator</code>来传递用户名密码,也可以继承<code>Authenticator</code>实现自己的验证规则.  </li>
+<li><code>proxy()</code> 是否使用代理. </li>
+</ul>
+</li>
+<li><p>创建<code>HttpRequset</code> </p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> httpRequset = HttpRequest.newBuilder(URI.create(<span class="string">""</span>))</span><br><span class="line">            .header(<span class="string">"Content-Type"</span>,<span class="string">"application/json"</span>)</span><br><span class="line">            .header(<span class="string">"token"</span>,<span class="string">"faeaafwefeawgaer"</span>)</span><br><span class="line">            .timeout(Duration.of(<span class="number">10</span>, ChronoUnit.SECONDS))</span><br><span class="line">            .expectContinue(<span class="keyword">true</span>)</span><br><span class="line">            .POST(HttpRequest.BodyPublishers.ofString(<span class="string">""</span>))</span><br><span class="line">            .version(HttpClient.Version.HTTP_2)</span><br><span class="line">            .build();</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>uri()</code> 可以在<code>newBuidler()</code> 中指定请求地址,也可以调用<code>uri()</code>方法指定请求地址.两者效果是一样的  </li>
+<li><code>header()</code> 效果与<code>setHeader()</code>相同,另有<code>headers()</code>批量设置请求头, 请求头键值对必须严格按照<a href="https://tools.ietf.org/html/rfc7230#section-3.2" target="_blank" rel="noopener">RFC7230-section-3.2</a>约定,否则抛出异常.</li>
+<li><code>timeout()</code> 请求超时时间设置,超过设定时间未收到响应则跑出异常,如不限制会永远阻塞(等待)</li>
+<li><code>POST()</code> <code>GET()</code> <code>DELETE()</code> <code>PUT()</code> 请求方法,或者使用<code>mehtod()</code>设置请求方法<br> 使用前后端分离时候往往前端会发送一次<code>options</code>请求来判断后端是否支持跨域,此时就可以使用<code>method(&quot;OPTIONS&quot;,BodyPublishers.noBody())</code><br> <code>BodyPublishers</code> 用于构建<code>BodyPublisher</code>的工具类,包含了一系列实用的构建请求体的方法,其中<code>BodyPublishers</code> 主要是调用<code>RequestPublishers</code> 来完成创建,<code>RequestPublishers</code> 中包含了很多<code>BodyPublisher</code>接口的实现</li>
+</ul>
+</li>
+<li><p><code>HttpResponse</code><br> 同步请求</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> httpResponse = httpClient.send(requset,BodyHandlers.ofString());</span><br></pre></td></tr></table></figure>
+<p> 异步请求  </p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> httpResponse = httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())</span><br><span class="line">            .thenApply(stringHttpResponse -&gt; &#123;</span><br><span class="line">                System.out.println(stringHttpResponse.statusCode());</span><br><span class="line">                <span class="keyword">return</span> stringHttpResponse;</span><br><span class="line">            &#125;)</span><br><span class="line">            .thenApply(HttpResponse::body)</span><br><span class="line">            .thenAccept(System.out::println);</span><br></pre></td></tr></table></figure>
+<p> or 批量请求接口</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"> <span class="keyword">var</span> client = HttpClient.newHttpClient();</span><br><span class="line"></span><br><span class="line">List&lt;HttpRequest&gt; requests = paths.stream()</span><br><span class="line">    .map(path -&gt; <span class="string">"https://localhost:8443"</span> + path)</span><br><span class="line">    .map(URI::create)</span><br><span class="line">    .map(uri -&gt; HttpRequest.newBuilder(uri).build())</span><br><span class="line">    .collect(Collectors.toList());</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">CompletableFuture&lt;?&gt;[] responses = requests.stream()</span><br><span class="line">    .map(request -&gt; client.sendAsync(request, BodyHandlers.ofString())</span><br><span class="line">        .thenApply(HttpResponse::body)</span><br><span class="line">        .exceptionally(e -&gt; <span class="string">"Error: "</span> + e.getMessage())</span><br><span class="line">        .thenAccept(System.out::println))</span><br><span class="line">    .toArray(CompletableFuture&lt;?&gt;[]::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>异步请求返回一个<code>CompletableFuture&lt;HttpResponse&lt;T&gt;&gt;</code>,当有响应返回时,该对象后续回调将会被调用.异步请求使用创建<code>httpClient</code>时指定的<code>executor</code>来执行异步请求.</p>
+</li>
+<li><p><code>HttpResponse</code>为一个接口, 不能直接创建, 所有实例都是<code>httpClient</code>请求返回, 接口提供方法如下:</p>
+<table>
+<thead>
+<tr>
+<th>返回值</th>
+<th>方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T</td>
+<td><code>body()</code></td>
+<td>返回响应体</td>
+</tr>
+<tr>
+<td>HttpHeaders</td>
+<td><code>headers()</code></td>
+<td>返回响应投</td>
+</tr>
+<tr>
+<td>int</td>
+<td><code>statusCode()</code></td>
+<td>返回的状态码</td>
+</tr>
+<tr>
+<td>HttpRequset</td>
+<td><code>request()</code></td>
+<td>返回对应的请求体</td>
+</tr>
+<tr>
+<td>URI</td>
+<td><code>uri()</code></td>
+<td>返回请求地址</td>
+</tr>
+<tr>
+<td>HttpClient.Version</td>
+<td><code>version()</code></td>
+<td>返回http请求协议版本</td>
+</tr>
+</tbody></table>
+</li>
+<li><p><code>BodyHandlers</code> 用于构建<code>BodyHandler</code>的工厂类.</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="进阶使用"><a href="#进阶使用" class="headerlink" title="进阶使用"></a>进阶使用</h2><ol>
+<li><p>JSON请求  </p>
+<p> 发送请求时秩序指定<code>Content-Type</code>为<code>application/json</code>, 然后将对象转换为<code>json</code>字符串</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> httpRequest = HttpRequest.newBuilder(URI.create(<span class="string">""</span>))</span><br><span class="line">                .header(<span class="string">"content-type"</span>,<span class="string">"application/json"</span>)</span><br><span class="line">                .GET()</span><br><span class="line">                .build();</span><br></pre></td></tr></table></figure>
+
+<p> 接受响应时,自定义<code>BodyHandler</code>将返回的<code>json</code>字符串转换为对象</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JsonHandler</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">HttpResponse</span>.<span class="title">BodyHandler</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;T&gt; type;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Gson gson;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">JsonHandler</span><span class="params">(Class&lt;T&gt; type, Gson gson)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.type = type;</span><br><span class="line">        <span class="keyword">this</span>.gson = gson;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> HttpResponse.<span class="function">BodySubscriber&lt;T&gt; <span class="title">apply</span><span class="params">(HttpResponse.ResponseInfo responseInfo)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span>  HttpResponse.BodySubscribers.mapping(HttpResponse.BodySubscribers.ofByteArray(),bytes -&gt; gson.fromJson(<span class="keyword">new</span> String(bytes),<span class="keyword">this</span>.type));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">JsonHandlers</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="title">JsonHandlers</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">JsonHandler&lt;T&gt; <span class="title">ofType</span><span class="params">(Class&lt;T&gt; type)</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> of(<span class="keyword">new</span> Gson(), type);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">JsonHandler&lt;T&gt; <span class="title">of</span><span class="params">(Gson gson, Class&lt;T&gt; type)</span></span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> JsonHandler&lt;T&gt;( type,gson);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 使用<code>client</code>发送请求,并接收响应.  </p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> client = HttpClient.newHttpClient(URI.create(<span class="string">"Http://localhost:8080"</span>));</span><br><span class="line"><span class="keyword">var</span> response = client.send(request, JsonHandler.JsonHandlers.ofType(UserBody<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line"><span class="keyword">var</span> userBody = response.body();</span><br></pre></td></tr></table></figure>
+<p> // or  使用异步响应</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> task = client.sendAsync(request, JsonHandler.JsonHandlers.ofType(UserBody<span class="class">.<span class="keyword">class</span>))</span></span><br><span class="line">            .thenApply(HttpResponse::body)</span><br><span class="line">            .thenApply(UserBody::getName)</span><br><span class="line">            .thenAccept(System.out::println);</span><br><span class="line">task.get();<span class="comment">//测试方便输出结果.</span></span><br></pre></td></tr></table></figure></li>
+<li><p><code>x-www-form-urlencoded</code> 请求  </p>
+<p> 这种请求类型是<code>form</code>表单的默认请求类型,另一种就是可以上传文件的<code>form-data</code>了,但是没有现成的类或者方法支持<code>x-www-form-urlencoded</code>请求,不过该请求投类型很好分析  </p>
+<ul>
+<li><p>将<code>form</code>表单里面的<code>name</code>和<code>value</code>用<code>=</code>链接,在把他们用<code>&amp;</code>符号链接起来,如果包含空格替换为<code>+</code>,如果有特殊符号,则转换为<code>ASCII HEX</code>值;如果包含中文字符,则转成<code>ASCII HEX</code>后在百分号编码.  </p>
+</li>
+<li><p>百分号编码: 汉字在<code>utf-8</code>字符集里面是占3个字节的,所以转换成16进制字符串就是占6个字节,每两个字节前面加一个百分号,就变成9个字节传递.  </p>
+</li>
+<li><p>如果是<code>GET</code>请求,那直接在<code>url</code>后<code>?</code>拼接.</p>
+</li>
+<li><p>如果是<code>POST</code>请求, 那就把拼接好的字符串放在<code>body</code>里面.</p>
+</li>
+<li><p>简单点就是用现成的库<code>urlencoded</code>, 这种库应该是大部分语言都自带的. </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> HttpRequest.<span class="function">BodyPublisher <span class="title">ofXForm</span><span class="params">(Map&lt;Object,Object&gt; map)</span></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> builder = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    map.forEach((key, value) -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (builder.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            builder.append(<span class="string">"&amp;"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        builder.append(URLEncoder.encode(key.toString(), StandardCharsets.UTF_8));</span><br><span class="line">        builder.append(<span class="string">"="</span>);</span><br><span class="line">        builder.append(URLEncoder.encode(value.toString(), StandardCharsets.UTF_8));</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> HttpRequest.BodyPublishers.ofString(builder.toString());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+</li>
+</ol>
+<ol start="3">
+<li><p>文件上传下载  </p>
+<ul>
+<li><p>下载  </p>
+<p>下载很简单直接,有现成的方法可以使用.  </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> client = HttpClient.newHttpClient();</span><br><span class="line"><span class="keyword">var</span> request = HttpRequest.newBuilder(URI.create(url)).build();</span><br><span class="line"><span class="keyword">var</span> file = Paths.get(<span class="string">"1.png"</span>);</span><br><span class="line"><span class="keyword">var</span> response = client.send(request,BodyHandlers.ofFile(file));</span><br></pre></td></tr></table></figure>
+<p>该方法适合知道文件名称时使用.<br>or </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> client = HttpClient.newHttpClient();</span><br><span class="line"><span class="keyword">var</span> request = HttpRequset.newBuilder(URI.create(url)).build();</span><br><span class="line"><span class="keyword">var</span> file = Paths.get(<span class="string">"/usr/local/file"</span>);</span><br><span class="line"><span class="keyword">var</span> response = client.send(requset,BodyHandlers.ofFileDownload(file));</span><br></pre></td></tr></table></figure>
+<p><code>ofFileDownload</code>属于比较常见的下载方式.  </p>
+</li>
+<li><p>上传</p>
+<p>上传没有现成的方法,所以需要我们自定义一个<code>BodyPublishers.ofFile()</code>方法,然后请求头为<code>mutipart/form-data</code>发送请求  </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> HttpRequest.<span class="function">BodyPublisher <span class="title">ofFile</span><span class="params">(Map&lt;Object,Object&gt; data,String boundary)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> byteArrays = <span class="keyword">new</span> ArrayList&lt;<span class="keyword">byte</span>[]&gt;();</span><br><span class="line">    <span class="keyword">byte</span>[] separator = (<span class="string">"--"</span> + boundary + <span class="string">"\r\nContent-Disposition: form-data; name="</span>)</span><br><span class="line">            .getBytes(StandardCharsets.UTF_8);</span><br><span class="line">    <span class="keyword">for</span> (Map.Entry&lt;Object, Object&gt; entry : data.entrySet()) &#123;</span><br><span class="line">        byteArrays.add(separator);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (entry.getValue() <span class="keyword">instanceof</span> Path) &#123;</span><br><span class="line">            <span class="keyword">var</span> path = (Path) entry.getValue();</span><br><span class="line">            String mimeType = Files.probeContentType(path);</span><br><span class="line">            byteArrays.add((<span class="string">"\""</span> + entry.getKey() + <span class="string">"\"; filename=\""</span> + path.getFileName()</span><br><span class="line">                    + <span class="string">"\"\r\nContent-Type: "</span> + mimeType + <span class="string">"\r\n\r\n"</span>).getBytes(StandardCharsets.UTF_8));</span><br><span class="line">            byteArrays.add(Files.readAllBytes(path));</span><br><span class="line">            byteArrays.add(<span class="string">"\r\n"</span>.getBytes(StandardCharsets.UTF_8));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            byteArrays.add((<span class="string">"\""</span> + entry.getKey() + <span class="string">"\"\r\n\r\n"</span> + entry.getValue() + <span class="string">"\r\n"</span>)</span><br><span class="line">                    .getBytes(StandardCharsets.UTF_8));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    byteArrays.add((<span class="string">"--"</span> + boundary + <span class="string">"--"</span>).getBytes(StandardCharsets.UTF_8));</span><br><span class="line">    <span class="keyword">return</span> HttpRequest.BodyPublishers.ofByteArrays(byteArrays);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;Object,Object&gt; data = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">data.put(<span class="string">"apikey"</span>, virusTotalApiKey);</span><br><span class="line">data.put(<span class="string">"file"</span>, localFile);</span><br><span class="line">String boundary = <span class="keyword">new</span> BigInteger(<span class="number">256</span>, <span class="keyword">new</span> Random()).toString();</span><br><span class="line"></span><br><span class="line">request = HttpRequest.newBuilder()</span><br><span class="line">          .header(<span class="string">"Content-Type"</span>, <span class="string">"multipart/form-data;boundary="</span> + boundary)</span><br><span class="line">          .POST(ofMimeMultipartData(data, boundary))</span><br><span class="line">          .uri(URI.create(url))</span><br><span class="line">          .build();</span><br><span class="line">HttpResponse&lt;String&gt; response = client.send(request, BodyHandlers.ofString());</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="高阶使用"><a href="#高阶使用" class="headerlink" title="高阶使用"></a>高阶使用</h2><ol>
+<li><p>HTTP2 server push </p>
+</li>
+<li><p>WebSocket  </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">WebSocket webSocket = HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(<span class="keyword">new</span> URI(<span class="string">"ws://localhost:8081/platform/device/gps"</span>), <span class="keyword">new</span> WebSocket.Listener() &#123;</span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="keyword">public</span> CompletionStage&lt;?&gt; onText(WebSocket webSocket,</span><br><span class="line">                                          CharSequence data, <span class="keyword">boolean</span> last) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">             System.out.println(<span class="string">"onText: "</span> + data);</span><br><span class="line"></span><br><span class="line">             <span class="keyword">return</span> WebSocket.Listener.<span class="keyword">super</span>.onText(webSocket, data, last);</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onOpen</span><span class="params">(WebSocket webSocket)</span> </span>&#123;</span><br><span class="line">             System.out.println(<span class="string">"onOpen"</span>);</span><br><span class="line">             WebSocket.Listener.<span class="keyword">super</span>.onOpen(webSocket);</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="keyword">public</span> CompletionStage&lt;?&gt; onClose(WebSocket webSocket, <span class="keyword">int</span> statusCode,</span><br><span class="line">                                           String reason) &#123;</span><br><span class="line">             System.out.println(<span class="string">"onClose: "</span> + statusCode + <span class="string">" "</span> + reason);</span><br><span class="line">             <span class="keyword">return</span> WebSocket.Listener.<span class="keyword">super</span>.onClose(webSocket, statusCode, reason);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;).join();</span><br><span class="line">     Gson gson = <span class="keyword">new</span> Gson();</span><br><span class="line">     Message message = <span class="keyword">new</span> Message();</span><br><span class="line">     message.setFrom(<span class="string">"dbj"</span>);</span><br><span class="line">     message.setContent(<span class="string">"client data send"</span>);</span><br><span class="line">     message.setTo(<span class="string">"some one"</span>);</span><br><span class="line">     webSocket.sendText(gson.toJson(message),<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+<p>其中<code>super.OnXxxx()</code>为固定句式, 其实就是调用<code>websocket.requset(1)</code>.固定调用.   </p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>java11</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>微信图片转换</title>
     <url>/2020/10/22/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87%E8%BD%AC%E6%8D%A2/</url>
     <content><![CDATA[<p>PC端微信图片转换</p>
