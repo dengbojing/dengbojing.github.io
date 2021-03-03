@@ -28,7 +28,7 @@
 <meta property="og:description" content="java.net.http模块使用">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-12-10T01:21:53.000Z">
-<meta property="article:modified_time" content="2020-12-22T04:14:21.280Z">
+<meta property="article:modified_time" content="2020-12-23T12:20:20.872Z">
 <meta property="article:author" content="Dengbojing">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="java11">
@@ -160,7 +160,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">9</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">10</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -244,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-22 12:14:21" itemprop="dateModified" datetime="2020-12-22T12:14:21+08:00">2020-12-22</time>
+                <time title="修改时间：2020-12-23 20:20:20" itemprop="dateModified" datetime="2020-12-23T20:20:20+08:00">2020-12-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -303,7 +303,7 @@
 </li>
 <li><p>创建<code>httpClient</code>  </p>
 <blockquote>
-<p>使用<code>builder</code>模式创建对象, 基本上该包下面所有的对象都使用<code>builder</code>模式创建对象, 这么做的好处参见<code>effect java</code>一书</p>
+<p>使用<code>builder</code>模式创建对象, 基本上该包下面所有的对象都使用<code>builder</code>模式创建对象, 这么做的好处参见<code>effective java</code>一书</p>
  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> httpClient = HttpClient.newBuilder()</span><br><span class="line">            .authenticator(<span class="keyword">new</span> BasicAuthenticator(<span class="string">"user"</span>, <span class="string">"password"</span>))</span><br><span class="line">            <span class="comment">//.authenticator(Authenticator.getDefault()</span></span><br><span class="line">            .connectTimeout(Duration.ofSeconds(<span class="number">10</span>))</span><br><span class="line">            .cookieHandler(CookieHandler.getDefault())</span><br><span class="line">            .executor(Executors.newFixedThreadPool(<span class="number">2</span>))</span><br><span class="line">            .followRedirects(HttpClient.Redirect.NEVER)</span><br><span class="line">            .priority(<span class="number">1</span>)</span><br><span class="line">            .proxy(ProxySelector.getDefault())</span><br><span class="line">            .sslContext(SSLContext.getDefault())</span><br><span class="line">            .sslParameters(<span class="keyword">new</span> SSLParameters())</span><br><span class="line">            .version(HttpClient.Version.HTTP_2)</span><br><span class="line">            .build();</span><br></pre></td></tr></table></figure>
 <p> or  </p>
  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> httpClient = HttpClient.newHttpClient();</span><br></pre></td></tr></table></figure>
@@ -484,7 +484,10 @@
     <a href="/2020/10/22/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87%E8%BD%AC%E6%8D%A2/" rel="prev" title="微信图片转换">
       <i class="fa fa-chevron-left"></i> 微信图片转换
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/03/Effective-java-%E7%AC%AC%E4%B8%80%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="Effective_java_第一章学习笔记">
+      Effective_java_第一章学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -559,7 +562,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -625,7 +628,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
