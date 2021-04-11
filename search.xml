@@ -1,11 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Effective_java_第一章学习笔记</title>
-    <url>/2021/03/03/Effective-java-%E7%AC%AC%E4%B8%80%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p>第一章: 创建和销毁对像</p>
+    <title>Effective-java-第四章学习笔记</title>
+    <url>/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第三章: 类和接口</p>
 <a id="more"></a>
-<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>java四大名著之一,值得反复研读,第三版包含lambda表达式的语法以及推荐写法以及最佳实践.  </p>
+
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>这章主要讲了类和接口的设计原则,如何设计除更健壮,更灵活的类和接口.</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="使类和成员的访问最小化以及在公有类中使用访问方法而非公有域"><a href="#使类和成员的访问最小化以及在公有类中使用访问方法而非公有域" class="headerlink" title="使类和成员的访问最小化以及在公有类中使用访问方法而非公有域"></a>使类和成员的访问最小化以及在公有类中使用访问方法而非公有域</h2><p>前面两条实质上讲的是一件事,就是不要暴露类的内部成员,如果是公有类(一般情况我们写的都是<code>public</code>的类)一定不能暴露内部的成员,而是使用<code>getter</code>和<code>setter</code>.<br>尽可能的降低内部成员的可访问性. 这么做的好处就是<code>封装</code>性比较强, 也灵活很多,如果将来想在类的成员上做限制,直接在<code>getter</code>或者<code>setter</code>上做改变就可以, 外部调用者完全感受不到变化.</p>
+<h2 id="如果编写一个不可变的类"><a href="#如果编写一个不可变的类" class="headerlink" title="如果编写一个不可变的类"></a>如果编写一个不可变的类</h2><ol>
+<li>不要提供任何会修改对象状态的方法–比如<code>setter</code></li>
+<li>保证类不会被扩展–使用<code>final</code>修饰符或者<code>private</code>的构造器.</li>
+<li>将所有的域(类的成员)都设置成<code>private final</code>的.</li>
+<li>确保任何可变组件的互斥访问–就是如果类的成员是一个对象引用, 则保证这个引用不会被外部获取到.</li>
+</ol>
+<blockquote>
+<p><code>functional</code>: 不改变当前实例, 而是创建一个返回一个新的实例的方法. 这种方法被称为<code>functional</code>. 这种方法的方法名都使用介词.</p>
+</blockquote>
+<h3 id="不可变对象的优点"><a href="#不可变对象的优点" class="headerlink" title="不可变对象的优点:"></a>不可变对象的优点:</h3><ol>
+<li>不可变对象是线程安全的, 不要求同步.</li>
+<li>不可变对象可以自由的共享, 甚至可以共享他们的内部信息.</li>
+<li>不可变对象可以为其他对象提供构件.</li>
+<li>不可变对象提供了原子性.</li>
+</ol>
+<h3 id="不可变对象的缺点"><a href="#不可变对象的缺点" class="headerlink" title="不可变对象的缺点"></a>不可变对象的缺点</h3><p>每一个不同的值都需要一个对象, 如果创建不可变对象代价太高, 那么可能会导致程序性能下降. 一般不可变对象都提供一个对应的可变的配套类,比如<code>String</code>和<code>StringBuilder</code>. </p>
+<h2 id="组合-复合-优于继承"><a href="#组合-复合-优于继承" class="headerlink" title="组合(复合)优于继承"></a>组合(复合)优于继承</h2><ol>
+<li>继承打破了封装性.子类依赖父类其中特定的功能细节,如果将来父类改变了,那么子类也会跟着发生相应的变化,往往这些变化不是子类自己能控制的. 除非父类是专门用来被继承的或者有很好的说明该如何继承该类, 否则最好使用组合.</li>
+<li>如果A和B两者直接存在<code>is-a</code>的关系才应该使用继承, 在实现继承时候, 要反复的确定 B 在任何时候都是一个 A 类型. 如果不是, B 仅仅是使用了 A 的一个功能, 那么就应该使用组合模式. </li>
+</ol>
+<h2 id="要么设计继承并提供文档-要么禁止继承"><a href="#要么设计继承并提供文档-要么禁止继承" class="headerlink" title="要么设计继承并提供文档, 要么禁止继承"></a>要么设计继承并提供文档, 要么禁止继承</h2><p>这条其实是对于上面那条的补充说明, 上一条说如果继承了一个不是用来被继承的类,是一件很危险的事情, 可能导致封装性被破坏, 在设计一个被继承的类时, 要有良好的说明</p>
+<ol>
+<li>该类必须有说明可以被重写的方法的<code>自用性</code>–即类必须在文档中说明,在哪些情况下它会调用被重写的方法.</li>
+<li>对于为了继承而设计的类, 必须在发布之前先编写子类对其进行测试.</li>
+<li>构造器不可以调用可以被重写的方法.</li>
+<li><code>clone</code>和<code>readObject</code> 方法也不能调用可以被重写方法.</li>
+</ol>
+<h2 id="接口优于抽象类"><a href="#接口优于抽象类" class="headerlink" title="接口优于抽象类"></a>接口优于抽象类</h2><p>如果是对实现类的规范和约束则应该使用抽象类, 如果想实现多继承则应该使用接口. 接口的可扩展性要优于继承.</p>
+<h2 id="接口的使用"><a href="#接口的使用" class="headerlink" title="接口的使用"></a>接口的使用</h2><ol>
+<li>为后代设计接口.</li>
+<li>接口只用于定义类型.</li>
+<li>不要使用常量接口. </li>
+</ol>
+<h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>整章对于在写代码设计类的层次接口非常有用, 但是由于使用<code>spring</code>框架, 很多事情<code>spring</code>都帮你做了, 这些设计原则用到的机会不是非常多, 导致里面有很多东西看了似懂非懂, 所以以后还是要离开<code>spring</code>框架单独做一些非<code>web</code>项目, 这样才能有较深的感悟.</p>
+]]></content>
+      <tags>
+        <tag>java, 读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective-java-第三章学习笔记</title>
+    <url>/2021/03/08/Effective-java-%E7%AC%AC%E4%B8%89%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第三章: 重写Object类中的几个方法</p>
+<a id="more"></a>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>这一章主要讲的是Object类中的几个方法该如何重写.实际上本章内容没有在开发实践中并不会出现,一般开发人员都用<code>lombok</code>或者其他工具类实现了Object中的方法,很少遇到自己重写的情况,而且在正常逻辑上也不会违背文中所说的注意点.</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="重写equals方法"><a href="#重写equals方法" class="headerlink" title="重写equals方法"></a>重写equals方法</h2><h3 id="在一下3种情况不应该重写equals"><a href="#在一下3种情况不应该重写equals" class="headerlink" title="在一下3种情况不应该重写equals"></a>在一下3种情况不应该重写equals</h3><ol>
+<li>该类不是一个值类,是代表活动实体的类,比如<code>Thread</code>.</li>
+<li>该类没必要提供逻辑相等,比如单例类,只会产生一个实例,<code>Object</code>类提供的地址相等的<code>equals</code>方法已经足够;再比如一些工具类<code>xxxUtil</code>,<code>xxxxBuilder</code>等,实际上这些类有时候无法实例化,所以没必要重写<code>equals</code>方法</li>
+<li>该类是私有的或者包级私有的,<strong>可以确保<code>equals</code>方法不会被调用.(这句才是重点)</strong></li>
+</ol>
+<h3 id="重写equals时遵循的规范"><a href="#重写equals时遵循的规范" class="headerlink" title="重写equals时遵循的规范"></a>重写equals时遵循的规范</h3><ol>
+<li><code>自反性(reflexive)</code>: 对于任何非<code>null</code>的引用值<code>x</code>, <code>x.equals(x)</code>必须返回<code>true</code>.</li>
+<li><code>对称性(symmetric)</code>: 对于任何非<code>null</code>的引用值<code>x</code>和<code>y</code>, 当且仅当<code>y.equals(x)</code>返回<code>true</code>, <code>x.equals(y)</code>必须返回<code>true</code>.</li>
+<li><code>传递性(transitive)</code>: 对于任何非<code>null</code>的引用值<code>x,y,z</code>, 如果<code>x.equals(y)</code>返回<code>true</code>,<code>y.equals(z)</code>返回<code>true</code>, 那么<code>x.equalis(z)</code>也返回<code>true</code></li>
+<li><code>一致性(consistent)</code>: 对于任何非<code>null</code>的引用值<code>x,y</code>,只要对象中的信息没有被修改过,那么多次调用<code>x.equals(y)</code>的结果必然一致.</li>
+<li>任何对象<code>equals(null)</code>必然返回false.</li>
+</ol>
+<p>以上规范,看起来挺复杂,实际上属于一种自然而然的做法,在重写<code>equals</code>的时候,很自然的就做到了.最好的方法就是使用第三方库来重写<code>equals</code>省事,还不会出错,除非你有非常特别的理由要自己手动重写.</p>
+<h3 id="重写equals时注意事项"><a href="#重写equals时注意事项" class="headerlink" title="重写equals时注意事项"></a>重写equals时注意事项</h3><ol>
+<li>不要依赖不可靠资源,比如<code>java.net.URL</code>中主机<code>ip</code>地址的比较,可能会存在<code>host</code>不变但是<code>ip</code>变了.</li>
+<li>优先比较最有可能不一致的字段,或者开销比较低的字段,最理想是二者兼备,有这些字段组成关键字段.</li>
+<li>重写<code>equals</code>时总是重写<code>hashCode</code>方法.</li>
+<li>不要让<code>equals</code>过于智能.</li>
+</ol>
+<h3 id="重写equals方法的步骤"><a href="#重写equals方法的步骤" class="headerlink" title="重写equals方法的步骤"></a>重写equals方法的步骤</h3><ol>
+<li>使用==操作符检查对象引用是否相等. 如果是,那么是同一个对象,直接返回<code>true</code>.</li>
+<li>使用<code>instanceOf</code>检查参数类型是否正确.</li>
+<li>类型转换.(如果是<code>jdk 14</code>以上可以和上一步合并: <code>if(o instanceof X x){}</code>)</li>
+<li>对该类型中的关键字段进行比较.如果是除浮点数之外的基本类型,直接用==判断,如果是对象递归使用<code>equals</code>,如果是浮点数(<code>float,double</code>)使用<code>Float.compare(param1,param2), Double.compare(param1,param2)</code>,原因是<code>float</code>和<code>double</code>中存在<code>Float.NaN,-0.0f</code> 这样的常量.</li>
+</ol>
+<p><strong>总结: 总之不要轻易的自己重写<code>equals</code>方法,在多数情况下并不需要,如果需要请使用第三方,如果还不满足在自己动手写.</strong></p>
+<hr>
+<h2 id="重写equals方法时重写hasCode方法"><a href="#重写equals方法时重写hasCode方法" class="headerlink" title="重写equals方法时重写hasCode方法"></a>重写equals方法时重写hasCode方法</h2><h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><ol>
+<li>如果两个对象<code>equals</code>, 那么他们必然具有相同的<code>hashCode</code>.  </li>
+</ol>
+<p><strong>为什么?</strong><br><strong>因为在使用<code>hashMap</code>等集合时, 如果相等的对象具有不同的<code>hashCode</code>,可能会放在不同的<code>bucket</code>中,这样导致<code>get</code>逻辑上相等的对象时, 会出现获取不到对象.</strong><br>2. 如果两个对象不<code>equals</code>, 但是他们可能具有相同的<code>hashCode</code>, 但是最好不要, 因为这样<code>HashMap</code>等依赖<code>hashCode</code>方法的集合类会变的性能非常低下,最好是不同的对象具有不同的<code>hashCode</code></p>
+<h3 id="重写步骤"><a href="#重写步骤" class="headerlink" title="重写步骤"></a>重写步骤</h3><ol>
+<li>定义一个<code>result</code>存储第一个关键字段的<code>hashCode</code>.</li>
+<li>关键字段的<code>hashCode</code>的计算:<br> a. 若果字段是基本类型,则调用对应的包装类型的<code>hashCode(value)</code>方法,如: <code>Integer.hashCode(code)</code>.<br> b. 如果字段是对象引用,并且<code>equals</code>中使用到这个字段时, 则同样的递归的调用该字段的<code>hashCode</code>方法. 如果需要更复杂的比较, 则可以为这个字段计算一个<code>范式</code>,然后针对这个范式计算<code>hashCode</code>. 如果该字段是<code>null</code>则返回<code>0</code><br> c. 如果字段是一个数组,则逐个计算数组中的元素的<code>hashCode</code>,如果数组不重要,返回一个常量,但最好不是<code>0</code>.</li>
+<li>根据前两步骤计算,合并除最后的<code>hashCode</code></li>
+<li>完整示例: <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> result = Short.hashCode(param);</span><br><span class="line">    result = <span class="number">31</span> * result + Integer.hashCode(param1);</span><br><span class="line">    result = <span class="number">31</span> * result + Double.hashCode(param2);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>使用乘法使得<code>hashCode</code>依赖字段顺序,设想一下如果不用乘法那么<code>abc</code>和<code>bac</code>将会拥有相同的<code>hashCode</code>,这显然是不对的.<br>使用31这个数字书中给出的原因是: 因为它是一个奇素数,习惯上使用,可以使用移位和减法来优化乘法<code>31 * i == (i &lt;&lt; 5) - i</code>,而且虚拟机自动完成这一优化;如果想知道更多具体内容请参考<a href="https://stackoverflow.com/questions/299304/why-does-javas-hashcode-in-string-use-31-as-a-multiplier" target="_blank" rel="noopener">stackoverflow上的回答</a></p>
+</blockquote>
+</li>
+</ol>
+<hr>
+<h2 id="重写toString方法"><a href="#重写toString方法" class="headerlink" title="重写toString方法"></a>重写toString方法</h2><p>该条主要作用是在日志或者输出对象时候,比较容易的读懂对象中的信息,书上说的有点啰嗦,最简单的方法是使用三方<code>json</code>库将对象直接按<code>json</code>输出.不建议自己手写,字段多了容易遗漏外加出错.</p>
+<hr>
+<h2 id="重写clone方法"><a href="#重写clone方法" class="headerlink" title="重写clone方法"></a>重写clone方法</h2><h3 id="通用约定-非必须"><a href="#通用约定-非必须" class="headerlink" title="通用约定(非必须)"></a>通用约定(非必须)</h3><ol>
+<li>x.clone() != x;</li>
+<li>x.clone().getClass() == x.getClass();</li>
+<li>x.clone().equals(x);</li>
+</ol>
+<h3 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h3><ol>
+<li>调用<code>super.clone()</code>, 然后转换类型.</li>
+<li>如果该类包含数组引用类型的字段, 并且是非<code>final</code>的, 那么调用该字段的<code>clone()</code>方法.</li>
+<li>如果该类包含引用类型中的字段还包含其他引用类型,那么递归调用,进行深拷贝.</li>
+<li>使用<code>构造拷贝器</code>–一个接收自身类型为参数的构造函数. 或者使用构造器静态工厂方法.</li>
+</ol>
+<blockquote>
+<p>总结: 实际生产过程中, 很少遇到需要调用<code>clone</code>方法来获取对象.</p>
+</blockquote>
+<hr>
+<h2 id="考虑实现comparable接口"><a href="#考虑实现comparable接口" class="headerlink" title="考虑实现comparable接口"></a>考虑实现comparable接口</h2><p>如果是在编写一个值类(value class)并且可能排序敏感,那么建议你实现<code>comparable</code>接口,这样当这个类的实例添加到集合里面的时候,便于搜索,分类,排序.  </p>
+<h3 id="通用约定"><a href="#通用约定" class="headerlink" title="通用约定"></a>通用约定</h3><ol>
+<li><code>sgn(x.compareTo(y)) == -sgn(y.compareTo(x))</code>,其中<code>sgn</code>为<code>signum</code>函数,根据表达式的值,返回<code>-1,0或者1</code>.</li>
+<li>如果<code>x.compareTo(y) &gt; 0 &amp;&amp; y.compareTo(z) &gt; 0</code> 则 <code>x.compareTo(z) &gt; 0</code>.</li>
+<li>如果<code>x.compareTo(y) == 9</code> 那么有<code>x.compareTo(z) == y.compareTo(z)</code>. </li>
+<li>如果<code>x.compareTo(y) == 0</code> 那么他们最好是相等, 如果不等请注明.</li>
+</ol>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>实现该方法时,最好不要使用<code>&lt;, &gt;</code>符号.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(PhoneNumber pn)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> result = Short.compare(<span class="keyword">this</span>.areaCode, pn.areaCode);</span><br><span class="line">    <span class="keyword">if</span>(result == <span class="number">0</span>)&#123;</span><br><span class="line">        result = Short.compare(<span class="keyword">this</span>.prefix, pn.prefix);</span><br><span class="line">        <span class="keyword">if</span>(result == <span class="number">0</span>)&#123;</span><br><span class="line">            result = Short.compare(<span class="keyword">this</span>.lineNum, pn.lineNum);</span><br><span class="line">        &#125;</span><br><span class="line">        ... </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>或者使用<code>java 8</code>中<code>Comparator</code>中的函数式接口实现</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Comparator&lt;PhoneNumber&gt; COMPARATOR = comparingInt(pn -&gt; pn.araeCode)</span><br><span class="line">                                                                     .thenComparingInt(pn -&gt; pn.prefix)</span><br><span class="line">                                                                     .thenCOmparingInt(pn -&gt; pn.lineNum);</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(PhoneNumber pn)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.COMPARATOR.compare(<span class="keyword">this</span>, pn);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>实际开发过程中很少用到该章节知识, <code>equals, hasCode, toString</code>等方法都是用第三方类库实现, <code>comparable</code>接口, 在流式处理集合的时候可以手动指定比较器. 总之, 该章节内容,理论大于实践, 只有在很少的情况用到, 自己有特殊的需求时才会用到. </p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>java, 读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective_java_第二章学习笔记</title>
+    <url>/2021/03/03/Effective-java-%E7%AC%AC%E4%BA%8C%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第二章: 创建和销毁对像</p>
+<a id="more"></a>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>第一章主要讲除了用构造函数之外,如何创建一个对象,以及他们之间的利弊</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><ol>
 <li><p>使用静态工厂方法创建对象.<br> 在对象方法内部,或者使用一个单独的工具类来维护一些静态的创建该类的对象的方法.<br> 工具类(<strong>书中术语叫做伴生类</strong>)命名方式一般在该类的后面加<code>s</code>, 比如<code>Collection</code> 和 <code>Collections</code> , <code>Collector</code> 和 <code>Collectors</code><br> 工厂方法的命名方式一般有:<br> <code>from</code> 类型转换方法, 从一个对象中获取我们想要的类的对象,通常只有一个参数. 如:</p>
  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">NewsBody newsbody = NewsBody.from(news);</span><br></pre></td></tr></table></figure>
@@ -80,7 +215,7 @@
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>剩下几条不是很重要,消除过期引用, 这个在源码里面可以看到, 就是将对象引用等于<code>null</code>; 不使用<code>finalizer</code>方法,这个方法从来都没用过,只在面试题见过; 使用<code>try-with-resource</code> 一般都会使用这种方式. </p>
 ]]></content>
       <categories>
-        <category>java</category>
+        <category>java,读书笔记</category>
       </categories>
       <tags>
         <tag>java</tag>
