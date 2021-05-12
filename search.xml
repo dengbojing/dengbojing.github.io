@@ -3,7 +3,7 @@
   <entry>
     <title>Effective-java-第四章学习笔记</title>
     <url>/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p>第三章: 类和接口</p>
+    <content><![CDATA[<p>第四章: 类和接口</p>
 <a id="more"></a>
 
 <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>这章主要讲了类和接口的设计原则,如何设计除更健壮,更灵活的类和接口.</p>
