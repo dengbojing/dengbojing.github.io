@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>bug总结</title>
+    <url>/2021/05/15/bug%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>日常开发中遇到的bug总结.</p>
+<a id="more"></a>
+
+<h2 id="2021年5月"><a href="#2021年5月" class="headerlink" title="2021年5月"></a>2021年5月</h2><h3 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h3><p>现象: <code>JPA</code> 中双向关联如果使用<code>mappedBy</code>会使<code>foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)</code>失效, 如果不使用<code>mappedBy</code> 则会生层一张中间表.<br>版本: <code>hiernate 5.x</code><br>临时解决方案: </p>
+<ol>
+<li>使用已被废弃的注解<code>@org.hiernate.annotations.ForeignKey</code>注解使外键失效. </li>
+<li>自行去除外键,并且<code>jpa.hibernate.dll-auto</code>设置为<code>none</code>.  </li>
+<li>去除<code>mappedBy</code>, 接受中间表.  </li>
+</ol>
+<p>stackoverflow 地址: <a href="https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association" target="_blank" rel="noopener">https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association</a></p>
+<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>现象: <code>zipInputstream</code> 或者 <code>zip4j</code> 无法解压<code>7zip</code>软件打包的的压缩包<br>版本: 所有<br>临时解决方案: 无.<br>issue: <a href="https://github.com/srikanth-lingala/zip4j/issues/45" target="_blank" rel="noopener">https://github.com/srikanth-lingala/zip4j/issues/45</a>  </p>
+<h3 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a>0x03</h3><p>现象: <code>junrar</code> 无法解压<code>rar5</code>版本的压缩包,也就是新版本的<code>winrar</code>打包的压缩包是无法解压的<br>版本: 所有<br>临时解决方案: 无<br>issue: <a href="https://github.com/junrar/junrar/issues/23" target="_blank" rel="noopener">https://github.com/junrar/junrar/issues/23</a></p>
+<h3 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a>0x04</h3><p>现象: 文件上传时,使用<code>@RequestParam</code>, <code>swagger2</code>无法生成对应的文件参数文档.<br>版本: <code>swagger2 3.x</code>, 可能所有版本都有<br>解决方法: 使用<code>@RequsetPart</code> 注解<code>multipart</code>参数  </p>
+]]></content>
+      <tags>
+        <tag>java</tag>
+        <tag>bug</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Effective-java-第四章学习笔记</title>
     <url>/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p>第四章: 类和接口</p>
