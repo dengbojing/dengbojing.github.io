@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dengbojing.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"manual"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="第四章: 类和接口">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective-java-第四章学习笔记">
+<meta property="og:url" content="http://dengbojing.com/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="生活不易,砥砺前行">
+<meta property="og:description" content="第四章: 类和接口">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-07T06:25:59.000Z">
+<meta property="article:modified_time" content="2021-07-14T08:47:13.672Z">
+<meta property="article:author" content="Dengbojing">
+<meta property="article:tag" content="java, 读书笔记">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://dengbojing.com/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Effective-java-第四章学习笔记 | 生活不易,砥砺前行</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288627-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-156288627-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4cafee18f10a04bf0eed864b0bd7f623";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="生活不易,砥砺前行" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">生活不易,砥砺前行</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Keep farmed and carry hard</p>
+      <a>
+        <img class="custom-logo-image" src="/back.png" alt="生活不易,砥砺前行">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">12</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">3</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">15</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://dengbojing.com/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="Dengbojing">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="生活不易,砥砺前行">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Effective-java-第四章学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-07 14:25:59" itemprop="dateCreated datePublished" datetime="2021-04-07T14:25:59+08:00">2021-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-14 16:47:13" itemprop="dateModified" datetime="2021-07-14T16:47:13+08:00">2021-07-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>第四章: 类和接口</p>
+<a id="more"></a>
+
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>这章主要讲了类和接口的设计原则,如何设计除更健壮,更灵活的类和接口.</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="使类和成员的访问最小化以及在公有类中使用访问方法而非公有域"><a href="#使类和成员的访问最小化以及在公有类中使用访问方法而非公有域" class="headerlink" title="使类和成员的访问最小化以及在公有类中使用访问方法而非公有域"></a>使类和成员的访问最小化以及在公有类中使用访问方法而非公有域</h2><p>前面两条实质上讲的是一件事,就是不要暴露类的内部成员,如果是公有类(一般情况我们写的都是<code>public</code>的类)一定不能暴露内部的成员,而是使用<code>getter</code>和<code>setter</code>.<br>尽可能的降低内部成员的可访问性. 这么做的好处就是<code>封装</code>性比较强, 也灵活很多,如果将来想在类的成员上做限制,直接在<code>getter</code>或者<code>setter</code>上做改变就可以, 外部调用者完全感受不到变化.</p>
+<h2 id="如果编写一个不可变的类"><a href="#如果编写一个不可变的类" class="headerlink" title="如果编写一个不可变的类"></a>如果编写一个不可变的类</h2><ol>
+<li>不要提供任何会修改对象状态的方法–比如<code>setter</code></li>
+<li>保证类不会被扩展–使用<code>final</code>修饰符或者<code>private</code>的构造器.</li>
+<li>将所有的域(类的成员)都设置成<code>private final</code>的.</li>
+<li>确保任何可变组件的互斥访问–就是如果类的成员是一个对象引用, 则保证这个引用不会被外部获取到.</li>
+</ol>
+<blockquote>
+<p><code>functional</code>: 不改变当前实例, 而是创建一个返回一个新的实例的方法. 这种方法被称为<code>functional</code>. 这种方法的方法名都使用介词.</p>
+</blockquote>
+<h3 id="不可变对象的优点"><a href="#不可变对象的优点" class="headerlink" title="不可变对象的优点:"></a>不可变对象的优点:</h3><ol>
+<li>不可变对象是线程安全的, 不要求同步.</li>
+<li>不可变对象可以自由的共享, 甚至可以共享他们的内部信息.</li>
+<li>不可变对象可以为其他对象提供构件.</li>
+<li>不可变对象提供了原子性.</li>
+</ol>
+<h3 id="不可变对象的缺点"><a href="#不可变对象的缺点" class="headerlink" title="不可变对象的缺点"></a>不可变对象的缺点</h3><p>每一个不同的值都需要一个对象, 如果创建不可变对象代价太高, 那么可能会导致程序性能下降. 一般不可变对象都提供一个对应的可变的配套类,比如<code>String</code>和<code>StringBuilder</code>. </p>
+<h2 id="组合-复合-优于继承"><a href="#组合-复合-优于继承" class="headerlink" title="组合(复合)优于继承"></a>组合(复合)优于继承</h2><ol>
+<li>继承打破了封装性.子类依赖父类其中特定的功能细节,如果将来父类改变了,那么子类也会跟着发生相应的变化,往往这些变化不是子类自己能控制的. 除非父类是专门用来被继承的或者有很好的说明该如何继承该类, 否则最好使用组合.</li>
+<li>如果A和B两者直接存在<code>is-a</code>的关系才应该使用继承, 在实现继承时候, 要反复的确定 B 在任何时候都是一个 A 类型. 如果不是, B 仅仅是使用了 A 的一个功能, 那么就应该使用组合模式. </li>
+</ol>
+<h2 id="要么设计继承并提供文档-要么禁止继承"><a href="#要么设计继承并提供文档-要么禁止继承" class="headerlink" title="要么设计继承并提供文档, 要么禁止继承"></a>要么设计继承并提供文档, 要么禁止继承</h2><p>这条其实是对于上面那条的补充说明, 上一条说如果继承了一个不是用来被继承的类,是一件很危险的事情, 可能导致封装性被破坏, 在设计一个被继承的类时, 要有良好的说明</p>
+<ol>
+<li>该类必须有说明可以被重写的方法的<code>自用性</code>–即类必须在文档中说明,在哪些情况下它会调用被重写的方法.</li>
+<li>对于为了继承而设计的类, 必须在发布之前先编写子类对其进行测试.</li>
+<li>构造器不可以调用可以被重写的方法.</li>
+<li><code>clone</code>和<code>readObject</code> 方法也不能调用可以被重写方法.</li>
+</ol>
+<h2 id="接口优于抽象类"><a href="#接口优于抽象类" class="headerlink" title="接口优于抽象类"></a>接口优于抽象类</h2><p>如果是对实现类的规范和约束则应该使用抽象类, 如果想实现多继承则应该使用接口. 接口的可扩展性要优于继承.</p>
+<h2 id="接口的使用"><a href="#接口的使用" class="headerlink" title="接口的使用"></a>接口的使用</h2><ol>
+<li>为后代设计接口.</li>
+<li>接口只用于定义类型.</li>
+<li>不要使用常量接口. </li>
+</ol>
+<h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>整章对于在写代码设计类的层次接口非常有用, 但是由于使用<code>spring</code>框架, 很多事情<code>spring</code>都帮你做了, 这些设计原则用到的机会不是非常多, 导致里面有很多东西看了似懂非懂, 所以以后还是要离开<code>spring</code>框架单独做一些非<code>web</code>项目, 这样才能有较深的感悟.</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Dengbojing
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://dengbojing.com/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Effective-java-第四章学习笔记">http://dengbojing.com/2021/04/07/Effective-java-第四章学习笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> java, 读书笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/08/Effective-java-%E7%AC%AC%E4%B8%89%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="Effective-java-第三章学习笔记">
+      <i class="fa fa-chevron-left"></i> Effective-java-第三章学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/15/bug%E6%80%BB%E7%BB%93/" rel="next" title="bug总结">
+      bug总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正文"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使类和成员的访问最小化以及在公有类中使用访问方法而非公有域"><span class="nav-number">2.1.</span> <span class="nav-text">使类和成员的访问最小化以及在公有类中使用访问方法而非公有域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果编写一个不可变的类"><span class="nav-number">2.2.</span> <span class="nav-text">如果编写一个不可变的类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#不可变对象的优点"><span class="nav-number">2.2.1.</span> <span class="nav-text">不可变对象的优点:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不可变对象的缺点"><span class="nav-number">2.2.2.</span> <span class="nav-text">不可变对象的缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组合-复合-优于继承"><span class="nav-number">2.3.</span> <span class="nav-text">组合(复合)优于继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#要么设计继承并提供文档-要么禁止继承"><span class="nav-number">2.4.</span> <span class="nav-text">要么设计继承并提供文档, 要么禁止继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口优于抽象类"><span class="nav-number">2.5.</span> <span class="nav-text">接口优于抽象类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口的使用"><span class="nav-number">2.6.</span> <span class="nav-text">接口的使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#写在最后"><span class="nav-number">3.</span> <span class="nav-text">写在最后</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dengbojing"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Dengbojing</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dengbojing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dengbojing" rel="noopener" target="_blank"><i class="fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/dengbojing@qq.com" title="E-Mail → dengbojing@qq.com"><i class="fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://dengbojing.com/" title="http:&#x2F;&#x2F;dengbojing.com">dengbojing</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">dengbojing</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dengbojing.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"manual"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="日常开发中遇到的bug总结.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="bug总结">
+<meta property="og:url" content="http://dengbojing.com/2021/05/15/bug%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="生活不易,砥砺前行">
+<meta property="og:description" content="日常开发中遇到的bug总结.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-15T11:00:27.000Z">
+<meta property="article:modified_time" content="2021-07-14T08:47:13.672Z">
+<meta property="article:author" content="Dengbojing">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="bug">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://dengbojing.com/2021/05/15/bug%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>bug总结 | 生活不易,砥砺前行</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288627-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-156288627-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4cafee18f10a04bf0eed864b0bd7f623";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="生活不易,砥砺前行" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">生活不易,砥砺前行</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Keep farmed and carry hard</p>
+      <a>
+        <img class="custom-logo-image" src="/back.png" alt="生活不易,砥砺前行">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">12</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">3</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">15</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://dengbojing.com/2021/05/15/bug%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="Dengbojing">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="生活不易,砥砺前行">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          bug总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-15 19:00:27" itemprop="dateCreated datePublished" datetime="2021-05-15T19:00:27+08:00">2021-05-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-14 16:47:13" itemprop="dateModified" datetime="2021-07-14T16:47:13+08:00">2021-07-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>日常开发中遇到的bug总结.</p>
+<a id="more"></a>
+
+<h2 id="2021年5月"><a href="#2021年5月" class="headerlink" title="2021年5月"></a>2021年5月</h2><h3 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h3><p>现象: <code>JPA</code> 中双向关联如果使用<code>mappedBy</code>会使<code>foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)</code>失效, 如果不使用<code>mappedBy</code> 则会生层一张中间表.<br>版本: <code>hiernate 5.x</code><br>临时解决方案: </p>
+<ol>
+<li>使用已被废弃的注解<code>@org.hiernate.annotations.ForeignKey</code>注解使外键失效. </li>
+<li>自行去除外键,并且<code>jpa.hibernate.dll-auto</code>设置为<code>none</code>.  </li>
+<li>去除<code>mappedBy</code>, 接受中间表.  </li>
+</ol>
+<p>stackoverflow 地址: <a href="https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association" target="_blank" rel="noopener">https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association</a></p>
+<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>现象: <code>zipInputstream</code> 或者 <code>zip4j</code> 无法解压<code>7zip</code>软件打包的的压缩包<br>版本: 2.4.2<br>解决方案: 无.<br>issue: <a href="https://github.com/srikanth-lingala/zip4j/issues/45" target="_blank" rel="noopener">https://github.com/srikanth-lingala/zip4j/issues/45</a>  </p>
+<h3 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a>0x03</h3><p>现象: <code>junrar</code> 无法解压<code>rar5</code>版本的压缩包,也就是新版本的<code>winrar</code>打包的压缩包是无法解压的<br>版本: 2.4.2<br>解决方案: 无<br>issue: <a href="https://github.com/junrar/junrar/issues/23" target="_blank" rel="noopener">https://github.com/junrar/junrar/issues/23</a></p>
+<h3 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a>0x04</h3><p>现象: 文件上传时,使用<code>@RequestParam</code>, <code>swagger2</code>无法生成对应的文件参数文档.<br>版本: <code>swagger2 3.x</code><br>解决方法: 使用<code>@RequsetPart</code> 注解<code>multipart</code>参数  </p>
+<h3 id="0x05"><a href="#0x05" class="headerlink" title="0x05"></a>0x05</h3><p>现象: <code>Spring data JPA 不支持</code>hibernate<code>中的</code>@FetchMode<code>,无法通过该注解直接实现</code>join<code>查询来避免</code>N+1<code>问题  
+版本: 2.4.2  
+解决方案: 使用</code>@EntityGraph<code>解决该问题,可以无限向下关联;或者使用原生</code>sql<code>查询;</code>spring data jpa<code>自带的一些方法无法做到多级</code>join`,即使使用的该注解,这个问题很奇怪.<br>stackoverflow: <a href="https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels" target="_blank" rel="noopener">https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels</a>  </p>
+<h3 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a>0x06</h3><p>现象: <code>Hibernate</code>或者<code>jpa</code> 实现多个实体类<code>join</code>, 如果是<code>hibernate</code> 则在使用<code>@FetchMode.JOIN</code>时候属性列指定为<code>List</code>会报错, 如果是 <code>spring data jpa</code> 多个属性列为<code>List</code> 则不能同时使用<code>FetchType.EAGRE</code><br>版本: 2.4.2<br>解决方案: 使用<code>Set</code>作为属性的类型<br>stackoverflow:  <a href="https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl" target="_blank" rel="noopener">https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl</a>  </p>
+<h2 id="2021年6月"><a href="#2021年6月" class="headerlink" title="2021年6月"></a>2021年6月</h2><h3 id="0x01-1"><a href="#0x01-1" class="headerlink" title="0x01"></a>0x01</h3><p>现象: <code>JPA</code> 对于非主键关联支持报错, <code>Tester</code>单向关联了<code>Project</code>类的<code>c_project_number</code>, </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Column</span>(name = <span class="string">"c_tester_name"</span>, columnDefinition = <span class="string">"VARCHAR(20) NOT NULL COMMENT '测试者姓名'"</span>)</span><br><span class="line"><span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Column</span>(name = <span class="string">"c_tester_phoneNum"</span>, columnDefinition = <span class="string">"VARCHAR(20) NOT NULL COMMENT '测试者联系电话'"</span>)</span><br><span class="line"><span class="keyword">private</span> String phoneNum;</span><br><span class="line"></span><br><span class="line"><span class="meta">@ManyToOne</span></span><br><span class="line"><span class="meta">@JoinColumn</span>(name = <span class="string">"c_project_num"</span>, referencedColumnName = <span class="string">"c_project_number"</span>, nullable = <span class="keyword">false</span> , foreignKey = <span class="meta">@ForeignKey</span>(ConstraintMode.NO_CONSTRAINT))</span><br><span class="line"><span class="keyword">private</span> Project project;</span><br></pre></td></tr></table></figure>
+<p>在根据项目编号和电话号码查询<code>Tester</code>对向时,如果不存在<code>Tester</code>对象,无任何问题,存在<code>Tester</code>对象则报错,报错如下:  </p>
+<blockquote>
+<p><code>com.xxx.entity.Project  is in unnamed module of loader &#39;app&#39;; java.io.Serializable is in module java.base of loader &#39;bootstrap&#39;</code> ,<br>版本: 2.4.2<br>解决方案: 初步判断为查找出<code>Tester</code>对象时,关联出<code>Project</code>对象, 此时被<code>app</code>这个<code>classLoader</code>加载, 导致问题,具体深层次原因未深究, 此处临时解决办法是不使用<code>c_project_number</code>字段关联, 使用<code>Project</code>类的主键进行关联.<br>stackoverflow: ttps://stackoverflow.com/questions/61862202/using-jpa-elementcollection-for-a-string-collection-from-a-join-table</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Dengbojing
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://dengbojing.com/2021/05/15/bug%E6%80%BB%E7%BB%93/" title="bug总结">http://dengbojing.com/2021/05/15/bug总结/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+              <a href="/tags/bug/" rel="tag"><i class="fa fa-tag"></i> bug</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="Effective-java-第四章学习笔记">
+      <i class="fa fa-chevron-left"></i> Effective-java-第四章学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/25/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="学习笔记">
+      学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#2021年5月"><span class="nav-number">1.</span> <span class="nav-text">2021年5月</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01"><span class="nav-number">1.1.</span> <span class="nav-text">0x01</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02"><span class="nav-number">1.2.</span> <span class="nav-text">0x02</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03"><span class="nav-number">1.3.</span> <span class="nav-text">0x03</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x04"><span class="nav-number">1.4.</span> <span class="nav-text">0x04</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x05"><span class="nav-number">1.5.</span> <span class="nav-text">0x05</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x06"><span class="nav-number">1.6.</span> <span class="nav-text">0x06</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2021年6月"><span class="nav-number">2.</span> <span class="nav-text">2021年6月</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01-1"><span class="nav-number">2.1.</span> <span class="nav-text">0x01</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dengbojing"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Dengbojing</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dengbojing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dengbojing" rel="noopener" target="_blank"><i class="fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/dengbojing@qq.com" title="E-Mail → dengbojing@qq.com"><i class="fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://dengbojing.com/" title="http:&#x2F;&#x2F;dengbojing.com">dengbojing</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">dengbojing</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
