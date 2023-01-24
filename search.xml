@@ -1,23 +1,786 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>spring-boot+elk</title>
+    <url>/2023/01/22/spring-boot-elk/</url>
+    <content><![CDATA[<p>spring boot 结合 ELK</p>
+<span id="more"></span>
+<h1 id="elasticsearch"><a href="#elasticsearch" class="headerlink" title="elasticsearch"></a>elasticsearch</h1><h2 id="install-elasticsearch"><a href="#install-elasticsearch" class="headerlink" title="install elasticsearch"></a>install elasticsearch</h2><ol start="0">
+<li><p><code>apt-get upgrade</code></p>
+</li>
+<li><p><code>wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -</code></p>
+</li>
+<li><p><code>apt-get install apt-transport-https</code></p>
+</li>
+<li><p><code>apt-get update</code></p>
+</li>
+<li><p><code>apt-get install elasticsearch</code></p>
+</li>
+</ol>
+<h2 id="configurate-elasticsearch"><a href="#configurate-elasticsearch" class="headerlink" title="configurate elasticsearch"></a>configurate elasticsearch</h2><ol>
+<li><p><code>vim  /etc/elasticsearch/elasticsearch.yml</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">network.host: 0.0.0.0  </span><br><span class="line">port: 9200  </span><br></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.0/getting-started.html">其他配置</a></p>
+</li>
+<li><p>启动: <code>systemctl start elasticsearch.service</code></p>
+</li>
+<li><p>测试: <code>curl -X GET &quot;localhost:9200&quot;</code></p>
+</li>
+</ol>
+<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><h2 id="install-kibana"><a href="#install-kibana" class="headerlink" title="install kibana"></a>install kibana</h2><ol>
+<li><code>apt-get install kibana</code></li>
+</ol>
+<h2 id="Configure-Kibana"><a href="#Configure-Kibana" class="headerlink" title="Configure Kibana"></a>Configure Kibana</h2><ol>
+<li><p><code>vim etc/kibana/kibana.yml</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">server.port: 5601  </span><br><span class="line">server.host: &quot;localhost&quot;</span><br><span class="line">elasticsearch.hosts: [&quot;http://localhost:9200&quot;]</span><br></pre></td></tr></table></figure>
+<p><a href="https://www.elastic.co/guide/en/kibana/7.17/get-started.html">其他配置</a></p>
+</li>
+<li><p>启动: <code>systemctl start kibana</code></p>
+</li>
+<li><p>开机启动(可选): <code>systemctl enable kibana</code></p>
+</li>
+<li><p>开放防火墙, 浏览器测试访问 <code>http://localhost:5601</code></p>
+</li>
+</ol>
+<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><h2 id="install-logstash"><a href="#install-logstash" class="headerlink" title="install logstash"></a>install logstash</h2><ol start="0">
+<li><p>主要作用: input 收集, filter过滤, output输出</p>
+</li>
+<li><p><code>apt-get install logstash</code></p>
+</li>
+<li><p>开机启动(可选): <code>systemctl enable logstash</code></p>
+</li>
+</ol>
+<h2 id="Configure-Logstash"><a href="#Configure-Logstash" class="headerlink" title="Configure Logstash"></a>Configure Logstash</h2><ol>
+<li><p><code>vim /etc/logstash/conf.d/logstash.conf</code><br><a href="https://www.elastic.co/guide/en/logstash/7.17/introduction.html">其他配置</a></p>
+</li>
+<li><p>配置说明: 以<code>beats</code>为例,下面使用<code>filebeat</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">  beats &#123;</span><br><span class="line">    port =&gt; 5044</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">  elasticsearch &#123;</span><br><span class="line">    hosts =&gt; [&quot;http://localhost:9200&quot;]</span><br><span class="line">    index =&gt; &quot;%&#123;[@metadata][beat]&#125;-%&#123;[@metadata][version]&#125;&quot; </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="FileBeat-可选"><a href="#FileBeat-可选" class="headerlink" title="FileBeat(可选)"></a>FileBeat(可选)</h1><h2 id="install-fileBeat"><a href="#install-fileBeat" class="headerlink" title="install fileBeat"></a>install fileBeat</h2><ol>
+<li><code>apt-get install filebeat</code></li>
+</ol>
+<h2 id="configure-filebeat"><a href="#configure-filebeat" class="headerlink" title="configure filebeat"></a>configure filebeat</h2><ol>
+<li><code>vim /etc/filebeat/filebeat.yml</code></li>
+</ol>
+<p>注释es配置,打开logstash配置</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># output.elasticsearch:</span><br><span class="line">   # Array of hosts to connect to.</span><br><span class="line">   # hosts: [&quot;localhost:9200&quot;]</span><br><span class="line">output.logstash</span><br><span class="line">   hosts: [&quot;localhost:5044&quot;]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><p>(可选)启动一个module(预设的一些日志处理模块): <code>filebeat modules enable system</code> system module在linux系统下会对&#x2F;var&#x2F;logs下面所有日志传输<br><a href="https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-installation-configuration.html">其他配置</a></p>
+</li>
+<li><p>加载日志: <code>filebeat setup -e</code></p>
+</li>
+<li><p>其他通用日志设置修改: </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">- type: filestream</span><br><span class="line"></span><br><span class="line">  # Unique ID among all inputs, an ID is required.</span><br><span class="line">  id: my-filestream-id</span><br><span class="line"></span><br><span class="line">  # Change to true to enable this input configuration.</span><br><span class="line">  enabled: false</span><br><span class="line"></span><br><span class="line">  # Paths that should be crawled and fetched. Glob based paths.</span><br><span class="line">  paths:</span><br><span class="line">    - /var/log/*.log</span><br><span class="line">    #- c:\programdata\elasticsearch\logs\*</span><br></pre></td></tr></table></figure>
+<p>enable 设置为ture, paths设置为日志文件目录</p>
+</li>
+<li><p>启动: <code>systemctl start filebeat</code></p>
+</li>
+<li><p>开机启动(可选): systemctl enable filebeat</p>
+</li>
+</ol>
+<h1 id="spring-boot"><a href="#spring-boot" class="headerlink" title="spring-boot"></a>spring-boot</h1><h2 id="add-dependency"><a href="#add-dependency" class="headerlink" title="add dependency"></a>add dependency</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">implementation group: &#x27;net.logstash.logback&#x27;, name: &#x27;logstash-logback-encoder&#x27;, version: &#x27;7.2&#x27;</span><br></pre></td></tr></table></figure>
+
+<h2 id="configure-logstash"><a href="#configure-logstash" class="headerlink" title="configure logstash"></a>configure logstash</h2><p>input moule选择tcp, 其他不变, <a href="https://www.elastic.co/guide/en/logstash/current/plugins-inputs-tcp.html">详见文档</a></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">  tcp &#123;</span><br><span class="line">    id =&gt; &quot;tcp_1&quot;</span><br><span class="line">    port =&gt; 9250</span><br><span class="line">    mode =&gt; [&quot;server&quot;]</span><br><span class="line">    codec =&gt; json_lines</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="set-log-file"><a href="#set-log-file" class="headerlink" title="set log file"></a>set log file</h2><p>logback.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line"></span><br><span class="line">    &lt;property name=&quot;LOGS&quot; value=&quot;./logs&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;appender name=&quot;Console&quot;</span><br><span class="line">              class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;</span><br><span class="line">        &lt;layout class=&quot;ch.qos.logback.classic.PatternLayout&quot;&gt;</span><br><span class="line">            &lt;Pattern&gt;</span><br><span class="line">                %red(%d&#123;ISO8601&#125;) %highlight(%-5level) [%blue(%t)] %yellow(%C&#123;1.&#125;): %msg%n%throwable</span><br><span class="line">            &lt;/Pattern&gt;</span><br><span class="line">        &lt;/layout&gt;</span><br><span class="line">    &lt;/appender&gt;</span><br><span class="line">    &lt;appender name=&quot;stash&quot; class=&quot;net.logstash.logback.appender.LogstashTcpSocketAppender&quot;&gt;</span><br><span class="line">        &lt;destination&gt;localhost:9250&lt;/destination&gt;</span><br><span class="line">        &lt;!-- encoder is required --&gt;</span><br><span class="line">        &lt;encoder class=&quot;net.logstash.logback.encoder.LogstashEncoder&quot; /&gt;</span><br><span class="line">    &lt;/appender&gt;</span><br><span class="line"></span><br><span class="line">    &lt;appender name=&quot;RollingFile&quot;</span><br><span class="line">              class=&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;</span><br><span class="line">        &lt;file&gt;$&#123;LOGS&#125;/spring-boot-logger.log&lt;/file&gt;</span><br><span class="line">        &lt;encoder</span><br><span class="line">                class=&quot;ch.qos.logback.classic.encoder.PatternLayoutEncoder&quot;&gt;</span><br><span class="line">            &lt;Pattern&gt;%d %p %C&#123;1.&#125; [%t] %m%n&lt;/Pattern&gt;</span><br><span class="line">        &lt;/encoder&gt;</span><br><span class="line"></span><br><span class="line">        &lt;rollingPolicy</span><br><span class="line">                class=&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;</span><br><span class="line">            &lt;!-- rollover daily and when the file reaches 10 MegaBytes --&gt;</span><br><span class="line">            &lt;fileNamePattern&gt;$&#123;LOGS&#125;/archived/spring-boot-logger-%d&#123;yyyy-MM-dd&#125;.%i.log</span><br><span class="line">            &lt;/fileNamePattern&gt;</span><br><span class="line">            &lt;timeBasedFileNamingAndTriggeringPolicy</span><br><span class="line">                    class=&quot;ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP&quot;&gt;</span><br><span class="line">                &lt;maxFileSize&gt;10MB&lt;/maxFileSize&gt;</span><br><span class="line">            &lt;/timeBasedFileNamingAndTriggeringPolicy&gt;</span><br><span class="line">        &lt;/rollingPolicy&gt;</span><br><span class="line">    &lt;/appender&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- LOG everything at INFO level --&gt;</span><br><span class="line">    &lt;root level=&quot;info&quot;&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;stash&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;RollingFile&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;Console&quot; /&gt;</span><br><span class="line">    &lt;/root&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- LOG &quot;com.lotus*&quot; at TRACE level --&gt;</span><br><span class="line">    &lt;logger name=&quot;com.lotus&quot; level=&quot;trace&quot; additivity=&quot;false&quot;&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;stash&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;RollingFile&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;Console&quot; /&gt;</span><br><span class="line">    &lt;/logger&gt;</span><br><span class="line"></span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>java</tag>
+        <tag>spring-boot</tag>
+        <tag>elk</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM-学习</title>
+    <url>/2021/11/25/JVM-%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<p>JVM 基础学习</p>
+<span id="more"></span>
+
+<h1 id="ClassLoader-SubSystem："><a href="#ClassLoader-SubSystem：" class="headerlink" title="ClassLoader SubSystem："></a><code>ClassLoader SubSystem</code>：</h1><ol>
+<li>类加载</li>
+<li>类链接(验证,准备,解析)</li>
+<li>初始化</li>
+</ol>
+<h2 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h2><p>加载就是读取class文件,并在方法区存储对应的二进制数据,每一个class文件<code>jvm</code>会存储以下信息至方法区：</p>
+<ol>
+<li>类(接口,枚举)的全限定名称</li>
+<li>该类(接口,枚举)的直接父类的全限定名称</li>
+<li>class文件是否关联一个类(接口,枚举)</li>
+<li>修饰符信息</li>
+<li>局部变量,成员变量信息</li>
+<li>方法信息</li>
+<li>常量池信息等等</li>
+</ol>
+<p>在加载class文件之后,jvm会立即创建一个代表该类的Class对象,以表示堆内存上的类级别的二进制信息.<br>每一个class文件加载之后只会创建一个代表该类的Class对象,无论你该类你在程序中使用多少次(创建多少次)</p>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><ol>
+<li>验证</li>
+</ol>
+<p>检查类的Class对象的二进制表示是否正确(静态约束和结构化约束),检查class文件是否符合规范,编译版本是否兼容.如果确认文件无误,可以使用jvm参数关闭验证.  </p>
+<ol start="2">
+<li>准备</li>
+</ol>
+<p><code>jvm</code>分配静态变量内存空间(变量定义在方法区上,变量的值如果是引用类型则在堆空间,如果是原始类型直接分配在方法区上,值分配在初始化时候),并为静态变量(static)赋默认值(不是初始值,初始值在初始化阶段赋值),如果是类常量(final static)直接赋初始值</p>
+<ol start="3">
+<li>解析</li>
+</ol>
+<p>将符号引用替换为直接引用(只会执行一次,这一步是可选的直到符号引用被使用).<br>符号引用：一组String字符串能唯一定位到所引用的类,变量或者方法.(当一个类编译完成,所有的方法引用,变量引用等等都是以符号引用保存在常量池中).<br>直接引用：直接指向目标的指针,相对偏移量(java做法),一个能定位到目标地址的句柄.</p>
+<h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><p>这个阶段所有的静态变量会被赋初始值,所有的静态代码块被执行(从上到下,从父类到子类),符合以下任意条件会初始化类：  </p>
+<ol>
+<li>new 一个该对象</li>
+<li>访问(读取或者设置)该类的静态字段或者调用该类的静态方法</li>
+<li>反射</li>
+<li>初始化类,会先初始化父类</li>
+<li><code>main</code>方法主类,<code>jvm</code>会优先初始化</li>
+</ol>
+<h1 id="ClassLoader类型"><a href="#ClassLoader类型" class="headerlink" title="ClassLoader类型"></a><code>ClassLoader</code>类型</h1><ol>
+<li>BootstrapClassLoader<br>  用c++实现,负责加载jdk-&gt;jre-&gt;lib-&gt;*.jar</li>
+<li>ExtensionClassLoader<br>  由sun.misc.Launcher$ExtClassLoader类实现,负责加载jdk-&gt;jre-&gt;lib-&gt;ext-&gt;*.class</li>
+<li>ApplicationClassLoader<br>  由sun.misc.Louncher$AppClassLoader实现,负责加载用户程序的类库(classpath下)</li>
+</ol>
+<p><code>CLassLoader</code> 使用双亲委派机制(delegation hierarchy principle):  当<code>jvm</code>遇到一个类,会先从方法区寻找该类的二进制表示,如果未找到如,则<code>ClassLoader SubSystem</code>会请求<code>Application ClassLoader</code>来加载这个这个类,<code>ApplicationClassLoader</code>会委托给<code>ExtensionClassLoader</code>加载,<code>ExtensionClassLoader</code>会委托给<code>BootstrapClassLoader</code>加载,当父加载器如果无法加载则会在委托给子的加载器加载.<br><strong>ps: 这里的<code>父子</code>并不具有继承关系,只是上层加载器的引用.</strong>  </p>
+<h1 id="运行时数据区域-Run-Time-Data-Areas"><a href="#运行时数据区域-Run-Time-Data-Areas" class="headerlink" title="运行时数据区域(Run-Time Data Areas)"></a>运行时数据区域(Run-Time Data Areas)</h1><h2 id="Method-area"><a href="#Method-area" class="headerlink" title="Method area"></a><code>Method area</code></h2><p>方法区: AKA永久代(1.8之前),AKA MetaSpace(1.8之后);<br><code>jvm</code>规范说方法区是逻辑上属于堆空间,可以是非连续性的,可以不需要垃圾回收机制,1.7方法区的实现是堆上的永久代,1.8之后方法区的实现变成了直接在本地内存上分配的元空间(MetaSpace,存储Class类的元数据)<br>在<code>jvm</code>启动时候就创建,全局共享,它存储每个类的结构,运行时常量池,字段和方法数据,构造函数,包含特殊的初始化方法.<br><strong>如果方法区中的内存无法满足分配请求,Java 虚拟机将抛出 <code>OutOfMemoryError</code>.</strong></p>
+<h2 id="heap"><a href="#heap" class="headerlink" title="heap"></a><code>heap</code></h2><p>堆: 在<code>jvm</code>启动时候创建,全局共享,堆是运行时数据区,从中分配所有类实例和数组的内存;垃圾回收机制主要是针对该区域回收.<br>1.7: 新生代,老年代,永久代.<br>1.8：新生代,老年代.<br><strong>如果对象需要分配的内存比可回收的内存多,则抛出<code>OutOfMemoryError.</code></strong>   </p>
+<h2 id="stack"><a href="#stack" class="headerlink" title="stack"></a><code>stack</code></h2><p>栈：每一个线程都有一个私有的栈,在线程创建时候被创建,栈里面存储着<code>frame</code>(stack frame),<code>frame</code>保存局部变量和部分结果(方法调用过程中产生),参与方法得调用和结果得返回.当一个方法被调用时候<code>frame</code>就会被创建,jvm对栈只有两个操作,psuh and pop<br><strong>如果线程需要得栈空间大于虚拟机所允许的大小,则抛出<code>StackOverflowError</code>.</strong><br><strong>如果栈可以动态扩展,而扩展没有足够的内存空间,或者初始化一个新的线程栈时候没有足够的空间,则会抛出<code>OutOfMemoryError</code>.</strong></p>
+<h2 id="Run-time-Constant-pool"><a href="#Run-time-Constant-pool" class="headerlink" title="Run-time Constant pool"></a><code>Run-time Constant pool</code></h2><p>运行时常量池：每个类或者接口一个,分配在方法区上.<br>包含<br>  1.类,接口,方法,动态计算(lambda表达式)的符号引用–基本上等于对应类,接口,方法的全限定名称,但是会多出来一些额外的东西,虚拟机使用这些符号引用找到对应依赖的类.<br>  2.类常量(final static)</p>
+<p><strong>如果创建类或者接口的运行时常量池需要的内存大于虚拟机可以使用的内存,则抛出<code>OutOfMemoryError</code>.</strong>    </p>
+<h1 id="Frame"><a href="#Frame" class="headerlink" title="Frame"></a>Frame</h1><p><code>stack frame</code>用于存储局部变量和中间结果以及执行动态链接,方法返回结果,抛出异常.以下简称<code>frame</code><br>当一个方法被调用时会创建一个新的<code>frame</code>,当方法调用结束时候(无论正常结束还是异常结束),<code>frame</code>会被销毁.<br>在任何时候一个线程只会有一个<code>frame</code>被执行,被称作<code>current frame</code>,对应的是当前正在执行的方法.<br>当一个<code>frame</code>执行时候遇见调用另一个方法,会创建一个对应方法的<code>new frame</code>,<code>new frame</code>将成<code>current frame</code>,然后等待新的方法执行完成,<code>new frame</code>返回结果至之前的<code>frame</code>,然后之前的<code>fram</code>再次成为<code>current frame</code>并且丢弃<code>new frame</code>.  </p>
+<p><code>frame</code>分为3个部分,局部变量数组,操作对象栈,帧数据</p>
+<h2 id="local-variables"><a href="#local-variables" class="headerlink" title="local variables"></a>local variables</h2><p>每一个<code>frame</code>中包含一个局部变量数组,数组的长度由编译期间方法内的代码确定,存储在<code>class</code>文件二进制的表示信息中(方法区中).<br>每个数组的槽站4个字节,其中<code>int float reference</code>占用数组的一个槽位,<code>long double</code>类型占用2个槽位,<code>byte char short</code>将会转会为<code>int</code>类型占用一个槽位,<code>boolean</code>类型占用的槽位不同虚拟机实现不同,大部分情况占用1个槽位.   </p>
+<h2 id="operand-stack"><a href="#operand-stack" class="headerlink" title="operand stack"></a>operand stack</h2><p>操作栈,也是一个栈类型的数据结构,先进后出; 作用是<code>stack</code>的工作空间<code>work space</code>, <code>jvm</code>指令从局部变量数组中获取数据push至操作栈,或者从操作栈中pop数据进行操作,然后在push结果到操作栈, </p>
+<h2 id="dynamic-link"><a href="#dynamic-link" class="headerlink" title="dynamic link"></a>dynamic link</h2><p>每个<code>frame</code>都包含一个指向运行时常量池中该<code>frame</code>所属方法的引用,持有这个引用是为了支持方法调用过程中的动态链接.<br>在类加载阶段中的解析阶段会将符号引用转为直接引用,这种转化也称为静态解析.另外的一部分将在运行时转化为直接引用,这部分称为动态链接.  </p>
+<h1 id="Class-文件结构"><a href="#Class-文件结构" class="headerlink" title="Class 文件结构"></a>Class 文件结构</h1><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ClassFile &#123;</span><br><span class="line">    u4             magic; <span class="comment">//魔法数,固定的,0xCAFEBABE</span></span><br><span class="line">    u2             minor_version;  <span class="comment">//编译次版本,向下兼容</span></span><br><span class="line">    u2             major_version;  <span class="comment">//编译主版本, 向下兼容</span></span><br><span class="line">    u2             constant_pool_count; <span class="comment">//常量池长度</span></span><br><span class="line">    cp_info        constant_pool[constant_pool_count-<span class="number">1</span>]; <span class="comment">//静态常量池,运行时生成动态常量池,下标从1开始</span></span><br><span class="line">    u2             access_flags; <span class="comment">//访问权限</span></span><br><span class="line">    u2             this_class; <span class="comment">//常量池中的该类的引用的索引</span></span><br><span class="line">    u2             super_class; <span class="comment">//0或者是常量池中的一个索引,如果是0表示是`Object`类,如果是索引表示父类在常量池中的索引</span></span><br><span class="line">    u2             interfaces_count; <span class="comment">//实现接口的数量</span></span><br><span class="line">    u2             interfaces[interfaces_count];<span class="comment">//接口数组</span></span><br><span class="line">    u2             fields_count; <span class="comment">//总共字段的数量(类变量,成员变量)</span></span><br><span class="line">    field_info     fields[fields_count];<span class="comment">//字段数组</span></span><br><span class="line">    u2             methods_count; <span class="comment">//方法数量</span></span><br><span class="line">    method_info    methods[methods_count];<span class="comment">//方法数组</span></span><br><span class="line">    u2             attributes_count; <span class="comment">//属性数量</span></span><br><span class="line">    attribute_info attributes[attributes_count]; <span class="comment">//属性数组,比较复杂</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中u代表字节,u1一个字节,u2两个字节<br>分析示例：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestClass</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;fffff&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">s2</span> <span class="operator">=</span><span class="string">&quot;xxxxxx&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="string">&quot;fdasg&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1000001</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> j;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Thread thread;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String...args)</span>&#123;</span><br><span class="line">        <span class="type">TestClass</span> <span class="variable">tc</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TestClass</span>();</span><br><span class="line">        tc.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">start</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">iiii</span> <span class="operator">=</span> <span class="number">135</span>;</span><br><span class="line">        thread = <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">jjjj</span> <span class="operator">=</span> iiii;</span><br><span class="line">            System.out.println(s1);</span><br><span class="line">            System.out.println(++jjjj);</span><br><span class="line">        &#125;);</span><br><span class="line">        thread.start();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestClass</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;fffff&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">s2</span> <span class="operator">=</span><span class="string">&quot;xxxxxx&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="string">&quot;fdasg&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1000001</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> j;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Thread thread;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String...args)</span>&#123;</span><br><span class="line">        <span class="type">TestClass</span> <span class="variable">tc</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TestClass</span>();</span><br><span class="line">        tc.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">start</span><span class="params">()</span>&#123;</span><br><span class="line">        thread = <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; System.out.println(s1));</span><br><span class="line">        thread.start();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译之后的运行时常量池<br><strong>这里Constant的意思不是指存储的是常量，而是说是不变的东西，也就是说类的方法，字段名称，字段的值都是编译期间可以知道的，所以这些东西是不变的,这些存储是以静态<code>constant_pool</code>存储(class文件的<code>constant_pool</code>),当jvm启动时候就会将静态的<code>constant_pool</code>转换为<code>runtime constant_pool</code>.</strong>  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt; javap -v TestClass.class</span><br><span class="line"> Constant pool:</span><br><span class="line">    #1 = Methodref          #21.#53       // java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">    #2 = String             #54           // fffff</span><br><span class="line">    #3 = Fieldref           #8.#55        // com/interact/jugg/TestClass.s:Ljava/lang/String;</span><br><span class="line">    #4 = String             #56           // fdasg</span><br><span class="line">    #5 = Fieldref           #8.#57        // com/interact/jugg/TestClass.s1:Ljava/lang/String;</span><br><span class="line">    #6 = Integer            1000001</span><br><span class="line">    #7 = Fieldref           #8.#58        // com/interact/jugg/TestClass.i:I</span><br><span class="line">    #8 = Class              #59           // com/interact/jugg/TestClass</span><br><span class="line">    #9 = Methodref          #8.#53        // com/interact/jugg/TestClass.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #10 = Methodref          #8.#60        // com/interact/jugg/TestClass.start:()V</span><br><span class="line">   #11 = Class              #61           // java/lang/Thread</span><br><span class="line">   #12 = InvokeDynamic      #0:#66        // #0:run:(Lcom/interact/jugg/TestClass;I)Ljava/lang/Runnable;</span><br><span class="line">   #13 = Methodref          #11.#67       // java/lang/Thread.&quot;&lt;init&gt;&quot;:(Ljava/lang/Runnable;)V</span><br><span class="line">   #14 = Fieldref           #8.#68        // com/interact/jugg/TestClass.thread:Ljava/lang/Thread;</span><br><span class="line">   #15 = Methodref          #11.#60       // java/lang/Thread.start:()V</span><br><span class="line">   #16 = Fieldref           #69.#70       // java/lang/System.out:Ljava/io/PrintStream;</span><br><span class="line">   #17 = Methodref          #71.#72       // java/io/PrintStream.println:(Ljava/lang/String;)V</span><br><span class="line">   #18 = Methodref          #71.#73       // java/io/PrintStream.println:(I)V</span><br><span class="line">   #19 = String             #74           // xxxxxx</span><br><span class="line">   #20 = Fieldref           #8.#75        // com/interact/jugg/TestClass.s2:Ljava/lang/String;</span><br><span class="line">   #21 = Class              #76           // java/lang/Object</span><br><span class="line">   #22 = Utf8               s</span><br><span class="line">   #23 = Utf8               Ljava/lang/String;</span><br><span class="line">   #24 = Utf8               s2</span><br><span class="line">   #25 = Utf8               s1</span><br><span class="line">   #26 = Utf8               ConstantValue</span><br><span class="line">   #27 = Utf8               i</span><br><span class="line">   #28 = Utf8               I</span><br><span class="line">   #29 = Utf8               j</span><br><span class="line">   #30 = Utf8               thread</span><br><span class="line">   #31 = Utf8               Ljava/lang/Thread;</span><br><span class="line">   #32 = Utf8               &lt;init&gt;</span><br><span class="line">   #33 = Utf8               ()V</span><br><span class="line">   #34 = Utf8               Code</span><br><span class="line">   #35 = Utf8               LineNumberTable</span><br><span class="line">   #36 = Utf8               LocalVariableTable</span><br><span class="line">   #37 = Utf8               this</span><br><span class="line">   #38 = Utf8               Lcom/interact/jugg/TestClass;</span><br><span class="line">   #39 = Utf8               main</span><br><span class="line">   #40 = Utf8               ([Ljava/lang/String;)V</span><br><span class="line">   #41 = Utf8               args</span><br><span class="line">   #42 = Utf8               [Ljava/lang/String;</span><br><span class="line">   #43 = Utf8               tc</span><br><span class="line">   #44 = Utf8               MethodParameters</span><br><span class="line">   #45 = Utf8               start</span><br><span class="line">   #46 = Utf8               iiii</span><br><span class="line">   #47 = Utf8               lambda$start$0</span><br><span class="line">   #48 = Utf8               (I)V</span><br><span class="line">   #49 = Utf8               jjjj</span><br><span class="line">   #50 = Utf8               &lt;clinit&gt;</span><br><span class="line">   #51 = Utf8               SourceFile</span><br><span class="line">   #52 = Utf8               TestClass.java</span><br><span class="line">   #53 = NameAndType        #32:#33       // &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #54 = Utf8               fffff</span><br><span class="line">   #55 = NameAndType        #22:#23       // s:Ljava/lang/String;</span><br><span class="line">   #56 = Utf8               fdasg</span><br><span class="line">   #57 = NameAndType        #25:#23       // s1:Ljava/lang/String;</span><br><span class="line">   #58 = NameAndType        #27:#28       // i:I</span><br><span class="line">   #59 = Utf8               com/interact/jugg/TestClass</span><br><span class="line">   #60 = NameAndType        #45:#33       // start:()V</span><br><span class="line">   #61 = Utf8               java/lang/Thread</span><br><span class="line">   #62 = Utf8               BootstrapMethods</span><br><span class="line">   #63 = MethodHandle       6:#77         // REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;</span><br><span class="line">   #64 = MethodType         #33           //  ()V</span><br><span class="line">   #65 = MethodHandle       7:#78         // REF_invokeSpecial com/interact/jugg/TestClass.lambda$start$0:(I)V</span><br><span class="line">   #66 = NameAndType        #79:#80       // run:(Lcom/interact/jugg/TestClass;I)Ljava/lang/Runnable;</span><br><span class="line">   #67 = NameAndType        #32:#81       // &quot;&lt;init&gt;&quot;:(Ljava/lang/Runnable;)V</span><br><span class="line">   #68 = NameAndType        #30:#31       // thread:Ljava/lang/Thread;</span><br><span class="line">   #69 = Class              #82           // java/lang/System</span><br><span class="line">   #70 = NameAndType        #83:#84       // out:Ljava/io/PrintStream;</span><br><span class="line">   #71 = Class              #85           // java/io/PrintStream</span><br><span class="line">   #72 = NameAndType        #86:#87       // println:(Ljava/lang/String;)V</span><br><span class="line">   #73 = NameAndType        #86:#48       // println:(I)V</span><br><span class="line">   #74 = Utf8               xxxxxx</span><br><span class="line">   #75 = NameAndType        #24:#23       // s2:Ljava/lang/String;</span><br><span class="line">   #76 = Utf8               java/lang/Object</span><br><span class="line">   #77 = Methodref          #88.#89       // java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;</span><br><span class="line">   #78 = Methodref          #8.#90        // com/interact/jugg/TestClass.lambda$start$0:(I)V</span><br><span class="line">   #79 = Utf8               run</span><br><span class="line">   #80 = Utf8               (Lcom/interact/jugg/TestClass;I)Ljava/lang/Runnable;</span><br><span class="line">   #81 = Utf8               (Ljava/lang/Runnable;)V</span><br><span class="line">   #82 = Utf8               java/lang/System</span><br><span class="line">   #83 = Utf8               out</span><br><span class="line">   #84 = Utf8               Ljava/io/PrintStream;</span><br><span class="line">   #85 = Utf8               java/io/PrintStream</span><br><span class="line">   #86 = Utf8               println</span><br><span class="line">   #87 = Utf8               (Ljava/lang/String;)V</span><br><span class="line">   #88 = Class              #91           // java/lang/invoke/LambdaMetafactory</span><br><span class="line">   #89 = NameAndType        #92:#96       // metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;</span><br><span class="line">   #90 = NameAndType        #47:#48       // lambda$start$0:(I)V</span><br><span class="line">   #91 = Utf8               java/lang/invoke/LambdaMetafactory</span><br><span class="line">   #92 = Utf8               metafactory</span><br><span class="line">   #93 = Class              #98           // java/lang/invoke/MethodHandles$Lookup</span><br><span class="line">   #94 = Utf8               Lookup</span><br><span class="line">   #95 = Utf8               InnerClasses</span><br><span class="line">   #96 = Utf8               (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;</span><br><span class="line">   #97 = Class              #99           // java/lang/invoke/MethodHandles</span><br><span class="line">   #98 = Utf8               java/lang/invoke/MethodHandles$Lookup</span><br><span class="line">   #99 = Utf8               java/lang/invoke/MethodHandles</span><br><span class="line">&#123;</span><br><span class="line">  public java.lang.Thread thread;</span><br><span class="line">    descriptor: Ljava/lang/Thread;</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line"></span><br><span class="line">  public com.interact.jugg.TestClass();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: aload_0</span><br><span class="line">         5: ldc           #2                  // String fffff</span><br><span class="line">         7: putfield      #3                  // Field s:Ljava/lang/String;</span><br><span class="line">        10: aload_0</span><br><span class="line">        11: ldc           #4                  // String fdasg</span><br><span class="line">        13: putfield      #5                  // Field s1:Ljava/lang/String;</span><br><span class="line">        16: aload_0</span><br><span class="line">        17: ldc           #6                  // int 1000001</span><br><span class="line">        19: putfield      #7                  // Field i:I</span><br><span class="line">        22: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 6: 0</span><br><span class="line">        line 8: 4</span><br><span class="line">        line 12: 10</span><br><span class="line">        line 14: 16</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      23     0  this   Lcom/interact/jugg/TestClass;</span><br><span class="line"></span><br><span class="line">  public static void main(java.lang.String...);</span><br><span class="line">    descriptor: ([Ljava/lang/String;)V</span><br><span class="line">    flags: (0x0089) ACC_PUBLIC, ACC_STATIC, ACC_VARARGS</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=2, args_size=1</span><br><span class="line">         0: new           #8                  // class com/interact/jugg/TestClass</span><br><span class="line">         3: dup</span><br><span class="line">         4: invokespecial #9                  // Method &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         7: astore_1</span><br><span class="line">         8: aload_1</span><br><span class="line">         9: invokevirtual #10                 // Method start:()V</span><br><span class="line">        12: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 21: 0</span><br><span class="line">        line 22: 8</span><br><span class="line">        line 23: 12</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      13     0  args   [Ljava/lang/String;</span><br><span class="line">            8       5     1    tc   Lcom/interact/jugg/TestClass;</span><br><span class="line">    MethodParameters:</span><br><span class="line">      Name                           Flags</span><br><span class="line">      args</span><br><span class="line"></span><br><span class="line">  public void start();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=5, locals=2, args_size=1</span><br><span class="line">         0: sipush        135</span><br><span class="line">         3: istore_1</span><br><span class="line">         4: aload_0</span><br><span class="line">         5: new           #11                 // class java/lang/Thread</span><br><span class="line">         8: dup</span><br><span class="line">         9: aload_0</span><br><span class="line">        10: iload_1</span><br><span class="line">        11: invokedynamic #12,  0             // InvokeDynamic #0:run:(Lcom/interact/jugg/TestClass;I)Ljava/lang/Runnable;</span><br><span class="line">        16: invokespecial #13                 // Method java/lang/Thread.&quot;&lt;init&gt;&quot;:(Ljava/lang/Runnable;)V</span><br><span class="line">        19: putfield      #14                 // Field thread:Ljava/lang/Thread;</span><br><span class="line">        22: aload_0</span><br><span class="line">        23: getfield      #14                 // Field thread:Ljava/lang/Thread;</span><br><span class="line">        26: invokevirtual #15                 // Method java/lang/Thread.start:()V</span><br><span class="line">        29: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 26: 0</span><br><span class="line">        line 27: 4</span><br><span class="line">        line 32: 22</span><br><span class="line">        line 34: 29</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      30     0  this   Lcom/interact/jugg/TestClass;</span><br><span class="line">            4      26     1  iiii   I</span><br><span class="line"></span><br><span class="line">  static &#123;&#125;;</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (0x0008) ACC_STATIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=1, locals=0, args_size=0</span><br><span class="line">         0: ldc           #19                 // String xxxxxx</span><br><span class="line">         2: putstatic     #20                 // Field s2:Ljava/lang/String;</span><br><span class="line">         5: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 10: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>十六进制字节码:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">TestClass.class</span><br><span class="line">00000000: cafe babe 0000 0037 0064 0a00 1500 3508  .......7.d....5.</span><br><span class="line">00000010: 0036 0900 0800 3708 0038 0900 0800 3903  .6....7..8....9.</span><br><span class="line">00000020: 000f 4241 0900 0800 3a07 003b 0a00 0800  ..BA....:..;....</span><br><span class="line">00000030: 350a 0008 003c 0700 3d12 0000 0042 0a00  5....&lt;..=....B..</span><br><span class="line">00000040: 0b00 4309 0008 0044 0a00 0b00 3c09 0045  ..C....D....&lt;..E</span><br><span class="line">00000050: 0046 0a00 4700 480a 0047 0049 0800 4a09  .F..G.H..G.I..J.</span><br><span class="line">00000060: 0008 004b 0700 4c01 0001 7301 0012 4c6a  ...K..L...s...Lj</span><br><span class="line">00000070: 6176 612f 6c61 6e67 2f53 7472 696e 673b  ava/lang/String;</span><br><span class="line">00000080: 0100 0273 3201 0002 7331 0100 0d43 6f6e  ...s2...s1...Con</span><br><span class="line">00000090: 7374 616e 7456 616c 7565 0100 0169 0100  stantValue...i..</span><br><span class="line">000000a0: 0149 0100 016a 0100 0674 6872 6561 6401  .I...j...thread.</span><br><span class="line">000000b0: 0012 4c6a 6176 612f 6c61 6e67 2f54 6872  ..Ljava/lang/Thr</span><br><span class="line">000000c0: 6561 643b 0100 063c 696e 6974 3e01 0003  ead;...&lt;init&gt;...</span><br><span class="line">000000d0: 2829 5601 0004 436f 6465 0100 0f4c 696e  ()V...Code...Lin</span><br><span class="line">000000e0: 654e 756d 6265 7254 6162 6c65 0100 124c  eNumberTable...L</span><br><span class="line">000000f0: 6f63 616c 5661 7269 6162 6c65 5461 626c  ocalVariableTabl</span><br><span class="line">00000100: 6501 0004 7468 6973 0100 1d4c 636f 6d2f  e...this...Lcom/</span><br><span class="line">00000110: 696e 7465 7261 6374 2f6a 7567 672f 5465  interact/jugg/Te</span><br><span class="line">00000120: 7374 436c 6173 733b 0100 046d 6169 6e01  stClass;...main.</span><br><span class="line">00000130: 0016 285b 4c6a 6176 612f 6c61 6e67 2f53  ..([Ljava/lang/S</span><br><span class="line">00000140: 7472 696e 673b 2956 0100 0461 7267 7301  tring;)V...args.</span><br><span class="line">00000150: 0013 5b4c 6a61 7661 2f6c 616e 672f 5374  ..[Ljava/lang/St</span><br><span class="line">00000160: 7269 6e67 3b01 0002 7463 0100 104d 6574  ring;...tc...Met</span><br><span class="line">00000170: 686f 6450 6172 616d 6574 6572 7301 0005  hodParameters...</span><br><span class="line">00000180: 7374 6172 7401 0004 6969 6969 0100 0e6c  start...iiii...l</span><br><span class="line">00000190: 616d 6264 6124 7374 6172 7424 3001 0004  ambda$start$0...</span><br><span class="line">000001a0: 2849 2956 0100 046a 6a6a 6a01 0008 3c63  (I)V...jjjj...&lt;c</span><br><span class="line">000001b0: 6c69 6e69 743e 0100 0a53 6f75 7263 6546  linit&gt;...SourceF</span><br><span class="line">000001c0: 696c 6501 000e 5465 7374 436c 6173 732e  ile...TestClass.</span><br><span class="line">000001d0: 6a61 7661 0c00 2000 2101 0005 6666 6666  java.. .!...ffff</span><br><span class="line">000001e0: 660c 0016 0017 0100 0566 6461 7367 0c00  f........fdasg..</span><br><span class="line">000001f0: 1900 170c 001b 001c 0100 1b63 6f6d 2f69  ...........com/i</span><br><span class="line">00000200: 6e74 6572 6163 742f 6a75 6767 2f54 6573  nteract/jugg/Tes</span><br><span class="line">00000210: 7443 6c61 7373 0c00 2d00 2101 0010 6a61  tClass..-.!...ja</span><br><span class="line">00000220: 7661 2f6c 616e 672f 5468 7265 6164 0100  va/lang/Thread..</span><br><span class="line">00000230: 1042 6f6f 7473 7472 6170 4d65 7468 6f64  .BootstrapMethod</span><br><span class="line">00000240: 730f 0600 4d10 0021 0f07 004e 0c00 4f00  s...M..!...N..O.</span><br><span class="line">00000250: 500c 0020 0051 0c00 1e00 1f07 0052 0c00  P.. .Q.......R..</span><br><span class="line">00000260: 5300 5407 0055 0c00 5600 570c 0056 0030  S.T..U..V.W..V.0</span><br><span class="line">00000270: 0100 0678 7878 7878 780c 0018 0017 0100  ...xxxxxx.......</span><br><span class="line">00000280: 106a 6176 612f 6c61 6e67 2f4f 626a 6563  .java/lang/Objec</span><br><span class="line">00000290: 740a 0058 0059 0a00 0800 5a01 0003 7275  t..X.Y....Z...ru</span><br><span class="line">000002a0: 6e01 0034 284c 636f 6d2f 696e 7465 7261  n..4(Lcom/intera</span><br><span class="line">000002b0: 6374 2f6a 7567 672f 5465 7374 436c 6173  ct/jugg/TestClas</span><br><span class="line">000002c0: 733b 4929 4c6a 6176 612f 6c61 6e67 2f52  s;I)Ljava/lang/R</span><br><span class="line">000002d0: 756e 6e61 626c 653b 0100 1728 4c6a 6176  unnable;...(Ljav</span><br><span class="line">000002e0: 612f 6c61 6e67 2f52 756e 6e61 626c 653b  a/lang/Runnable;</span><br><span class="line">000002f0: 2956 0100 106a 6176 612f 6c61 6e67 2f53  )V...java/lang/S</span><br><span class="line">00000300: 7973 7465 6d01 0003 6f75 7401 0015 4c6a  ystem...out...Lj</span><br><span class="line">00000310: 6176 612f 696f 2f50 7269 6e74 5374 7265  ava/io/PrintStre</span><br><span class="line">00000320: 616d 3b01 0013 6a61 7661 2f69 6f2f 5072  am;...java/io/Pr</span><br><span class="line">00000330: 696e 7453 7472 6561 6d01 0007 7072 696e  intStream...prin</span><br><span class="line">00000340: 746c 6e01 0015 284c 6a61 7661 2f6c 616e  tln...(Ljava/lan</span><br><span class="line">00000350: 672f 5374 7269 6e67 3b29 5607 005b 0c00  g/String;)V..[..</span><br><span class="line">00000360: 5c00 600c 002f 0030 0100 226a 6176 612f  \.`../.0..&quot;java/</span><br><span class="line">00000370: 6c61 6e67 2f69 6e76 6f6b 652f 4c61 6d62  lang/invoke/Lamb</span><br><span class="line">00000380: 6461 4d65 7461 6661 6374 6f72 7901 000b  daMetafactory...</span><br><span class="line">00000390: 6d65 7461 6661 6374 6f72 7907 0062 0100  metafactory..b..</span><br><span class="line">000003a0: 064c 6f6f 6b75 7001 000c 496e 6e65 7243  .Lookup...InnerC</span><br><span class="line">000003b0: 6c61 7373 6573 0100 cc28 4c6a 6176 612f  lasses...(Ljava/</span><br><span class="line">000003c0: 6c61 6e67 2f69 6e76 6f6b 652f 4d65 7468  lang/invoke/Meth</span><br><span class="line">000003d0: 6f64 4861 6e64 6c65 7324 4c6f 6f6b 7570  odHandles$Lookup</span><br><span class="line">000003e0: 3b4c 6a61 7661 2f6c 616e 672f 5374 7269  ;Ljava/lang/Stri</span><br><span class="line">000003f0: 6e67 3b4c 6a61 7661 2f6c 616e 672f 696e  ng;Ljava/lang/in</span><br><span class="line">00000400: 766f 6b65 2f4d 6574 686f 6454 7970 653b  voke/MethodType;</span><br><span class="line">00000410: 4c6a 6176 612f 6c61 6e67 2f69 6e76 6f6b  Ljava/lang/invok</span><br><span class="line">00000420: 652f 4d65 7468 6f64 5479 7065 3b4c 6a61  e/MethodType;Lja</span><br><span class="line">00000430: 7661 2f6c 616e 672f 696e 766f 6b65 2f4d  va/lang/invoke/M</span><br><span class="line">00000440: 6574 686f 6448 616e 646c 653b 4c6a 6176  ethodHandle;Ljav</span><br><span class="line">00000450: 612f 6c61 6e67 2f69 6e76 6f6b 652f 4d65  a/lang/invoke/Me</span><br><span class="line">00000460: 7468 6f64 5479 7065 3b29 4c6a 6176 612f  thodType;)Ljava/</span><br><span class="line">00000470: 6c61 6e67 2f69 6e76 6f6b 652f 4361 6c6c  lang/invoke/Call</span><br><span class="line">00000480: 5369 7465 3b07 0063 0100 256a 6176 612f  Site;..c..%java/</span><br><span class="line">00000490: 6c61 6e67 2f69 6e76 6f6b 652f 4d65 7468  lang/invoke/Meth</span><br><span class="line">000004a0: 6f64 4861 6e64 6c65 7324 4c6f 6f6b 7570  odHandles$Lookup</span><br><span class="line">000004b0: 0100 1e6a 6176 612f 6c61 6e67 2f69 6e76  ...java/lang/inv</span><br><span class="line">000004c0: 6f6b 652f 4d65 7468 6f64 4861 6e64 6c65  oke/MethodHandle</span><br><span class="line">000004d0: 7300 2100 0800 1500 0000 0600 0200 1600  s.!.............</span><br><span class="line">000004e0: 1700 0000 0a00 1800 1700 0000 1200 1900  ................</span><br><span class="line">000004f0: 1700 0100 1a00 0000 0200 0400 1200 1b00  ................</span><br><span class="line">00000500: 1c00 0100 1a00 0000 0200 0600 0200 1d00  ................</span><br><span class="line">00000510: 1c00 0000 0100 1e00 1f00 0000 0500 0100  ................</span><br><span class="line">00000520: 2000 2100 0100 2200 0000 4d00 0200 0100   .!...&quot;...M.....</span><br><span class="line">00000530: 0000 172a b700 012a 1202 b500 032a 1204  ...*...*.....*..</span><br><span class="line">00000540: b500 052a 1206 b500 07b1 0000 0002 0023  ...*...........#</span><br><span class="line">00000550: 0000 0012 0004 0000 0006 0004 0008 000a  ................</span><br><span class="line">00000560: 000c 0010 000e 0024 0000 000c 0001 0000  .......$........</span><br><span class="line">00000570: 0017 0025 0026 0000 0089 0027 0028 0002  ...%.&amp;.....&#x27;.(..</span><br><span class="line">00000580: 0022 0000 0049 0002 0002 0000 000d bb00  .&quot;...I..........</span><br><span class="line">00000590: 0859 b700 094c 2bb6 000a b100 0000 0200  .Y...L+.........</span><br><span class="line">000005a0: 2300 0000 0e00 0300 0000 1500 0800 1600  #...............</span><br><span class="line">000005b0: 0c00 1700 2400 0000 1600 0200 0000 0d00  ....$...........</span><br><span class="line">000005c0: 2900 2a00 0000 0800 0500 2b00 2600 0100  ).*.......+.&amp;...</span><br><span class="line">000005d0: 2c00 0000 0501 0029 0000 0001 002d 0021  ,......).....-.!</span><br><span class="line">000005e0: 0001 0022 0000 005e 0005 0002 0000 001e  ...&quot;...^........</span><br><span class="line">000005f0: 1100 873c 2abb 000b 592a 1bba 000c 0000  ...&lt;*...Y*......</span><br><span class="line">00000600: b700 0db5 000e 2ab4 000e b600 0fb1 0000  ......*.........</span><br><span class="line">00000610: 0002 0023 0000 0012 0004 0000 001a 0004  ...#............</span><br><span class="line">00000620: 001b 0016 0020 001d 0022 0024 0000 0016  ..... ...&quot;.$....</span><br><span class="line">00000630: 0002 0000 001e 0025 0026 0000 0004 001a  .......%.&amp;......</span><br><span class="line">00000640: 002e 001c 0001 1002 002f 0030 0001 0022  ........./.0...&quot;</span><br><span class="line">00000650: 0000 005f 0002 0003 0000 0015 1b3d b200  ..._.........=..</span><br><span class="line">00000660: 1012 04b6 0011 b200 1084 0201 1cb6 0012  ................</span><br><span class="line">00000670: b100 0000 0200 2300 0000 1200 0400 0000  ......#.........</span><br><span class="line">00000680: 1c00 0200 1d00 0a00 1e00 1400 1f00 2400  ..............$.</span><br><span class="line">00000690: 0000 2000 0300 0000 1500 2500 2600 0000  .. .......%.&amp;...</span><br><span class="line">000006a0: 0000 1500 2e00 1c00 0100 0200 1300 3100  ..............1.</span><br><span class="line">000006b0: 1c00 0200 0800 3200 2100 0100 2200 0000  ......2.!...&quot;...</span><br><span class="line">000006c0: 1e00 0100 0000 0000 0612 13b3 0014 b100  ................</span><br><span class="line">000006d0: 0000 0100 2300 0000 0600 0100 0000 0a00  ....#...........</span><br><span class="line">000006e0: 0300 3300 0000 0200 3400 5f00 0000 0a00  ..3.....4._.....</span><br><span class="line">000006f0: 0100 5d00 6100 5e00 1900 3e00 0000 0c00  ..].a.^...&gt;.....</span><br><span class="line">00000700: 0100 3f00 0300 4000 4100 400a            ..?...@.A.@.</span><br></pre></td></tr></table></figure>
+<p>1.cafebabe固定4个字节<br>2.0000 次版本,无<br>3.0037 主版本,对应十进制为55,查找版本对照表,为11,具体规则可以查看<code>jvm</code>规范,无非就是什么版本对应什么数字,哪些版本没有次要版本,做了什么兼容设定<br>4.0064 常量池长度,对应十进制为100,上面常量池示例中正好到序号99.<br>5.0a 对应常量池第一个变量,<code>cp_info</code>具体结构为:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u1 info[];</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>所以第一个字符0a对用为10,10对应的<code>cp_info</code>的<code>tag</code>为<code>Method_ref</code>,对应结构如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">CONSTANT_Methodref_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u2 class_index;</span><br><span class="line">    u2 name_and_type_index;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以随后的两个字节0015代表着对应的<code>class</code>在常量池中的索引,0015对应的十进制为21,查看上面javap代码可以找到对应#21为<code>java.lang.Object</code>类.<br>在之后的2个字节0035代表着也对应着常量池中的索引，而该索引处的数据结构必须符合<code>CONSTANT_NameAndType_info</code>,0035对应十进制为53,查看上面javap代码,得到#53是一个<code>NameAndType</code>而且按照对应的结构引用了<code>utf_8</code>结构的#32#33,分别为特殊方法<code>&lt;init&gt;</code>以及返回值<code>()v</code>,世界上就是一个初始化方法.<br>上述分析对比一下javap反编代码的常量池#1,符合我们的分析.  </p>
+<p><strong>静态常量池中的<code>CONSTANT_NameAndType_info, CONSTANT_Module_info, and CONSTANT_Package_info, and the foundational structure CONSTANT_Utf8_info</code>不会被转换至动态常量池中,这些结构只会在初始化实例时候间接的使用</strong></p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>简单的<code>jvm</code>入门是完成了,虽然看懂了,但是不知道又什么用,参考了很多文章和书籍,<code>jvm</code>规范是最权威的,但是写的略简单,而博客文章又是千篇一律,互相抄,所以最后总结还是看书加动手实践是最好的.  </p>
+]]></content>
+      <tags>
+        <tag>java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective-java-第十一章学习笔记</title>
+    <url>/2021/09/20/Effective-java-%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第十一章: 并发</p>
+<span id="more"></span>
+
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1>]]></content>
+      <tags>
+        <tag>java,读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective-java-第十章学习笔记</title>
+    <url>/2021/09/19/Effective-java-%E7%AC%AC%E5%8D%81%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第十章: 异常</p>
+<span id="more"></span>
+
+<h1 id="异常只在异常情况下使用"><a href="#异常只在异常情况下使用" class="headerlink" title="异常只在异常情况下使用"></a>异常只在异常情况下使用</h1><p>异常不应该用于流程控制：</p>
+<ol>
+<li>现代的<code>jvm</code>设计并没有对异常进行优化设计.</li>
+<li>将代码放入<code>try-catch</code>模块，将组织<code>jvm</code>对其进行优化.</li>
+</ol>
+<p>对于使用异常控制流程的代码可以使用状态测试方法(比如<code>iterator</code>的<code>next</code>方法为状态测试方法，<code>hasNext()</code>为依赖状态测试的方法)，或者返回<code>optional</code>空包含。<br>如果是并发访问并且没有额外的同步控制或者方法调用会改变对象状态，应该使用返回<code>optonal</code>空包含；否则应该使用状态测试方法，状态测试方法具有更好的可读性,而且如果错误的使用也会被更容易的检测出来。</p>
+<h1 id="可恢复情况使用checked-Exception，对于不可恢复情况使用未受检查异常unchecked-Exception"><a href="#可恢复情况使用checked-Exception，对于不可恢复情况使用未受检查异常unchecked-Exception" class="headerlink" title="可恢复情况使用checked Exception，对于不可恢复情况使用未受检查异常unchecked Exception"></a>可恢复情况使用<code>checked Exception</code>，对于不可恢复情况使用未受检查异常<code>unchecked Exception</code></h1><p>所有<code>checked exception</code>都是<code>RuntimeException</code>的子类（直接或者间接的继承）  </p>
+<p>异常应该提供一个获取异常详细信息的方法,比如：触发条件，如何恢复，特别是<code>checked Exception</code></p>
+<h1 id="避免不必要的checked-Exception"><a href="#避免不必要的checked-Exception" class="headerlink" title="避免不必要的checked Exception"></a>避免不必要的<code>checked Exception</code></h1><p><code>checked Exception</code>可以调高程序的可读性，但是过度使用也会给调用客户端带来痛苦，所以当程序出意外时候可以恢复但是又需要客户端必须要处理一些意外的情况，可以使用<code>optional</code>. 如果<code>optional</code>不能满足情况(无法提供额外的信息说明为什么不能执行)，那么可以返回一个<code>checked exception</code>.</p>
+<h1 id="使用标准异常-java内置"><a href="#使用标准异常-java内置" class="headerlink" title="使用标准异常(java内置)"></a>使用标准异常(java内置)</h1><table>
+<thead>
+<tr>
+<th>异常</th>
+<th>翻译</th>
+<th>何时使用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IllegalArgumentException</td>
+<td>参数错误</td>
+<td>参数不符合要求</td>
+</tr>
+<tr>
+<td>IllegalStateException</td>
+<td>状态错误</td>
+<td>对象状态不符合调用该方法</td>
+</tr>
+<tr>
+<td>NullPointerException</td>
+<td>空指针</td>
+<td>参数为空</td>
+</tr>
+<tr>
+<td>IndexOutOfBoundsException</td>
+<td>下标越界</td>
+<td>数据或者集合下标超出长度</td>
+</tr>
+<tr>
+<td>ConcurrentModificationException</td>
+<td>并发修改</td>
+<td>并发修改一个对象使不被允许的</td>
+</tr>
+<tr>
+<td>UnsupportedOperationException</td>
+<td>对象不支持该操作</td>
+<td>对象不不具备该操作</td>
+</tr>
+</tbody></table>
+<p>这些是常用的异常，当然还有其他异常可以使用。</p>
+<h1 id="异常转译"><a href="#异常转译" class="headerlink" title="异常转译"></a>异常转译</h1><p>高层调用将底层的异常包装起来，抛出更高层次的异常给调用者，避免调用者感到困惑.</p>
+<p><strong>异常链:</strong> 底层的异常信息对于调试有作用，此时高层的异常提供一个访问的方法获取底层异常的信息(比如: <code>Throwable的getCause()</code>方法)</p>
+<h1 id="异常文档注释"><a href="#异常文档注释" class="headerlink" title="异常文档注释"></a>异常文档注释</h1><p>注释添加@throws表明会抛出哪些异常.</p>
+<h1 id="异常信息包含细节信息"><a href="#异常信息包含细节信息" class="headerlink" title="异常信息包含细节信息"></a>异常信息包含细节信息</h1><p>异常详细信息应该包含除去敏感信息的所有参数值.</p>
+<h1 id="失败的原子性"><a href="#失败的原子性" class="headerlink" title="失败的原子性"></a>失败的原子性</h1><p>当抛出异常时候，应该保持使用的对象保持在调用之前的状态.</p>
+<ol>
+<li>对象设计为<code>immutable</code></li>
+<li>进行参数检查，在方法开始检查参数是否有效，如果不满足调用条件，提前抛出异常，保持对象的状态不被改变.</li>
+<li>创建一个临时的拷贝对象进行操作，操作完成之后使用临时拷贝对象中的结果作为代替原来对象的内容，如果失败，原对象内容并不会被改变.</li>
+<li>最不常用的方法，编写一段<code>recovery code</code>回滚对象状态.</li>
+</ol>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>并没有关于自定义异常使用的建议，个人在写代码会使用自定义异常（<code>BusinessException</code>关闭爬栈开关）作为方法调用的前置条件不满足时的异常（参数检查不通过，抛出异常）.</p>
+]]></content>
+      <tags>
+        <tag>java,读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective-java-第九章学习笔记</title>
+    <url>/2021/08/25/Effective-java-%E7%AC%AC%E4%B9%9D%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第九章：通用编程意见</p>
+<span id="more"></span>
+
+<h1 id="最小化局部变量得作用范围"><a href="#最小化局部变量得作用范围" class="headerlink" title="最小化局部变量得作用范围"></a>最小化局部变量得作用范围</h1><p>前面说过将类得成员变量访问最小化，增强代码得可读性和可维护性，同样将局部变量得访问最小化，也利于维护和可读性。</p>
+<h2 id="在变量使用前声明"><a href="#在变量使用前声明" class="headerlink" title="在变量使用前声明"></a>在变量使用前声明</h2><p>如果过早得声明变量，会造成读代码的人不得一直记住这个变量的值，会给阅读带来混乱，等到读到使用变量的地方，可能读者已经忘记了变量的值，不得不重新在去寻找一遍该变量的声明。如果一变量在使用他的代码块(<code>&#123;&#125;</code>之间)之外声明，那么在代码块执行结束以后，该变量仍然可见，如果在在代码块执行之前被失误的使用，那么可能造成程序错误。</p>
+<h2 id="声明变量应该初始化-赋值"><a href="#声明变量应该初始化-赋值" class="headerlink" title="声明变量应该初始化(赋值)"></a>声明变量应该初始化(赋值)</h2><p>如果你要声明一个变量那么最好是有足够的信息进行初始化该变量，否则应该推迟到直至有足够的信息初始化该变量在声明。在<code>try-catch</code>声明变量例外，因为try里面的变量外部无法访问，那么就无法释放资源。</p>
+<h2 id="循环变量"><a href="#循环变量" class="headerlink" title="循环变量"></a>循环变量</h2><p>一般在循环中的变量都有一个特殊的地方声明变量来使变量作用域最小化，就是在循环的小括号内，因此应该优先使用<code>for</code>循环，而不是<code>while</code>循环，因为<code>while</code>循环没有一个特殊的地方(小括号内)声明变量，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">for</span> (Element e : c) &#123;</span><br><span class="line">... <span class="comment">// Do Something with e</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Iterator&lt;Element&gt; i = c.iterator();</span><br><span class="line"><span class="keyword">while</span> (i.hasNext()) &#123;</span><br><span class="line">doSomething(i.next());</span><br><span class="line">&#125; ...</span><br><span class="line">Iterator&lt;Element&gt; i2 = c2.iterator();</span><br><span class="line"><span class="keyword">while</span> (i.hasNext()) &#123; <span class="comment">// BUG!</span></span><br><span class="line">doSomethingElse(i2.next());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述<code>while</code>循环就会出现问题，第二个<code>while</code>循环使用的条件判断是<code>i</code>而不是<code>i2</code>,有可能第二个<code>while</code>会执行，也可能不会执行，也可能执行几个，那得看<code>c</code>比<code>c2</code>大多少倍了。 第一个增强的<code>for</code>循环就不会有问题。</p>
+<p>另一种是循环变量最小化的做法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>, n = expensiveComputation(); i &lt; n; i++) &#123;</span><br><span class="line">... <span class="comment">// Do something with i;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>n</code>用来表示<code>i</code>的上限，此处<code>n</code>只是用来限制<code>i</code>的上限，只会被用到一次，所以应该声明为循环变量。  </p>
+<h2 id="是方法体代码少和功能单一"><a href="#是方法体代码少和功能单一" class="headerlink" title="是方法体代码少和功能单一"></a>是方法体代码少和功能单一</h2><p>如果把多个功能的操作合并到一个方法里面，不仅造成方法臃肿，而且两个功能的操作变量还可能重复，造成误操作。、</p>
+<h1 id="优先使用for-each循环代替for循环"><a href="#优先使用for-each循环代替for循环" class="headerlink" title="优先使用for-each循环代替for循环"></a>优先使用<code>for-each</code>循环代替<code>for</code>循环</h1><p>传统的迭代器循环</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Not the best way to iterate over a collection!</span></span><br><span class="line"><span class="keyword">for</span> (Iterator&lt;Element&gt; i = c.iterator(); i.hasNext(); ) &#123;</span><br><span class="line"><span class="type">Element</span> <span class="variable">e</span> <span class="operator">=</span> i.next();</span><br><span class="line">... <span class="comment">// Do something with e</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>传统的数组循环</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Click here to view code image</span><br><span class="line"><span class="comment">// Not the best way to iterate over an array!</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; a.length; i++) &#123;</span><br><span class="line">... <span class="comment">// Do something with a[i]</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上两种方法，迭代器中的变量和索引变量都要使用3次，可能会出现错误的使用索引(多重循环最容易出现此问题)，编译器可能发现不了问题。使用<code>for-each</code>循环(增强的<code>for</code>)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (Element e : elements) &#123;</span><br><span class="line">... <span class="comment">// Do something with e</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总之，<code>for-each</code>循环的简洁性和预防bug性都要强于传统的<code>for</code>循环，但是如果有一下情况无法使用<code>for-each</code>循环。</p>
+<ol>
+<li><p>过滤-如果要遍历集合，并删除指定元素，就需要显示的的迭代器，以便可以调用它的<code>remove</code>方法。</p>
+</li>
+<li><p>转换-如果需要遍历数组，并且替换其中某些位置的元素，那么就需要用到下标替换。</p>
+</li>
+<li><p>平行迭代-如果需要并行的遍历多个集合，就需要显示的控制迭代器或者索引变量，以便于所有的迭代器或者索引都同步前向移动。</p>
+</li>
+</ol>
+<h1 id="了解和使用java常用类库"><a href="#了解和使用java常用类库" class="headerlink" title="了解和使用java常用类库"></a>了解和使用<code>java</code>常用类库</h1><p>书中开头举例了一个随机算法的例子，说明了线性同余<code>x(n+1) = (a*x(n)+c) % n</code>伪随机方法,<code>a,c,n</code>为常数，<code>x(n)</code>随机种子，产生随机数的缺陷： </p>
+<ol>
+<li>存在生成周期，如果n比较小,那么生成周期就小，随机数过一个周期就会重复。</li>
+<li>如果n不是一个2的乘方，随机分布不均匀，如果n比较大更会体现出这个缺点。</li>
+<li>第三个问题和线性随机无关，是<code>java</code>中最小值取绝对值，还是最小值(负值)。</li>
+</ol>
+<p>但是书中又说了,直接使用<code>Random.nextInt(int)</code>就可以产生一个想要的随机数，没看太明白，待实践到底表达什么意思</p>
+<p>同时<code>jdk7</code>以后生成随机数时候使用<code>threadlocalrandom</code>，在<code>stream</code>中使用<code>splittablerandom</code>  </p>
+<p><strong>总之， 每个<code>java</code>程序员都应该熟悉的包：<code>java.lang,  java.util.concurrent, java.util.function, java.time, java.io, java.nio, java.util.stream</code></strong> </p>
+<h1 id="精确的数值计算避免使用-float-double"><a href="#精确的数值计算避免使用-float-double" class="headerlink" title="精确的数值计算避免使用 float double"></a>精确的数值计算避免使用 float double</h1><p><strong>浮点数公式: V &#x3D; (-1)^S * M * R^E</strong></p>
+<p>其中各个变量的含义如下：</p>
+<ul>
+<li>S：符号位，取值 0 或 1，决定一个数字的符号，0 表示正，1 表示负</li>
+<li>M：尾数，用小数表示，例如前面所看到的 8.345 * 10^0，8.345 就是尾数</li>
+<li>R：基数，表示十进制数 R 就是 10，表示二进制数 R 就是 2</li>
+<li>E：指数，用整数表示，例如前面看到的 10^-1，-1 即是指数</li>
+</ul>
+<p>参见文章<a href="https://www.ruanyifeng.com/blog/2010/06/ieee_floating-point_representation.html">浮点数的二进制表述</a>, 显然由于浮点数的表示精度由尾数决定, 浮点数的范围有指数决定,而浮点数是固定宽度的(32和64位), 按照约定来说就可能出现丢失精度或者说出现很大无法表示的小数, 在对数字高敏感度的环境并不适用, 比如银行交易(在项目里使用浮点数计算金钱基本就等着被开除吧), 出现了错误可能是致命的, 所以应该是<code>BigDecimal</code>来代替。</p>
+<h1 id="基本类型优先于包装类型"><a href="#基本类型优先于包装类型" class="headerlink" title="基本类型优先于包装类型"></a>基本类型优先于包装类型</h1><ol>
+<li>基本类型值包含值，包装类型不仅包含值，还包含一些对象信息，所以包装类型是不能使用&#x3D;&#x3D;进行比较的.  </li>
+<li>在使用包装类型进行操作时候，会出现空指针异常，而且进行算术运算会有自动拆箱操作，性能较差.</li>
+</ol>
+<p><strong>在编写<code>PO</code>和<code>VO</code>时候应该使用包装类型，数据对应的任何字段都有可能是<code>null</code>值，使用基本类型在获取数据时候会出现错误，前端页面传值也会有这种问题</strong></p>
+<h1 id="有更合适的类型，尽量避免使用String"><a href="#有更合适的类型，尽量避免使用String" class="headerlink" title="有更合适的类型，尽量避免使用String"></a>有更合适的类型，尽量避免使用<code>String</code></h1><ol>
+<li><code>String</code> 不适合代替其他类型得值</li>
+<li><code>String</code> 不适合代替枚举值</li>
+<li><code>String</code> 不适合代替聚合类型</li>
+<li><code>String</code> 不适合作为能力表示</li>
+</ol>
+<h1 id="字符串连接-性能低下"><a href="#字符串连接-性能低下" class="headerlink" title="字符串连接+性能低下"></a>字符串连接<code>+</code>性能低下</h1><p>如果在<code>for</code>循环中拼接字符串，使用<code>+</code>会使得性能非常低下，建议使用<code>StringBuilder</code>,如果只是定义简单得字符串可以使用<code>+</code></p>
+<h1 id="通过接口引用对象"><a href="#通过接口引用对象" class="headerlink" title="通过接口引用对象"></a>通过接口引用对象</h1><p>如果有合适得接口存在，那么参数，返回值，成员变量，这些都应该被定义为接口类型。使用接口定义，可以使程序更加零多（多态性），有一种例外，就是如果需要类得具体功能，而接口又不具备，那么此时应该使用具体得类作为对象的引用。</p>
+<h1 id="接口优先于反射"><a href="#接口优先于反射" class="headerlink" title="接口优先于反射"></a>接口优先于反射</h1><p>反射性能非常差，而且代码多，编译期间无法检查你反射出的对象是否可以执行对应的代码。<br>但是有些时候不得不使用反射，在编写一些底层框架代码,如<code>Spring</code>等这些框架就利用了反射，而反射只需要在启动时候执行一次，也不会影响运行过程中的性能;或者编写一些类似对象监视作用的代码也可能会需要反射机制。</p>
+<h1 id="谨慎的使用native代码"><a href="#谨慎的使用native代码" class="headerlink" title="谨慎的使用native代码"></a>谨慎的使用<code>native</code>代码</h1><p>非常难以调试，出错了也不知道报错信息，之前朋友代码中使用<code>JNI</code>非常不友好，<code>native</code>代码出错没法调试，内存泄漏没法控制，灾难性的东西。</p>
+<h1 id="不要过早的优化"><a href="#不要过早的优化" class="headerlink" title="不要过早的优化"></a>不要过早的优化</h1><ol>
+<li><p>More computing sins are committed in the name of efficiency (without<br>necessarily achieving it) than for any other single reason—including blind<br>stupidity.<br>                                            —William A. Wulf [Wulf72]</p>
+</li>
+<li><p>We should forget about small efficiencies, say about 97% of the time:<br>premature optimization is the root of all evil.<br>                                           —Donald E. Knuth [Knuth74]</p>
+</li>
+<li><p>We follow two rules in the matter of optimization:<br>Rule 1. Don’t do it.<br>Rule 2 (for experts only). Don’t do it yet—that is, not until you have a<br>perfectly clear and unoptimized solution.<br>                                           —M. A. Jackson [Jackson75]</p>
+</li>
+<li><p>努力编写好的程序，而不是快的程序</p>
+</li>
+<li><p>努力避免那些限制性能的设计决策</p>
+</li>
+<li><p>考虑<code>API</code>设计决策对性能的影响</p>
+</li>
+<li><p>未获得更好的性能，对<code>API</code>进行包装，是一个非常愚蠢的想法</p>
+</li>
+<li><p>每次优化前后都要进行性能测试</p>
+</li>
+</ol>
+<h1 id="遵循通用命名规范"><a href="#遵循通用命名规范" class="headerlink" title="遵循通用命名规范"></a>遵循通用命名规范</h1><p>参见<a href="https://dengbojing.com/2020/09/21/Naming-Convention-%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83/">Naming Convention–命名规范</a>
+ </p>
+]]></content>
+      <tags>
+        <tag>java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective-java-第八章学习</title>
+    <url>/2021/08/20/Effective-java-%E7%AC%AC%E5%85%AB%E7%AB%A0%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<p>第八章：方法</p>
+<span id="more"></span>
+
+<h1 id="检查方法参数"><a href="#检查方法参数" class="headerlink" title="检查方法参数"></a>检查方法参数</h1><p>failure atomicity(原子性失败): 失败的方法调用，应该使对象保持在被调用之前的状态。</p>
+<p>如果一个方法在执行之前未检查参数，那么可能出现以下几种情况：</p>
+<ol>
+<li>方法执行失败，抛出令人困惑的异常。</li>
+<li>方法执行成功，但是返回的值不正确。</li>
+<li>方法执行成功，返回值也是正确的，但是有些对象的状态可能处于未知的状态，可能在未知的时刻，未知的调用情况下出现错误。</li>
+</ol>
+<p>以上几点都违反了原子性失败，基于以上几点，所以在方法执行前一定要进行方法参数的检查。检查遵循如下约定：</p>
+<ol>
+<li><p>对于<code>public</code>和<code>protected</code>方法，可以在方法上使用<code>@throw</code>注释说明方法参数可能会引发何种异常，比如<code>IllegalArgumentException, IndexOutOfBoundsException, NullPointerException</code>，并且在参数未通过检查时，抛出这些异常。</p>
+</li>
+<li><p>使用<code>@Nullable</code>和其他相似的注解，注解在方法参数上，指示方法参数是否可以为空等等。</p>
+</li>
+<li><p>使用<code>Objects</code>工具类中提供的静态方法，进行方法参数的校验。</p>
+</li>
+<li><p>对于不被暴露对外的方法(<code>private</code>)，可以控制在什么情况下被调用，可以确认什么时候被调用，什么样参数会被传入，可以使用断言<code>assert</code>，通常在测试时候可以使用<code>-ea</code>开启断言，在正式环境默认是不开启。</p>
+</li>
+<li><p>对于有些参数在方法本身没有用到，只是保存起来以便以后使用，对于这种参数检查特别重要，因为如果不检查在之后使用中出现了错误，你无法知道是参数错误还是其他错误，举例：静态工厂方法<code>Lists.asList()</code>，构造函数等。</p>
+</li>
+<li><p>参数检查也有例外，比如检查参数非常的消耗资源，或者有效性检查，隐式的在后续计算中完成，<code>Collections.sort(list)</code>(不用检查<code>list</code>中每个元素是否可以比较，<code>sort</code>方法会做出检查)，当然有可能隐式的检查抛出的异常和我们预期的异常是不同的，所以此时我们需要进行异常转换。</p>
+</li>
+<li><p>并非参数检查越多越好，如果一个方法能接受所有的参数而且都能工作，非常的通用，那么对参数的限制当然是越少越好。</p>
+</li>
+<li><p>参数的检查应该写在方法的注释中。</p>
+</li>
+</ol>
+<h1 id="防御性的复制-拷贝"><a href="#防御性的复制-拷贝" class="headerlink" title="防御性的复制(拷贝)"></a>防御性的复制(拷贝)</h1><h2 id="不可变类"><a href="#不可变类" class="headerlink" title="不可变类"></a>不可变类</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Broken &quot;immutable&quot; time period class</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">Period</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Date start;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Date end;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> start the beginning of the period</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> end the end of the period; must not precede start</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@throws</span> IllegalArgumentException if start is after end</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@throws</span> NullPointerException if start or end is null</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Period</span><span class="params">(Date start, Date end)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (start.compareTo(end) &gt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(start + <span class="string">&quot; after &quot;</span> + end);</span><br><span class="line">        <span class="built_in">this</span>.start = start;</span><br><span class="line">        <span class="built_in">this</span>.end = end;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Date <span class="title function_">start</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> start;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Date <span class="title function_">end</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> end;</span><br><span class="line">    &#125;</span><br><span class="line">    ... <span class="comment">// Remainder omitted</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码看起来是不可变，实际上有两个问题:</p>
+<ol>
+<li><p><code>start()</code>,<code>end()</code>方法返回了类的成员变量的引用，调用者可以使用该引用改变成员变量。</p>
+</li>
+<li><p>构造函数中将传入参数的引用赋给成员变量，如果该引用发生了变化，那么该类的实例也发生了变化。</p>
+</li>
+</ol>
+<p>修改：</p>
+<ol>
+<li><p>在构造函数中使用形参内容创建一个<em>copy</em>的中间对象，然后在将中间对象赋值给成员变量，这样即使传入的参数内容发生了改变也不在会影响该类的实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">Period</span><span class="params">(Date start, Date end)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.start = <span class="keyword">new</span> <span class="title class_">Date</span>(start.getTime());</span><br><span class="line">    <span class="built_in">this</span>.end = <span class="keyword">new</span> <span class="title class_">Date</span>(end.getTime());</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.start.compareTo(<span class="built_in">this</span>.end) &gt; <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(</span><br><span class="line">    <span class="built_in">this</span>.start + <span class="string">&quot; after &quot;</span> + <span class="built_in">this</span>.end);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>start()</code>,<code>end()</code> 方法返回该成员变量的<em>copy</em>对象。</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Date <span class="title function_">start</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Date</span>(start.getTime());</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> Date <span class="title function_">end</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Date</span>(end.getTime());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>ps: 在<code>jdk 8</code>以后的版本可以直接使用<code>java.time</code>下的<code>LocalDate</code>，因为<code>LocalDate</code>被设计成不变的。但是本例讨论的是不可变类在内部有可变成员变量时候如何保证不可变性。</p>
+</blockquote>
+<p><code>defensive copy</code>: 以上设计就是一种防御性复制(拷贝)。  </p>
+<p>一个不可变的类中含有可变的成员变量，在构造函数中进行防御性复制是不可缺少的。  </p>
+<p><strong>防御性拷贝应该是在参数检查之前进行，并且参数检查应该检查防御性拷贝之后对象，如果先进行参数检查，在进行拷贝，那么在参数检查之后拷贝进行之前这段<em>脆弱的窗口期</em>其他线程就可以改变参数的内容(虽然时间很短，但是多线程可能出现这种情况)，那么在进行拷贝时，可能就是一个不正确的值。在计算机安全社区，这种是一种攻击手段，叫做：</strong></p>
+<blockquote>
+<p><em>TOCTOU</em> : tiem of check&#x2F;time of use    </p>
+</blockquote>
+<p>上述构造方法中并没有使用<code>date.clone()</code>方法获得一个拷贝，因为<code>Date</code>类可以被继承，所以实际的参数就可以是<code>Date</code>的子类的实例，在这种情况调用<code>clone</code>方法，并不能保证正确性和安全性。所以对于 <strong>不被信任</strong> 可以被子类化的参数(参数的类是可以被继承，实现(implements))不要使用其<code>clone（）</code>方法。但是在<code>start()</code>,<code>end()</code>成员方法时可以使用<code>clone()</code>方法，因为，此时我们已经知道了<code>start</code>,<code>end</code>成员变量就是<code>Date</code>类型，是可以被信任的。</p>
+<h2 id="可变类"><a href="#可变类" class="headerlink" title="可变类"></a>可变类</h2><p>在编写可变类时候也要仔细的考虑是否可以接受客户端传入一个可变的参数，如果不能，那么就要进项防御性拷贝，避免客户端改变参数，影响该类的实例。  </p>
+<p>其次在返回类的成员变量之前也要考虑是否可以接受客户端改变该类的成员变量的引用，或者改变其内容，如果不能，那么也要进行防御性拷贝。</p>
+<p>如果使用不可变类的对象作为成员变量，那么就不必考虑防御性拷贝。  </p>
+<p>简而言之，如果类具有从客户端得到或者返回到客户端的可变组件，类就必须考虑是否要进行防御性拷贝。</p>
+<h1 id="仔细的设计方法签名"><a href="#仔细的设计方法签名" class="headerlink" title="仔细的设计方法签名"></a>仔细的设计方法签名</h1><ol>
+<li><p>仔细的设计方法名称，应该是见名之意，容易理解，并且保持和类的内部或者包内部其他方法名称格式保持一致，而且方法名也不能过长。</p>
+</li>
+<li><p>不要过于追求便利：每个方法都应该做到它的责任，太多的方法，使类或者接口难以维护，阅读，实现。</p>
+</li>
+<li><p>避免过长的参数列表： 最多4个参数，特别使相同类型的长参数列表，调用的时候记不住顺序，类型又相同，非常容易传错参数，但是类型相同，编译又不会出错。如果参数太多，考虑查拆分为多个方法; 或者写一个辅助类，保存这些参数; 或者使用<code>builder</code>构造模式。</p>
+</li>
+<li><p>使用接口类型作为参数类型：增加通用性。</p>
+</li>
+<li><p>使用枚举代替boolean参数。</p>
+</li>
+</ol>
+<h1 id="谨慎的进行方法重载"><a href="#谨慎的进行方法重载" class="headerlink" title="谨慎的进行方法重载"></a>谨慎的进行方法重载</h1><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Broken! - What does this program print?</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CollectionClassifier</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">classify</span><span class="params">(Set&lt;?&gt; s)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Set&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">classify</span><span class="params">(List&lt;?&gt; lst)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;List&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">classify</span><span class="params">(Collection&lt;?&gt; c)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Unknown Collection&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        Collection&lt;?&gt;[] collections = &#123;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">HashSet</span>&lt;String&gt;(),</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;BigInteger&gt;(),</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, String&gt;().values()</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="keyword">for</span> (Collection&lt;?&gt; c : collections)</span><br><span class="line">            System.out.println(classify(c));</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>灵魂拷问：输出什么? 结果是3次”Unknow Collection”,因为在编译期间所有参数都是c.要调用哪个方法是在编译期间决定的，所以尽管实际参数类型是<code>set</code>,<code>list</code>也还是调用<code>classify(Collection&lt;?&gt;)</code>调用。</p>
+<p>重载方法是静态选择的或者说是编译期间选择的，而重写方法的选择是动态的或者说是在运行期间的，选择依据是重写方法在运行时候被调用传入的参数类型。比如如下代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Wine</span> &#123;</span><br><span class="line">    String <span class="title function_">name</span><span class="params">()</span> &#123; <span class="keyword">return</span> <span class="string">&quot;wine&quot;</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SparklingWine</span> <span class="keyword">extends</span> <span class="title class_">Wine</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span> String <span class="title function_">name</span><span class="params">()</span> &#123; <span class="keyword">return</span> <span class="string">&quot;sparkling wine&quot;</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Champagne</span> <span class="keyword">extends</span> <span class="title class_">SparklingWine</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span> String <span class="title function_">name</span><span class="params">()</span> &#123; <span class="keyword">return</span> <span class="string">&quot;champagne&quot;</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Overriding</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;Wine&gt; wineList = List.of(</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">Wine</span>(), <span class="keyword">new</span> <span class="title class_">SparklingWine</span>(), <span class="keyword">new</span> <span class="title class_">Champagne</span>());</span><br><span class="line">            <span class="keyword">for</span> (Wine wine : wineList)</span><br><span class="line">                System.out.println(wine.name());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上代码就会输出我们想要的结果：<code>wine, sparkling wine, champagne</code>  </p>
+<p><strong>结论：对于具有相同数目参数的方法来说，应该尽量避免重载</strong></p>
+<h1 id="谨慎的使用可变参数"><a href="#谨慎的使用可变参数" class="headerlink" title="谨慎的使用可变参数"></a>谨慎的使用可变参数</h1><h1 id="返回零长度的数组或者空集合而不是返回null"><a href="#返回零长度的数组或者空集合而不是返回null" class="headerlink" title="返回零长度的数组或者空集合而不是返回null"></a>返回零长度的数组或者空集合而不是返回null</h1><p>返回<code>null</code>值，调用的客户端必须要做<code>null</code>检查，实际上0长度的数组或者集合和<code>null</code>代表了一个意思，都是没有的意思，显然返回0长度的集合或者数组更加合适。</p>
+<h1 id="慎用optionals"><a href="#慎用optionals" class="headerlink" title="慎用optionals"></a>慎用<code>optionals</code></h1><p><code>Optional</code>是<code>java 8</code>提供的一种容器，用来解决<code>npe</code>问题。实际上类似另一种<code>checked exception</code>操作，只是该操作不像抛出异常时需要爬栈(实际自定义异常也可以关闭爬栈)，比较优雅。</p>
+<p>容器类型，比如<code>collections, maps, streams, arrays</code>和<code>optioal</code>自身(也可看做一个容器，只能存放至多一个元素)不应该使用<code>optional</code>进行包装。</p>
+<p>如果一个方法可能返回<code>null</code>可能返回具体的值，且客户端要对没返回值进行特殊处理，那么因该定义返回<code>Optional&lt;T&gt;</code>  </p>
+<p>不要使用<code>optional</code>包装一个原始类型的装箱类型，<code>java</code>提供了<code>OptionalInt, OptionalLong,OptionalDouble.</code>3种类来处理这种情况，<code>Boolean, Byte, Character, Short, and Float.</code>这些没有对应的类，所以最好是不用<code>optional</code>进行包装，因为会进行2曾包装，所以最好是直接返回原始类型的值。  </p>
+<p>不要集合中使用<code>optional</code>,也不要将<code>optinal</code>作为<code>key</code>存入<code>Map</code>.如果这么做了，在检查元素是否在集合中就会很麻烦。得不偿失。</p>
+<p>不要将<code>optional</code>作为成员变量使用。 </p>
+<h1 id="为所有导出的api元素编写注释"><a href="#为所有导出的api元素编写注释" class="headerlink" title="为所有导出的api元素编写注释"></a>为所有导出的api元素编写注释</h1><p>注释应该简洁的说明方法是做什么的，而不是怎么做；同时文档注释中应该包含该方法调用的前置条件和后置条件</p>
+<p><code>@param</code>: 描述参数，前置条件<br><code>@return</code>: 返回值<br><code>@throws</code>: 如果不满足前置条件会抛出什么异常，该描述应该包含一个”如果(if)”,表示异常条件什么时候会抛出<br><code>@code</code>: 在注释中使用代码时候使用。如<pre>{@code int index = 1; index++;}</pre><br><code>@literal</code>: 如果文档包含<code>html</code>元字符比如<code>&lt;</code>,<code>&gt;</code>可以使用该注释是java doc comment不解释该字符.<br><code>@link</code>: 链接到别的类或者方法，字段等.<br><code>@see</code>: 同<code>&#123;@link&#125;</code> 区别是需要单独一行，顶头写，不能混在注释里面。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Effective-java-第七章学习笔记</title>
+    <url>/2021/08/11/Effective-java-%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第七章：Lambdas 表达式 和 Streams流处理</p>
+<span id="more"></span>
+
+
+<h1 id="使用Lambads优先于匿名内部类"><a href="#使用Lambads优先于匿名内部类" class="headerlink" title="使用Lambads优先于匿名内部类"></a>使用<code>Lambads</code>优先于匿名内部类</h1><p>函数式接口： 只拥有一个抽象方法的接口(interface)被称作函数式接口。</p>
+<p>函数对象：只具有一个方法的接口的实例，代表一种方法或者具体的执行动作。</p>
+<p><code>Lambad</code>表达式减少了匿名内部类的样板代码，比如: </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">Thread</span>  <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="comment">//do sth</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>使用<code>Lambads</code>代替：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">Thread</span>  <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;<span class="comment">//do sth&#125;);</span></span><br></pre></td></tr></table></figure>
+<p>当明白了<code>Lambads</code>的语法，会觉得上述写法非常简洁，也非常直观的知道这个线程的作用.</p>
+<ol>
+<li><p>当使用<code>Lambads</code>时，通常省略参数类型，除非参数类型的指定能让程序看起来更加清晰，如果编译器发出警告或者编译错误无法推断参数类型，此时你应该明确的指定参数类型。编译器的类型推断是根据传入参数，或者返回值的泛型类型来确定，所以一定要使用泛型来代替原始类型。</p>
+</li>
+<li><p><code>Lambads</code>最好不要超过3行，超过3行可读性就会非常差，超过3行就要进行重构</p>
+</li>
+<li><p><code>Lambads</code>没有名称和很好的文档注释，如果表达式不能自我表达，自我描述，或者超过行数限制，都不应该写<code>Lambads</code></p>
+</li>
+<li><p><code>Lambads</code>中<code>this</code>指代的是包含表达式的对象，匿名内部类中<code>this</code>代表该匿名内部类的实例。</p>
+</li>
+<li><p>使用泛型更好的实现枚举的constant-specific方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">Operation</span> &#123;</span><br><span class="line">    PLUS (<span class="string">&quot;+&quot;</span>, (x, y) -&gt; x + y),</span><br><span class="line">    MINUS (<span class="string">&quot;-&quot;</span>, (x, y) -&gt; x - y),</span><br><span class="line">    TIMES (<span class="string">&quot;*&quot;</span>, (x, y) -&gt; x * y),</span><br><span class="line">    DIVIDE(<span class="string">&quot;/&quot;</span>, (x, y) -&gt; x / y);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String symbol;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> DoubleBinaryOperator op;</span><br><span class="line">    Operation(String symbol, DoubleBinaryOperator op) &#123;</span><br><span class="line">    <span class="built_in">this</span>.symbol = symbol;</span><br><span class="line">    <span class="built_in">this</span>.op = op;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="使用方法引用优先于Lambads"><a href="#使用方法引用优先于Lambads" class="headerlink" title="使用方法引用优先于Lambads"></a>使用方法引用优先于<code>Lambads</code></h1><p>如果方法引用不能使代码更加清晰，降低了可读性，那么则应该使用<code>lambad</code>表达式。</p>
+<h1 id="优先使用标准的函数式接口"><a href="#优先使用标准的函数式接口" class="headerlink" title="优先使用标准的函数式接口"></a>优先使用标准的函数式接口</h1><ol>
+<li><p>如果有标准的函数式接口可以完成需求，那么就应该优先使用，而不是专门构建一个函数式接口。<code>java 8</code>内置了很多函数式接口在<code>java.util.function</code>包下，优先使用这些函数式接口。如果有以下情况除外：<br>  1.1. 需要一个通用的，具有描述性的名字的函数式接口.<br>  1.2. 拥有很强的约束关系.<br>  1.3. 讲受益于自定义的默认方法.</p>
+</li>
+<li><p>不要试图使用带有包装类型的基础函数式接口代替原始类型的函数式接口。</p>
+</li>
+<li><p>函数式接口必须要使用<code>@FunctionalInterface</code>注解。</p>
+</li>
+</ol>
+<h1 id="谨慎的使用-96-Streams·"><a href="#谨慎的使用-96-Streams·" class="headerlink" title="谨慎的使用&#96;Streams·"></a>谨慎的使用&#96;Streams·</h1><p><code>Stream</code>概念包含一组数据(<code>Steam</code>)和作用于数据上的一个或者多个操作(<code>Stream pipline</code>).</p>
+<p><code>Stream pipline</code>分为两种操作：中间操作(<code>intermediate operations</code>) 和 终止操作(<code>terminal operation</code>),中间操作可以有一个或者多个，而终止操作只能有一个，但是只有在调用了有了终止操作，整个<code>Stream pipline</code>才会被触发，如果没有终止操作，那么处理流的代码永远不会被执行。</p>
+<p>流的处理默认是串行的，只有当调用流的<code>parallel</code>方法时候流的处理才会被并行处理，但是很少这么做，并行处理需要注意很多地方，且并行处理并不一定都会使处理速度加快。</p>
+<p>过度是使用流操作也会是代码难以阅读和维护，比如: </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Overuse of streams - don&#x27;t do this!</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Anagrams</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">Path</span> <span class="variable">dictionary</span> <span class="operator">=</span> Paths.get(args[<span class="number">0</span>]);</span><br><span class="line">        <span class="type">int</span> <span class="variable">minGroupSize</span> <span class="operator">=</span> Integer.parseInt(args[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">try</span> (Stream&lt;String&gt; words = Files.lines(dictionary)) &#123;</span><br><span class="line">            words.collect(</span><br><span class="line">            groupingBy(word -&gt; word.chars().sorted()</span><br><span class="line">            .collect(StringBuilder::<span class="keyword">new</span>,</span><br><span class="line">            (sb, c) -&gt; sb.append((<span class="type">char</span>) c),</span><br><span class="line">            StringBuilder::append).toString()))</span><br><span class="line">            .values().stream()</span><br><span class="line">            .filter(group -&gt; group.size() &gt;= minGroupSize)</span><br><span class="line">            .map(group -&gt; group.size() + <span class="string">&quot;: &quot;</span> + group)</span><br><span class="line">            .forEach(System.out::println);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码里面的<code>gourpingBy</code>函数的代码读对于没怎么使用过流的人来说读起来非常吃力。<br>建议讲<code>groupingBy</code>单独封装一个方法，单独封装一个方法，可以使用有涵义的方法名和良好的说明注释，这样可以使整个代码可读性和维护性有很大的提升。</p>
+<p>由于<code>lambdd</code>表达式没有显示的参数类型，所以参数的名称就非常重要，好的参数名称对于可读性来说是非常重要的，尽量不要使用单个字母来命名，使用单词或者合成单词来命名。  </p>
+<p>避免使用流来处理<code>char</code>数据，书中举例是因为<code>char</code>字符在输出时会使用对应的<code>int</code>值。</p>
+<p>除非有必要重构<code>for</code>循环代码为<code>Stream</code>，否则你应该保持克制，并不是所有的循环改为<code>Stream</code>都拥有很好的可读性和可维护性。复杂的任务进行重构时可能会带来过度使用<code>Stream</code>的问题。从而使代码的可读性和维护性降低。</p>
+<p><code>Stream</code>适用的场景：</p>
+<ul>
+<li>对元素进行一些列的变换</li>
+<li>过滤元素</li>
+<li>合并元素(添加，合并)</li>
+<li>元素聚集(合并为一个map,list等)</li>
+<li>按条件搜索元素</li>
+</ul>
+<h1 id="使用Streams中无额为影响的函数"><a href="#使用Streams中无额为影响的函数" class="headerlink" title="使用Streams中无额为影响的函数"></a>使用<code>Streams</code>中无额为影响的函数</h1><p>纯函数(pure function): 输出只依赖输入，不依赖其他任何阶段的状态，也不会改变其他任何东西的状态。</p>
+<p><strong><code>forEach</code>函数应该只用作输出<code>Stream</code>最后计算出来的结果，不应该执行具体的计算，偶尔可以用作其他目的，比如添加<code>Stream</code>计算的结果到一个集合中。</strong> </p>
+<p>应该静态导入<code>Collectors</code>类，提高<code>Stream</code>最终的可读性，永远不要直接使用<code>Collectors.collect(counting())</code>等其他方法(<code>suming,averaging,summarizing,filtering,reducing,mapping,flatmapping</code>等)，这些方法是为了<code>downStream</code>(Collectors许多方法都有<code>downStream</code>参数)设计，应该使用<code>Stream</code>自带的方法</p>
+<h1 id="优先使用集合作为返回值"><a href="#优先使用集合作为返回值" class="headerlink" title="优先使用集合作为返回值"></a>优先使用集合作为返回值</h1><p>问题很简单，因为所有集合都实现了<code>Iterable</code>接口，整个更加通用。</p>
+<p>如果返回的数据集特别大，不建议使用现有的集合类，而是自己实现<code>AbstractList</code>.</p>
+<p>如实现一个给定集合的全排列： </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//The power set of &#123;a, b, c&#125; is &#123;&#123;&#125;, &#123;a&#125;, &#123;b&#125;, &#123;c&#125;, &#123;a, b&#125;, &#123;a, c&#125;, &#123;b, c&#125;, &#123;a, b, c&#125;&#125;.</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PowerSet</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> &lt;E&gt; Collection&lt;Set&lt;E&gt;&gt; <span class="title function_">of</span><span class="params">(Set&lt;E&gt; s)</span> &#123;</span><br><span class="line">        List&lt;E&gt; src = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(s);</span><br><span class="line">        <span class="keyword">if</span> (src.size() &gt; <span class="number">30</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Set too big &quot;</span> + s);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">AbstractList</span>&lt;Set&lt;E&gt;&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span> <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">size</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span> &lt;&lt; src.size(); <span class="comment">// 2 to the power srcSize</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="meta">@Override</span> <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(Object o)</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> o <span class="keyword">instanceof</span> Set &amp;&amp; src.containsAll((Set)o);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="meta">@Override</span> <span class="keyword">public</span> Set&lt;E&gt; <span class="title function_">get</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">                Set&lt;E&gt; result = <span class="keyword">new</span> <span class="title class_">HashSet</span>&lt;&gt;();</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; index != <span class="number">0</span>; i++, index &gt;&gt;= <span class="number">1</span>)</span><br><span class="line">                    <span class="keyword">if</span> ((index &amp; <span class="number">1</span>) == <span class="number">1</span>)</span><br><span class="line">                        result.add(src.get(i));</span><br><span class="line">                <span class="keyword">return</span> result;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Stream并行化的建议"><a href="#Stream并行化的建议" class="headerlink" title="Stream并行化的建议"></a><code>Stream</code>并行化的建议</h1><p>如果使用<code>Stream.iterate</code> 和 中间操作<code>limit</code>,并行化流并不会得到性能提升。</p>
+<p>在<code>ArrayList, HashMap, HashSet, and ConcurrentHashMap instances; arrays; int ranges; and long ranges</code>上使用并行流会有显著的性能提升。因为这些数据结构统一，可以被精确的分割，有利于并行化。另一重要的因素是这些数据结构有着很好的局部引用，数据引用在内存连续的，虽然这些也引用的数据对象在内存上是不连续的，不利于并行处理的；内存的连续性(局部的引用性)是并行处理的最关键因素，如果没有内存连续性的，线程大部分是空闲的，在等待cpu将内存数据获取到cpu缓存中。最好的内存连续性数据结构就是原始数据类型的数组，他们的分配都是在连续的内存上。</p>
+<p>使用并行流不止有可能导致性能降低，还有可能导致结果不正确(使用<code>forEachOrder</code>)和活锁(<code>limit</code>).</p>
+<p>只用在适当的情况下，使用并行流才会提升性能，所以建议是不要并行化，除非你有很好的理由非要这么做。</p>
+]]></content>
+      <tags>
+        <tag>java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective-java-第六章学习笔记</title>
+    <url>/2021/07/15/Effective-java-%E7%AC%AC%E5%85%AD%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第六章: 枚举和注解</p>
+<span id="more"></span>
+
+<h1 id="使用枚举替代int常量"><a href="#使用枚举替代int常量" class="headerlink" title="使用枚举替代int常量"></a>使用枚举替代int常量</h1><p>在没有枚举之前一致使用int常量或者string常量</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">APPLE_FUJI</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">APPLE_PIPPIN</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">APPLE_GRANNY_SMITH</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">ORANGE_NAVEL</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">ORANGE_TEMPLE</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">ORANGE_BLOOD</span> <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>int常量并不好维护, 而且即使你将常量类型弄混了, 也不会有什么问题, 因为都是int类型, 而且java没有命名空间这个概念, 只能使用前缀作为区分,这种情况下将apple常量和orange常量混合起来计算也不会出现任何编译或者运行时错误, 只会得到错误的结果,同样在进行调试的时候，显示的是一些数字，很难搞清楚数字背后的真正表达的含义。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">Apple</span> &#123; FUJI, PIPPIN, GRANNY_SMITH &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">Orange</span> &#123; NAVEL, TEMPLE, BLOOD &#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果将这些常量分开使用枚举类型来表示,  那么此时你将Apple和Orange混合使用计算,那么会报错, 因为两者不兼容.  </p>
+<p><strong>如果一个枚举类型和一个类又紧密的联系,而且不会被外部使用, 那么应该将枚举作为该类的成员内部类使用, 而且尽量降低枚举的可见性, 如果只在包内使用那么可以设为private 或者 package-private</strong>  </p>
+<p><strong>constant-specific:</strong> 在枚举中定义一个抽象方法，然后在具体的枚举实现常量里面实现该方法。这样做可以使每个枚举常量都可以拥有不同的行为。比如：加，减，乘，除，4个枚举常量对应4中不同的处理数据的行为。</p>
+<h2 id="如果重写了toString方法-那么可以写一个fromString方法反向获取枚举"><a href="#如果重写了toString方法-那么可以写一个fromString方法反向获取枚举" class="headerlink" title="如果重写了toString方法,那么可以写一个fromString方法反向获取枚举"></a>如果重写了toString方法,那么可以写一个fromString方法反向获取枚举</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">GenderType</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 0-男, 1-女</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    MALE(<span class="string">&quot;男&quot;</span>), FEMALE(<span class="string">&quot;女&quot;</span>);</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 描述性字段</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String value;</span><br><span class="line"></span><br><span class="line">    GenderType(String value) &#123;</span><br><span class="line">        <span class="built_in">this</span>.value = value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> GenderType <span class="title function_">instance</span><span class="params">(<span class="type">int</span> order)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (order == MALE.ordinal()) &#123;</span><br><span class="line">            <span class="keyword">return</span> MALE;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> FEMALE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, GenderType&gt; STRING_TO_ENUM = Stream.of(values()).collect(Collectors.toMap(Object::toString, e -&gt; e));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Optional&lt;GenderType&gt; <span class="title function_">fromString</span><span class="params">(String value)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Optional.ofNullable(STRING_TO_ENUM.get(value));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用实例字段代替ordinals"><a href="#使用实例字段代替ordinals" class="headerlink" title="使用实例字段代替ordinals"></a>使用实例字段代替ordinals</h1><p>在枚举里面ordinals代表了每个枚举的顺序, 如果增加了或减少了枚举, 这个ordinal就发生了变化, 而这种变化是我们无法控制的,  所以应该用一个字段来代替他.  </p>
+<h1 id="使用EnumSet和EnumMap"><a href="#使用EnumSet和EnumMap" class="headerlink" title="使用EnumSet和EnumMap"></a>使用EnumSet和EnumMap</h1><p>太高深了,完全不懂,重读第三遍在重新理解.</p>
+<h1 id="用接口扩展枚举"><a href="#用接口扩展枚举" class="headerlink" title="用接口扩展枚举"></a>用接口扩展枚举</h1><p>枚举是不可继承的,因为,枚举实际上就是一个<code>class</code>编译过后的枚举是集成于<code>Enum</code>类的,而且是<code>final</code>的,<code>final</code>类是无法集成的, 为什么要设置成<code>final</code>呢,  很好理解, 所有枚举都是<code>extends Enum</code> 如果你还要在继承自己的<code>BasEnum</code> 就会出现<code>childEnum extends BaseEnum, Enum</code>这种多继承,  而<code>java</code>是禁止多继承的.</p>
+<p>不过枚举是可以实现接口的,所以如果又扩展需要,可以实现接口</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Operation</span> &#123;</span><br><span class="line">    <span class="type">double</span> <span class="title function_">apply</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">BasicOperation</span> <span class="keyword">implements</span> <span class="title class_">Operation</span> &#123;</span><br><span class="line">    PLUS(<span class="string">&quot;+&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> <span class="title function_">apply</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span> &#123; <span class="keyword">return</span> x + y; &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    MINUS(<span class="string">&quot;-&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> <span class="title function_">apply</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span> &#123; <span class="keyword">return</span> x - y; &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    TIMES(<span class="string">&quot;*&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> <span class="title function_">apply</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span> &#123; <span class="keyword">return</span> x * y; &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    DIVIDE(<span class="string">&quot;/&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">double</span> <span class="title function_">apply</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span> &#123; <span class="keyword">return</span> x / y; &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String symbol;</span><br><span class="line">    BasicOperation(String symbol) &#123;</span><br><span class="line">    <span class="built_in">this</span>.symbol = symbol;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span> <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> symbol;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用注解代替命名模式"><a href="#使用注解代替命名模式" class="headerlink" title="使用注解代替命名模式"></a>使用注解代替命名模式</h1><p>命名模式: 就是约定(方法名,字段名,类名等)命名的格式或者规范, 这种方式有很大的弊端，拿<code>junit3</code>来举例: </p>
+<ol>
+<li>容易拼写错误<code>test</code>拼写为<code>tset</code></li>
+<li>你无法确定使用的是否合适或者说使用的是否准确，比如一个类名叫做<code>TestSafeMechanisms</code>, 本意是想测试该类下面所有的方法，但是<code>junit3</code>并不会这么做。</li>
+<li>没法很好的把参数和程序元素关联起来，比如想写一个测试类，在抛出特定的异常时候才算成功，这时候异常的本质是测试的参数。这时候可以利用具体的命名模式，把异常名字写在方法名中，首先这很不优雅，其次就算你写错了，编译器也检查不出来。</li>
+</ol>
+<p>使用注解可以解决上述的弊端，而且从<code>junit4</code>开始也使用@Test来代替命名模式。<br>具体的使用可以搜索元注解，annotationsprocessor等关键信息。<br>总之，使用注解代替原来的命名模式；应该使用<code>java</code>预定义的注解<code>@Override</code>等注解。</p>
+<h1 id="标记接口-vs-标记注解"><a href="#标记接口-vs-标记注解" class="headerlink" title="标记接口 vs 标记注解"></a>标记接口 vs 标记注解</h1><ol>
+<li><p>标记接口定义了一个由标记类的实例实现的类型，这句话有点绕，实际上就是标记接口定义了一种类型。在实际运用过程中，如果一个方法要求的参数是一种标记接口，那么编译器可以检查传入的实际参数是否符合要求，而标记注解(上面所说的@Test)则不能让编译器进行类型检查。</p>
+</li>
+<li><p>标记接口能更精确的标记，比如只想标记某些特定的接口，就可以创建一个标记接口继承这个特定的接口来进行标记。比如·<code>Set</code>之于<code>Collection</code>，可以把<code>Set</code>看成一个标记接口，<code>Collection</code>是一个特定的接口，<code>Set</code>并没有增加任何方法，可以看作只是一个标记接口。</p>
+</li>
+<li><p>标记注解更好的地方在于可以应用于大型的框架之内，可以作为框架的元注解构成更高级的注解比如<code>@SpringBootApplication</code>就是基于·@EnableAutoConfiguration&#96;等注解，这种方式可以实现更加丰富的框架。</p>
+</li>
+<li><p>如果是标记方法参数，成员变量等应当使用标记注解；因为标记接口只能又类和接口来扩展；如果需要标记一个类或者接口，那么分情况，如果该接口是一个或多个方法的参数，则应该使用标记接口。如果这个类不会被用做参数，那么应该使用标记注解。或者如果被标记的类是重度使用注解的框架，那么也应该使用注解。</p>
+</li>
+<li><p>如果标记注解是<code>Element.TYPE</code>类型（可以用在任何地方），那么应该花时间思考是否真的应该是一个标记注解，或者可以使用标记接口会更好。</p>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Effective-java-第五章学习笔记</title>
+    <url>/2021/07/08/Effective-java-%E7%AC%AC%E4%BA%94%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>第五章: 泛型使用注意事项</p>
+<span id="more"></span>
+
+<h1 id="泛型术语"><a href="#泛型术语" class="headerlink" title="泛型术语"></a>泛型术语</h1><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>写法</th>
+<th>翻译</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Parameterized type</td>
+<td>List<String></td>
+<td>参数化类型</td>
+</tr>
+<tr>
+<td>Actual type parameter</td>
+<td>String</td>
+<td>实际类型参数</td>
+</tr>
+<tr>
+<td>Generic type</td>
+<td>List<E></td>
+<td>泛型</td>
+</tr>
+<tr>
+<td>Formal type parameter</td>
+<td>E</td>
+<td>形式类型参数</td>
+</tr>
+<tr>
+<td>Unbounded wildcard type</td>
+<td>List&lt;?&gt;</td>
+<td>无界通配符类型</td>
+</tr>
+<tr>
+<td>Raw type</td>
+<td>List</td>
+<td>原始类型</td>
+</tr>
+<tr>
+<td>Bounded type parameter</td>
+<td>&lt;E extends Number&gt;</td>
+<td>有界类型参数</td>
+</tr>
+<tr>
+<td>Recursive type bound</td>
+<td>&lt;T extends Comparable&lt;T&gt;&gt;</td>
+<td>递归类型限制</td>
+</tr>
+<tr>
+<td>Bounded wildcard type</td>
+<td>List&lt;? extends Number&gt;</td>
+<td>有界通配符类型</td>
+</tr>
+<tr>
+<td>Generic method static</td>
+<td>static &lt;E&gt; List&lt;E&gt; asList(E[] a)</td>
+<td>泛型方法</td>
+</tr>
+<tr>
+<td>Type token</td>
+<td>String.class</td>
+<td>类型标记</td>
+</tr>
+</tbody></table>
+<h1 id="不要使用原始类型"><a href="#不要使用原始类型" class="headerlink" title="不要使用原始类型"></a>不要使用原始类型</h1><h2 id="为什么不该使用"><a href="#为什么不该使用" class="headerlink" title="为什么不该使用"></a>为什么不该使用</h2><p>每一个泛型类型定义都对应着原始类型,通俗来说就是不带泛型. 如:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">Collections</span> <span class="variable">stamps</span> <span class="operator">=</span> ...;</span><br></pre></td></tr></table></figure>
+
+<p>如果使用这种集合,你可以添加任何类型的对象,看名字其实只是想添加<code>Stamp</code>类的实例,他是不报错的.ide 工具会给出警告.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">stamps.add(<span class="keyword">new</span> <span class="title class_">Stamp</span>()); <span class="comment">//unchecked call add(e)</span></span><br><span class="line">stamps.add(<span class="keyword">new</span> <span class="title class_">String</span>());  <span class="comment">// unchecked call add(E)</span></span><br><span class="line">stamps.add(<span class="keyword">new</span> <span class="title class_">Integer</span>(<span class="number">1</span>)); <span class="comment">// unchecked call add(E)</span></span><br></pre></td></tr></table></figure>
+
+<p>在遍历取出的时候,编译期间还是不会报错,只有运行时候才会抛出异常.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">Iterator</span> <span class="variable">i</span> <span class="operator">=</span> stamps.iterator(); i.hasNext(); )</span><br><span class="line">  <span class="type">Stamp</span> <span class="variable">stamp</span> <span class="operator">=</span> (Stamp) i.next(); <span class="comment">// Throws ClassCastException</span></span><br><span class="line">  stamp.cancel();</span><br></pre></td></tr></table></figure>
+
+<p>编译期间发现不了问题就很可怕,如果这段代码一直没有执行,那么系统一直没有问题,知道有一天它执行了,boom!<br>这段代码就是个定时炸弹,所以千万不要用泛型的原始类型.<br>而且就修复来说,这种情况就很麻烦, 修复,重新编译, 测试, 发布.</p>
+<h2 id="替代原始类型的方式"><a href="#替代原始类型的方式" class="headerlink" title="替代原始类型的方式"></a>替代原始类型的方式</h2><p>如果你想一个容器添加任意类型的参数,那么可以使用<code>List&lt;Object&gt;</code>这种形式,这种形式处于泛型系统之内,只是显示的告诉了编译器,我何以接受任何类型的参数.<br>如果你使用原始类型的那么你将失类型安全,但是如果使用<code>List&lt;Object&gt;</code>并不会有这个问题.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; strings = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">unsafeAdd(Strings, Integer.valueOf(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unsafeAdd</span><span class="params">(List list, Object obj)</span>&#123;</span><br><span class="line">	list.add(obj); <span class="comment">// warning  unchecked call to  add()</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如上代码,编译器并不会报错,只会给出警告,如果你不在意这些警告,那么,运行时就会报错.但是如果我们换成以下代码:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; strings = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">unsafeAdd(strings, Integer.valueOf(<span class="number">2</span>)): <span class="comment">//compiler error</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unsafeAdd</span><span class="params">(List&lt;Object&gt; list, Object obj)</span>&#123;</span><br><span class="line">	list.add(obj):</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码会在编译期间就报错,有助于你提前发现问题,修复问题.</p>
+<h2 id="无界通配符-lt-gt"><a href="#无界通配符-lt-gt" class="headerlink" title="无界通配符 &lt;?&gt;"></a>无界通配符 &lt;?&gt;</h2><p>如果你在写一个对外的<code>api</code>但是返回值不确定,可能是<code>String</code>,可能是自定义类型,这取决与需求是什么样的,那么这个时候该怎么写呢:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Response&lt;?&gt; api(String str)&#123;</span><br><span class="line">	<span class="keyword">return</span> Response.success(someService.doSth(str));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> Response&lt;T&gt;&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Response&lt;T&gt; <span class="title function_">success</span><span class="params">(<span class="meta">@NotNull</span> T t)</span> &#123;</span><br><span class="line">	        <span class="keyword">return</span> of(t, ResponseState.SUCCESS);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>无界通配符不能用来的容器不能用来添加东西,<code>null</code>值例外,如:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">toAdd</span><span class="params">(List&lt;?&gt; list)</span>&#123;</span><br><span class="line">	list.add(<span class="literal">null</span>);</span><br><span class="line">	list.add(<span class="string">&quot;fda&quot;</span>); <span class="comment">//complier error</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个是编译器为了阻止改变参数的类型, 假设调用此方法传进来的参数是<code>List&lt;Integer&gt;</code>, 那么添加<code>String</code> 类型就会抛出异常, 所以编译器提前阻止了这种类型的改变.</p>
+<h2 id="只能使用原始类型的特殊情况"><a href="#只能使用原始类型的特殊情况" class="headerlink" title="只能使用原始类型的特殊情况"></a>只能使用原始类型的特殊情况</h2><ol>
+<li>代表<code>class</code>字面量, 比如<code>List.class</code></li>
+<li>使用<code>instanceof</code></li>
+</ol>
+<h1 id="消除unchecked警告"><a href="#消除unchecked警告" class="headerlink" title="消除unchecked警告"></a>消除<code>unchecked</code>警告</h1><h2 id="手动消除警告"><a href="#手动消除警告" class="headerlink" title="手动消除警告"></a>手动消除警告</h2><p>使用<code>@SuppressWarnings(&quot;unchecked&quot;)</code> 消除警告.注意一下几点:</p>
+<ul>
+<li>尽可能的缩小注解的作用范围.</li>
+<li>需要在注解上注释描述为什么这么做</li>
+</ul>
+<h1 id="优先使用泛型集合-而不使用数组"><a href="#优先使用泛型集合-而不使用数组" class="headerlink" title="优先使用泛型集合,而不使用数组"></a>优先使用泛型集合,而不使用数组</h1><h2 id="数组是协变的-而泛型集合是不变的"><a href="#数组是协变的-而泛型集合是不变的" class="headerlink" title="数组是协变的, 而泛型集合是不变的"></a>数组是协变的, 而泛型集合是不变的</h2><p>如果一个<code>sub</code> 是 <code>sup</code>的子类, 那么<code>sub[]</code> 也是 <code>sup[]</code>的子类型. 是兼容的.<br>但是,<code>List&lt;sub&gt;</code>却不是<code>List&lt;sup&gt;</code>的子类行,两者是不兼容的.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Fails at runtime!</span></span><br><span class="line">Object[] objectArray = <span class="keyword">new</span> <span class="title class_">Long</span>[<span class="number">1</span>];</span><br><span class="line">objectArray[<span class="number">0</span>] = <span class="string">&quot;I don&#x27;t fit in&quot;</span>; <span class="comment">// Throws ArrayStoreException</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Won&#x27;t compile!</span></span><br><span class="line">List&lt;Object&gt; ol = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Long&gt;(); <span class="comment">// Incompatible types</span></span><br><span class="line">ol.add(<span class="string">&quot;I don&#x27;t fit in&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码可以看出第一段代码得等到运行时才会发现问题,如果代码得不到执行,那么程序就一直是正常运行,定时炸弹.<br>而第二段代码在编译期间就指出了错误.</p>
+<h2 id="为什么不能显示的创建泛型数组"><a href="#为什么不能显示的创建泛型数组" class="headerlink" title="为什么不能显示的创建泛型数组"></a>为什么不能显示的创建泛型数组</h2><p>数组是具体化的,数组不论是在编译期间还是运行期间都会强制要求数组中的元素类型一致.<br>而泛型在编译期间强制要求元素类型,但是在运行期间会进行泛型擦除.这么做的目的是为了兼容 <code>jdk5</code> 之前的代码.</p>
+<p>基于以上两点就很好解释为什么不能创建泛型数组了.</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt;[] stringLists = <span class="keyword">new</span> <span class="title class_">List</span>&lt;String&gt;[<span class="number">1</span>]; <span class="comment">// (1)</span></span><br><span class="line">List&lt;Integer&gt; intList = List.of(<span class="number">42</span>); <span class="comment">// (2)</span></span><br><span class="line">Object[] objects = stringLists; <span class="comment">// (3)</span></span><br><span class="line">objects[<span class="number">0</span>] = intList; <span class="comment">// (4)</span></span><br><span class="line"><span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> stringLists[<span class="number">0</span>].get(<span class="number">0</span>); <span class="comment">// (5)</span></span><br></pre></td></tr></table></figure>
+
+<p>如上代码, 假设<code>(1)</code>是可以编译通过, <code>(3)</code>由于数组的协变是正确的语法,因为所有类都是<code>Object</code>的子类, <code>(4)</code> 由于泛型的擦除在运行期间<code>ListMString&gt;[]</code> 被擦除为<code>List[]</code>, <code>List&lt;Integer&gt;</code> 被擦除为<code>List</code> 因此不管编译还是运行都不会出错, <code>(5)</code>在运行期间会出现<code>ClassCastException</code> ,因为存进去的显然不是<code>String</code>; 因此在编译期间就阻止<code>(1)</code>编译通过.<br>如上所说<code>List&lt;E&gt;</code>, <code>List&lt;String&gt;</code>, <code>E</code>这些参数化类型,被称为不可具体化的类型,因为他们在运行期间会被泛型擦除,无法表达容器在运行时所需要的元素类型. 只有一种情况例外就是<code>&lt;?&gt;</code>无界通配符:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;?&gt;[] list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;?&gt;[<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+
+<p>这种是可以编译通过的, 但是问题来了, 无界通配符容器是不允许被改变的, 这么做毫无意义.</p>
+<h2 id="使用-List-代替-泛型数组定义-E"><a href="#使用-List-代替-泛型数组定义-E" class="headerlink" title="使用 List 代替 泛型数组定义 E[]"></a>使用 List<E> 代替 泛型数组定义 E[]</h2><p>简单来讲就是你无法创建一个泛型数组, 但是可以通过<code>Collection.toArray()</code>获得一个泛型数组:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">E[] e = (E[]) someCollection.toArray(); <span class="comment">//unchecked cast</span></span><br></pre></td></tr></table></figure>
+
+<p>这样我们就获得另一个泛型数组, 但是需要强转, 且这句话会出现警告, 因为在运行期间会出现泛型擦除, 所以编译器无法保证运行时类型转换正确, 所以会出现<code>unchecked cast</code>. 因此,我们需要稍微修改一下:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;E&gt; lists = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(someCollection);</span><br></pre></td></tr></table></figure>
+
+<p>虽然丧失了一些性能, 但是编译器能保证正确的类型转换.</p>
+<h1 id="偏好使用泛型"><a href="#偏好使用泛型" class="headerlink" title="偏好使用泛型"></a>偏好使用泛型</h1><p>通俗来说就是,如果你在写一个容器类, 里面所需要容纳的元素类型,最好使用泛型来代替. 书中举例:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Stack</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Object[] elements;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Stack</span><span class="params">()</span> &#123;</span><br><span class="line">        elements = <span class="keyword">new</span> <span class="title class_">Object</span>[DEFAULT_INITIAL_CAPACITY];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">push</span><span class="params">(Object e)</span> &#123;</span><br><span class="line">        ensureCapacity();</span><br><span class="line">        elements[size++] = e;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">pop</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (size == <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">EmptyStackException</span>();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> elements[--size];</span><br><span class="line">        elements[size] = <span class="literal">null</span>; <span class="comment">// Eliminate obsolete reference</span></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isEmpty</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> size == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">ensureCapacity</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (elements.length == size)</span><br><span class="line">        elements = Arrays.copyOf(elements, <span class="number">2</span> * size + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>应该替换为:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Stack</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="keyword">private</span> E[] elements;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Stack</span><span class="params">()</span> &#123;</span><br><span class="line">        elements = (E[]) <span class="keyword">new</span> <span class="title class_">Object</span>[DEFAULT_INITIAL_CAPACITY];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">push</span><span class="params">(E e)</span> &#123;</span><br><span class="line">        ensureCapacity();</span><br><span class="line">        elements[size++] = e;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">pop</span><span class="params">()</span> <span class="keyword">throws</span> EmptyStackException &#123;</span><br><span class="line">        <span class="keyword">if</span> (size == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">EmptyStackException</span>();</span><br><span class="line">        <span class="type">E</span> <span class="variable">result</span> <span class="operator">=</span> elements[--size];</span><br><span class="line">        elements[size] = <span class="literal">null</span>; <span class="comment">// Eliminate obsolete reference</span></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isEmpty</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> size == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">ensureCapacity</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (elements.length == size)</span><br><span class="line">            elements = Arrays.copyOf(elements, <span class="number">2</span> * size + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这条看上去是和上面一条有些冲突,上面一条说明优先使用泛型集合,而这里又使用泛型数组了;因为,这里实现的是<code>Stack</code>容器类,类似<code>List</code>容器类,所以使用泛型数组,而且<code>List</code>容器类的实现也是泛型数组实现.</p>
+<h1 id="偏好使用泛型方法"><a href="#偏好使用泛型方法" class="headerlink" title="偏好使用泛型方法"></a>偏好使用泛型方法</h1><p>简单来说,就是任何容器实例,都应该使用泛型化来使用, 比如:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="title function_">add</span><span class="params">(set o, set  o2)</span>&#123;</span><br><span class="line">	o.addALL(o2);</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>应该改为:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;E&gt; <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Set&lt;E&gt; o, Set&lt;E&gt; o2)</span>&#123;</span><br><span class="line">	o.addAll(o2)</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><strong>在方法修饰符和返回值之间的<code>&lt;E&gt;</code>,被称为类型参数列表.</strong></p>
+<h2 id="泛型单例工厂"><a href="#泛型单例工厂" class="headerlink" title="泛型单例工厂"></a>泛型单例工厂</h2><p>返回一个<code>函数式对象</code>可以包含不同的<code>参数化类型</code>,例如: <code>Collections.reverseOrder()</code>和<code>Collections.emptySet()</code>. 下面是书中给的<code>恒等函数</code>示例: </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Generic singleton factory pattern</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> UnaryOperator&lt;Object&gt; IDENTITY_FN = (t) -&gt; t;</span><br><span class="line"><span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; UnaryOperator&lt;T&gt; <span class="title function_">identityFunction</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (UnaryOperator&lt;T&gt;) IDENTITY_FN;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="递归类型界限"><a href="#递归类型界限" class="headerlink" title="递归类型界限"></a>递归类型界限</h2><p><code>&lt;E extends Comparable&lt;E&gt;&gt;</code>: 类型参数<code>(E)</code>被涉及到类型参数本身的表达式<code>(&lt;Comparable&lt;E&gt;&gt;)</code>限制.<br>这种用法很少用到,一般是用在有些自我表达,自我操作的方法. 比如: 一个集合里面的排序, 最大值,最小值.(自我比较)</p>
+<h1 id="使用界限通配符增减API的灵活性"><a href="#使用界限通配符增减API的灵活性" class="headerlink" title="使用界限通配符增减API的灵活性"></a>使用界限通配符增减API的灵活性</h1><p>为了使方法拥有最大的灵活性,可以在表示消费或者生产的方法的参数上使用通配符类型来代表</p>
+<ul>
+<li>上界通配符 <code>&lt;? extends E&gt;</code></li>
+<li>下界通配符 <code>&lt;? super E&gt;</code></li>
+<li>PECS – producers-extends and consumers-super. 代表生产时使用<code>extends</code>, 代表消费时使用<code>super</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;E&gt; <span class="keyword">void</span> <span class="title function_">add1</span><span class="params">(List&lt;? <span class="built_in">super</span> E&gt; list, E e)</span>&#123;</span><br><span class="line">    list.add(e);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;E&gt; E <span class="title function_">get</span><span class="params">(List&lt;? extends E&gt; list)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> list.get(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><strong>如果在方法定义的时候类型参数只出现一次,那么应该使用通配符来代替(有界或者无界)</strong>  </p>
+<p><strong>不要在返回值上使用通配符</strong>, 这将会迫使客户端也使用通配符.   </p>
+<p><strong>如果一个用户使用这个方法要考虑通配符类型,那么这个<code>api</code>可是是错的,好的<code>api</code>应该是让用户感觉不到通配符的存在</strong> </p>
+<h1 id="谨慎的将可变参数和泛型结合在一起"><a href="#谨慎的将可变参数和泛型结合在一起" class="headerlink" title="谨慎的将可变参数和泛型结合在一起"></a>谨慎的将可变参数和泛型结合在一起</h1><h2 id="将值存进可变泛型数组是不安全的"><a href="#将值存进可变泛型数组是不安全的" class="headerlink" title="将值存进可变泛型数组是不安全的"></a>将值存进可变泛型数组是不安全的</h2><p>在’为什么不能显示的创建泛型数组’中已经演示过,泛型数组的危害,这里稍微改变一下上述代码:  </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dangerous</span><span class="params">(List&lt;String&gt;... stringLists)</span> &#123;</span><br><span class="line">    List&lt;Integer&gt; intList = List.of(<span class="number">42</span>);</span><br><span class="line">    Object[] objects = stringLists;</span><br><span class="line">    objects[<span class="number">0</span>] = intList; <span class="comment">// Heap pollution</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> stringLists[<span class="number">0</span>].get(<span class="number">0</span>); <span class="comment">// ClassCastException</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里其实就是将之前的代码中显示的创建泛型数组,改为可变参数泛型数组. 因为可变参数实际上编译完成之后,是将可变参数存进一个临时数组里面,所以上述代码实际上就等于隐式的创建了一个可变参数泛型数组,但是最终导致类型装换错误,原因之前已经分析过了.  </p>
+<p><strong>结论1: 将值存入泛型数组是不安全的,泛型数组应该只是传递这些值,比如: Arrays.asList(T…t), 该方法只是将可变参数里面的值放到List里面然后返回该List</strong><br><strong>结论2: 返回泛型数组引用也是不安全的, 比如下列代码:</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// UNSAFE - Exposes a reference to its generic parameter array!</span></span><br><span class="line"><span class="keyword">static</span> &lt;T&gt; T[] toArray(T... args) &#123;</span><br><span class="line">    <span class="keyword">return</span> args;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> &lt;T&gt; T[] pickTwo(T a, T b, T c) &#123;</span><br><span class="line">    <span class="keyword">switch</span>(ThreadLocalRandom.current().nextInt(<span class="number">3</span>)) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0</span>: <span class="keyword">return</span> toArray(a, b);</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> toArray(a, c);</span><br><span class="line">        <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> toArray(b, c);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AssertionError</span>(); <span class="comment">// Can&#x27;t get here</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    String[] attributes = pickTwo(<span class="string">&quot;Good&quot;</span>, <span class="string">&quot;Fast&quot;</span>, <span class="string">&quot;Cheap&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>toArray</code>方法直接诶返回了泛型数组, 而<code>main</code>方法调用<code>pickTwo</code>方法编译器会推断出该方法返回<code>string[]</code>数组,所以在<code>return toArray(x,x)</code>处会出现一个隐式的转换转换为<code>Object[]</code>数组. 显然<code>string[]</code>数组不是<code>object[]</code>数组的超类. 所以出现<code>ClassCastException</code>, 由此可以看出返回一个泛型数组的引用是多么的不安全, 除非是受到控制的方法, 即不对外暴露的方法, 由<code>api</code>方法编写者确认这个使用是安全的, 并且使用<code>@SafaVarargs</code>注解.  </p>
+<h1 id="类型安全的异构容器"><a href="#类型安全的异构容器" class="headerlink" title="类型安全的异构容器"></a>类型安全的异构容器</h1><p>一个很有意思的写法:   </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Favorites</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;Class&lt;?&gt;, Object&gt; favorites = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="keyword">void</span> <span class="title function_">putFavorite</span><span class="params">(Class&lt;T&gt; type, T instance)</span> &#123;</span><br><span class="line">        favorites.put(Objects.requireNonNull(type), instance);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; T <span class="title function_">getFavorite</span><span class="params">(Class&lt;T&gt; type)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> type.cast(favorites.get(type));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以存入任意类型的<code>Class</code>(不能是原始类型), 然后获取对应的值.</p>
+]]></content>
+      <tags>
+        <tag>java,读书笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>学习笔记</title>
+    <url>/2021/06/25/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p><code>GraalVM</code> 尝试</p>
+<span id="more"></span>
+<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>GraalVM 是一个更快的JAVA虚拟机,而且可以构建<code>native image</code>这个词的意思是,如果是<code>windows</code>系统就能构建一个<code>exe</code>执行程序,其他系统就对应其他系统的执行程序,<br><code>quarkus</code>通俗的来说,是基于该虚拟机的一个<code>java web</code>开放框架, 实现了标准的<code>JAX-RS</code>规范,并且顶层并没有采用传统的<code>servlet</code>, 而是使用了<code>vert.x</code> 这种<code>react</code>框架, 可以很好的实现<code>react</code>功能.  </p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><ul>
+<li>下载<a href="https://www.graalvm.org/downloads/">GraalVM</a>, 根据自己系统弄个需要下<br>载.  </li>
+<li>配置<code>PATH</code> , <code>JAVA_HOME</code>等环境变量, 指向<code>GraalVM</code>所在的目录.  </li>
+<li>通过<a href="https://code.quarkus.io/">Quarksu</a>网站配置一个项目或者使用<code>mvn</code>命令行创建项目, <code>mvn io.quarkus:quarkus-maven-plugin:2.0.0.CR2:create &quot;-DprojectGroupId=com.sa&quot; &quot;-DprojectArtifactId=sa&quot; &quot;-DclassName=com.sa.GreetingResource&quot; &quot;-Dpath=/hello&quot;</code>.</li>
+</ul>
+<h1 id="开发"><a href="#开发" class="headerlink" title="开发"></a>开发</h1><p>默认<code>Qarkus</code>是使用<code>maven</code>作为项目管理的.<br>下载好项目,通过<code>vscode</code> 或者 <code>idea</code>打开,<code>vscode</code>会提示安装插件, 按照提示安装插件,<code>idea</code>自己搜索<code>quarkus</code>插件.<br>运行, <code>mvn:dev</code>, 不到1s就启动好了, 可以访问默认的<code>/hello</code><br><code>quarkus</code> 的<code>maven</code>插件提供了安装第三方<code>jar</code>的命令<br><code>mvn quarkus:list-extensions</code> 查看所有可以安装的第三方<code>jar</code><br><code>mvn quarkus:add-extension -Dextensions=&#39;quarkus-jsonp&#39;</code> 安装第三方<code>jar</code> 或者<code>mvn quarksu:add-extensions -Dextensions=&#39;xxx,xxx,x</code> 批量安装第三方jar包,也可以使用通配符<code>*</code>安装.  </p>
+<h1 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h1><p><code>mvn quarkus:dev</code></p>
+<h1 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h1><p>普通<code>jar</code>包: <code>mvn package</code><br><code>exe</code>本地可执行文件: </p>
+<ul>
+<li>安装<code>MSVC 2019</code> 对应你的<code>GraalVM</code>版本应该是<code>openjdk11</code>版本,</li>
+<li>安装<code>windows sdk</code> </li>
+<li>安装<code>Microsoft visual studio </code>–和上一步合并安装命令<code>choco install visualstudio2019-workload-vctools</code> , 前提是电脑得有<code>chocolatey</code>这个windows包管理工具.  </li>
+<li>进入项目执行以下命令: <blockquote>
+<p><code>call &quot;C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars64.bat&quot; mvnw package -Pnative -DskipTests</code></p>
+</blockquote>
+</li>
+</ul>
+<h1 id="碰见的问题"><a href="#碰见的问题" class="headerlink" title="碰见的问题"></a>碰见的问题</h1><p>由于电脑是洋垃圾cpu,所以cpu架构被识别为??而非arm的, 所以得在<code>application.properties</code>中添加<code>quarkus.native.additional-build-args=-H:-CheckToolchain</code>参数跳过检查.  </p>
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>总的来说<code>GraaalVM</code>的速度还是很快的, <code>Quarkus</code>也带来了新的<code>web</code>开发体验, 上手难度比较小,只要你懂<code>JAX-RS</code>规范就行,而且还很好的和<code>docker</code>进行了集成,可以直接配置<code>hibernate entity</code> 而不进行任何数据库配置, <code>quarkus</code>在背后会自动寻找<code>docker</code>为你创建数据库,让开发人员专注与开发. 但是关于<code>graalVM</code>编译本地可执行文件来说,感觉有点鸡肋,虽然实现了,但是还是需要<code>visual studio </code> 这种庞大的工具. </p>
+]]></content>
+      <tags>
+        <tag>java</tag>
+        <tag>quarkus</tag>
+        <tag>graalvm</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>bug总结</title>
     <url>/2021/05/15/bug%E6%80%BB%E7%BB%93/</url>
     <content><![CDATA[<p>日常开发中遇到的bug总结.</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="2021年5月"><a href="#2021年5月" class="headerlink" title="2021年5月"></a>2021年5月</h2><h3 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h3><p>现象: <code>JPA</code> 中双向关联如果使用<code>mappedBy</code>会使<code>foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)</code>失效, 如果不使用<code>mappedBy</code> 则会生层一张中间表.<br>版本: <code>hiernate 5.x</code><br>临时解决方案: </p>
 <ol>
 <li>使用已被废弃的注解<code>@org.hiernate.annotations.ForeignKey</code>注解使外键失效. </li>
 <li>自行去除外键,并且<code>jpa.hibernate.dll-auto</code>设置为<code>none</code>.  </li>
-<li>去除<code>mappedBy</code>, 接受中间表.  </li>
+<li>去除<code>mappedBy</code>, 接受中间表.</li>
 </ol>
-<p>stackoverflow 地址: <a href="https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association" target="_blank" rel="noopener">https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association</a></p>
-<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>现象: <code>zipInputstream</code> 或者 <code>zip4j</code> 无法解压<code>7zip</code>软件打包的的压缩包<br>版本: 所有<br>临时解决方案: 无.<br>issue: <a href="https://github.com/srikanth-lingala/zip4j/issues/45" target="_blank" rel="noopener">https://github.com/srikanth-lingala/zip4j/issues/45</a>  </p>
-<h3 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a>0x03</h3><p>现象: <code>junrar</code> 无法解压<code>rar5</code>版本的压缩包,也就是新版本的<code>winrar</code>打包的压缩包是无法解压的<br>版本: 所有<br>临时解决方案: 无<br>issue: <a href="https://github.com/junrar/junrar/issues/23" target="_blank" rel="noopener">https://github.com/junrar/junrar/issues/23</a></p>
-<h3 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a>0x04</h3><p>现象: 文件上传时,使用<code>@RequestParam</code>, <code>swagger2</code>无法生成对应的文件参数文档.<br>版本: <code>swagger2 3.x</code>, 可能所有版本都有<br>解决方法: 使用<code>@RequsetPart</code> 注解<code>multipart</code>参数  </p>
-<h3 id="0x05"><a href="#0x05" class="headerlink" title="0x05"></a>0x05</h3><p>现象: Spring data JPA 不支持<code>hibernate</code>中的<code>@FetchMode</code>,无法通过该注解直接实现<code>join</code>查询来避免<code>N+1</code>问题<br>版本: 所有<br>解决方案: 使用<code>@EntityGraph</code>解决该问题,可以无限向下关联;或者使用原生<code>sql</code>查询;<code>spring data jpa</code>自带的一些方法无法做到多级<code>join</code>,即使使用的该注解,这个问题很奇怪.<br>stackoverflow: <a href="https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels" target="_blank" rel="noopener">https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels</a>  </p>
-<h3 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a>0x06</h3><p>现象: <code>Hibernate</code>或者<code>jpa</code> 实现多个实体类<code>join</code>, 如果是<code>hibernate</code> 则在使用<code>@FetchMode.JOIN</code>时候属性列指定为<code>List</code>会报错, 如果是 <code>spring data jpa</code> 多个属性列为<code>List</code> 则不能同时使用<code>FetchType.EAGRE</code><br>版本: 所有<br>解决方案: 使用<code>Set</code>作为属性的类型<br>stackoverflow:  <a href="https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl" target="_blank" rel="noopener">https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl</a>  </p>
+<p>stackoverflow 地址: <a href="https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association">https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association</a></p>
+<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>现象: <code>zipInputstream</code> 或者 <code>zip4j</code> 无法解压<code>7zip</code>软件打包的的压缩包<br>版本: 2.4.2<br>解决方案: 无.<br>issue: <a href="https://github.com/srikanth-lingala/zip4j/issues/45">https://github.com/srikanth-lingala/zip4j/issues/45</a>  </p>
+<h3 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a>0x03</h3><p>现象: <code>junrar</code> 无法解压<code>rar5</code>版本的压缩包,也就是新版本的<code>winrar</code>打包的压缩包是无法解压的<br>版本: 2.4.2<br>解决方案: 无<br>issue: <a href="https://github.com/junrar/junrar/issues/23">https://github.com/junrar/junrar/issues/23</a></p>
+<h3 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a>0x04</h3><p>现象: 文件上传时,使用<code>@RequestParam</code>, <code>swagger2</code>无法生成对应的文件参数文档.<br>版本: <code>swagger2 3.x</code><br>解决方法: 使用<code>@RequsetPart</code> 注解<code>multipart</code>参数  </p>
+<h3 id="0x05"><a href="#0x05" class="headerlink" title="0x05"></a>0x05</h3><p>现象: <code>Spring data JPA 不支持</code>hibernate<code>中的</code>@FetchMode<code>,无法通过该注解直接实现</code>join<code>查询来避免</code>N+1<code>问题   版本: 2.4.2   解决方案: 使用</code>@EntityGraph<code>解决该问题,可以无限向下关联;或者使用原生</code>sql<code>查询;</code>spring data jpa<code>自带的一些方法无法做到多级</code>join&#96;,即使使用的该注解,这个问题很奇怪.<br>stackoverflow: <a href="https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels">https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels</a>  </p>
+<h3 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a>0x06</h3><p>现象: <code>Hibernate</code>或者<code>jpa</code> 实现多个实体类<code>join</code>, 如果是<code>hibernate</code> 则在使用<code>@FetchMode.JOIN</code>时候属性列指定为<code>List</code>会报错, 如果是 <code>spring data jpa</code> 多个属性列为<code>List</code> 则不能同时使用<code>FetchType.EAGRE</code><br>版本: 2.4.2<br>解决方案: 使用<code>Set</code>作为属性的类型<br>stackoverflow:  <a href="https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl">https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl</a>  </p>
+<h2 id="2021年6月"><a href="#2021年6月" class="headerlink" title="2021年6月"></a>2021年6月</h2><h3 id="0x01-1"><a href="#0x01-1" class="headerlink" title="0x01"></a>0x01</h3><p>现象: <code>JPA</code> 对于非主键关联支持报错, <code>Tester</code>单向关联了<code>Project</code>类的<code>c_project_number</code>, </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Column(name = &quot;c_tester_name&quot;, columnDefinition = &quot;VARCHAR(20) NOT NULL COMMENT &#x27;测试者姓名&#x27;&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Column(name = &quot;c_tester_phoneNum&quot;, columnDefinition = &quot;VARCHAR(20) NOT NULL COMMENT &#x27;测试者联系电话&#x27;&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String phoneNum;</span><br><span class="line"></span><br><span class="line"><span class="meta">@ManyToOne</span></span><br><span class="line"><span class="meta">@JoinColumn(name = &quot;c_project_num&quot;, referencedColumnName = &quot;c_project_number&quot;, nullable = false , foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))</span></span><br><span class="line"><span class="keyword">private</span> Project project;</span><br></pre></td></tr></table></figure>
+<p>在根据项目编号和电话号码查询<code>Tester</code>对向时,如果不存在<code>Tester</code>对象,无任何问题,存在<code>Tester</code>对象则报错,报错如下:  </p>
+<blockquote>
+<p><code>com.xxx.entity.Project  is in unnamed module of loader &#39;app&#39;; java.io.Serializable is in module java.base of loader &#39;bootstrap&#39;</code> ,<br>版本: 2.4.2<br>解决方案: 初步判断为查找出<code>Tester</code>对象时,关联出<code>Project</code>对象, 此时被<code>app</code>这个<code>classLoader</code>加载, 导致问题,具体深层次原因未深究, 此处临时解决办法是不使用<code>c_project_number</code>字段关联, 使用<code>Project</code>类的主键进行关联.<br>stackoverflow: ttps:&#x2F;&#x2F;stackoverflow.com&#x2F;questions&#x2F;61862202&#x2F;using-jpa-elementcollection-for-a-string-collection-from-a-join-table</p>
+</blockquote>
+<h2 id="2022年6月"><a href="#2022年6月" class="headerlink" title="2022年6月"></a>2022年6月</h2><h3 id="0x01-2"><a href="#0x01-2" class="headerlink" title="0x01"></a>0x01</h3><p>现象<code>JPA</code>非主键关联，如果上级实体类和下级实体类同时包含另一个实体类，如下: <code>Patient</code>和<code>Recheck</code>都包含<code>Department</code>对象，同时<code>Recheck</code>又包含<code>Patient</code>对象，</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Patient: </span><br><span class="line">    <span class="meta">@ManyToOne</span></span><br><span class="line">    <span class="meta">@JoinColumn(name = &quot;c_department_code&quot;,  referencedColumnName = &quot;c_code&quot; ,nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), columnDefinition = &quot;VARCHAR(20) COMMENT &#x27;部门code, 关联t_department表&#x27;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Department department;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Recheck: </span><br><span class="line"></span><br><span class="line">    <span class="meta">@ManyToOne</span></span><br><span class="line">    <span class="meta">@JoinColumn(name = &quot;c_patient_id&quot;, columnDefinition = &quot;int comment &#x27;病患id&#x27;&quot;, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))</span></span><br><span class="line">    <span class="keyword">private</span> Patient patient;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ManyToOne</span></span><br><span class="line">    <span class="meta">@JoinColumn(name = &quot;c_department_code&quot;,  referencedColumnName = &quot;c_code&quot; ,nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), columnDefinition = &quot;VARCHAR(20) COMMENT &#x27;部门code, 关联t_department表&#x27;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Department department;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>此时查询<code>Recheck</code>集合会出现多出查询问题，会单独出现一条语句，查询<code>Recheck</code>里面的<code>Department</code>对象，如果<code>List&lt;Rechck&gt;</code>都是同一个部门那么，只会查询一次<code>Deparment</code>对象，如果对应多个部门，则会查询多个部门.如果<code>Department</code>使用主键关联则不会出现这种问题.<br>怀疑和非主键关联无法lazy加载有关，但是又不像.<br>版本：spring-data-jpa 2.6.0, hibernate-core 5.6.3<br>解决方案：<code>EntityGraph</code>去除<code>patient</code>查询，或者使用主键关联<br>stackoverflow: <a href="https://stackoverflow.com/questions/30082281/manytoonefetch-fetchtype-lazy-doesnt-work-on-non-primary-key-referenced-co">https://stackoverflow.com/questions/30082281/manytoonefetch-fetchtype-lazy-doesnt-work-on-non-primary-key-referenced-co</a></p>
 ]]></content>
       <tags>
         <tag>java</tag>
@@ -1023,19 +1786,19 @@
 <p>好记性不如烂笔头</p>
 </blockquote>
 <p>记录一下使用hexo + github pages搭建博客的过程,以及过程中遇到的坑;同时也给阅读这篇文章,想要搭建博客的人一点帮助</p>
-<a id="more"></a>
-<h1 id="为什么搞独立blog"><a href="#为什么搞独立blog" class="headerlink" title="为什么搞独立blog"></a>为什么搞独立blog</h1><p><code>市面上blog service多如牛毛为啥非要搞自己的,因为独立的才是自己的</code></p>
-<h1 id="为什么使用gihub-pages"><a href="#为什么使用gihub-pages" class="headerlink" title="为什么使用gihub pages"></a>为什么使用gihub pages</h1><p><code>因为不用买服务器,免费而且稳定,也无需域名,只需要你有github账号就能用</code></p>
+<span id="more"></span>
+
+<h1 id="使用gihub-pages"><a href="#使用gihub-pages" class="headerlink" title="使用gihub pages"></a>使用gihub pages</h1><p>免费而且稳定,也无需域名,只需要你有github账号就能用&#96;</p>
 <blockquote>
 <h1 id="Talk-is-cheap-show-me-the-code"><a href="#Talk-is-cheap-show-me-the-code" class="headerlink" title="Talk is cheap, show me the code"></a>Talk is cheap, show me the code</h1></blockquote>
 <h1 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h1><ol>
-<li><a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git</a>根据自己电脑下载相应版本,本人是win10电脑使用git bash.</li>
+<li><a href="https://git-scm.com/downloads">git</a>根据自己电脑下载相应版本,本人是win10电脑使用git bash.</li>
 <li>安装完成打开<code>git bash</code>, 输入<code>git --version</code>测试是否安装成功</li>
-<li>注册<a href="https://github.com/" target="_blank" rel="noopener">github</a>账号(全球最大的同性交友网站,你值得拥有).</li>
+<li>注册<a href="https://github.com/">github</a>账号(全球最大的同性交友网站,你值得拥有).</li>
 <li>新建<code>&lt;username&gt;.github.io</code>仓库.</li>
 </ol>
 <h1 id="node"><a href="#node" class="headerlink" title="node"></a>node</h1><ol>
-<li><a href="http://nodejs.cn/download/]" target="_blank" rel="noopener">node</a>根据自己电脑下载相应版本</li>
+<li><a href="http://nodejs.cn/download/]">node</a>根据自己电脑下载相应版本</li>
 <li>安装完成之后,在之前的<code>git bash</code>输入<code>node --version</code>测试是否安装成功</li>
 </ol>
 <h1 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h1><ol>
@@ -1045,7 +1808,7 @@
 </blockquote>
 <p> ps: 可能安装失败,如果失败,安装cnpm,然后在安装hexo;或者挂代理,走梯子</p>
 <blockquote>
-<p>npm install -g cnpm –registry=<a href="https://registry.npm.taobao.org" target="_blank" rel="noopener">https://registry.npm.taobao.org</a></p>
+<p>npm install -g cnpm –registry&#x3D;<a href="https://registry.npm.taobao.org/">https://registry.npm.taobao.org</a></p>
 </blockquote>
 </li>
 <li><p>安装 Hexo 完成后,执行</p>
@@ -1054,27 +1817,29 @@
 </blockquote>
 <p> 执行完成之后目录会像</p>
 <blockquote>
-<p>├── _config.yml<br> ├── node_modules<br> │   ├── hexo<br> │   ├── hexo-generator-archive<br> │   ├── hexo-generator-category<br> │   ├── hexo-generator-index<br> │   ├── hexo-generator-tag<br> │   ├── hexo-renderer-ejs<br> │   ├── hexo-renderer-marked<br> │   ├── hexo-renderer-stylus<br> │   └── hexo-server<br> ├── package.json<br> ├── scaffolds<br> │   ├── draft.md<br> │   ├── page.md<br> │   └── post.md<br> ├── source<br> │   └── _posts<br> └── themes  </p>
-<pre><code>└── landscape  </code></pre></blockquote>
+<p>├── _config.yml<br> ├── node_modules<br> │   ├── hexo<br> │   ├── hexo-generator-archive<br> │   ├── hexo-generator-category<br> │   ├── hexo-generator-index<br> │   ├── hexo-generator-tag<br> │   ├── hexo-renderer-ejs<br> │   ├── hexo-renderer-marked<br> │   ├── hexo-renderer-stylus<br> │   └── hexo-server<br> ├── package.json<br> ├── scaffolds<br> │   ├── draft.md<br> │   ├── page.md<br> │   └── post.md<br> ├── source<br> │   └── _posts<br> └── themes<br>     └── landscape  </p>
+</blockquote>
 <p> ps: 简单说明一下目录作用   </p>
 <blockquote>
-<p> _config.yml  配置文件,网站的标题,作者,主题配置等<br> node_modules hexo的模块,较少关心<br> package.json 项目描述文件,不用关心<br> scaffolds  模版配置,较少关心<br> source–&gt;_post  主要存放我们写的文章<br> themes  <a href="https://hexo.io/themes/" target="_blank" rel="noopener">hexo主题</a>,文件夹名称对应为主题名称  </p>
+<p> _config.yml  配置文件,网站的标题,作者,主题配置等<br> node_modules hexo的模块,较少关心<br> package.json 项目描述文件,不用关心<br> scaffolds  模版配置,较少关心<br> source–&gt;_post  主要存放我们写的文章<br> themes  <a href="https://hexo.io/themes/">hexo主题</a>,文件夹名称对应为主题名称  </p>
 </blockquote>
 </li>
 <li><p>配置_config.yml</p>
- <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># Site</span><br><span class="line">title: Hexo #标题</span><br><span class="line">subtitle: #副标题</span><br><span class="line">description: #描述</span><br><span class="line">author: #你的名字</span><br><span class="line">language: zh #网站使用的语言,注意使用主题下面的语言(themes--&gt;&lt;要使用的主题&gt;--&gt;languages)不然会出现未知结果</span><br><span class="line">timezone: Asia&#x2F;Shanghai #网站时区 </span><br><span class="line"></span><br><span class="line"># URL</span><br><span class="line">url: https:&#x2F;&#x2F;dengbojing.com #地址(如果未申请域名则不需要填写)</span><br><span class="line">root: &#x2F; #根目录</span><br><span class="line">permalink: :year&#x2F;:month&#x2F;:day&#x2F;:title&#x2F; #文章的永久链接格式</span><br><span class="line">permalink_defaults: #</span><br><span class="line">    trailing_index: true # Set to false to remove trailing &#39;index.html&#39; from permalinks</span><br><span class="line">    trailing_html: true # Set to false to remove trailing &#39;.html&#39; from permalinks</span><br><span class="line"></span><br><span class="line"># Directory</span><br><span class="line">source_dir: source #资源文件夹</span><br><span class="line">public_dir: public #由资源文件夹生成而来</span><br><span class="line">tag_dir: tags #标签文件夹,默认是没有的需要使用hexo new page tags 自行创建</span><br><span class="line">archive_dir: archives #归档文件夹</span><br><span class="line">category_dir: categories #分类文件夹,默认是没有的需要使用hexo new page tags 自行创建</span><br><span class="line">code_dir: downloads&#x2F;code #Include code 文件夹</span><br><span class="line">i18n_dir: :lang #国际化（i18n）文件夹</span><br><span class="line">skip_render: #跳过指定文件的解析</span><br><span class="line"></span><br><span class="line"># Writing</span><br><span class="line">new_post_name: title.md # 新文章的文件名称</span><br><span class="line">default_layout: post #预设布局</span><br><span class="line">titlecase: false # 把标题转换为单词首字母大写</span><br><span class="line">external_link: </span><br><span class="line">    enable: true # 在新标签中打开链接</span><br><span class="line">    field: site</span><br><span class="line">    exclude: &#39;&#39; #排除文件</span><br><span class="line">filename_case: 0 #把文件名称转换为 (1) 小写或 (2) 大写</span><br><span class="line">render_drafts: false #显示草稿</span><br><span class="line">post_asset_folder: false #启动 Asset 文件夹，为 true 时，每次建立文件时，Hexo 会自动建立一个与文章同名的文件夹</span><br><span class="line">relative_link: false #把链接改为与根目录的相对位址</span><br><span class="line">future: true #显示未来的文章</span><br><span class="line">highlight: #代码块高亮,很多主题要求此项为false</span><br><span class="line">    enable: true</span><br><span class="line">    line_number: true</span><br><span class="line">    auto_detect: true</span><br><span class="line">    tab_replace:</span><br><span class="line"></span><br><span class="line"># Category &amp; Tag</span><br><span class="line">default_category: uncategorized #默认分类</span><br><span class="line">category_map: #分类别名</span><br><span class="line">tag_map: #标签别名</span><br><span class="line"></span><br><span class="line"># Date &#x2F; Time format</span><br><span class="line">date_format: YYYY-MM-DD #日期格式</span><br><span class="line">time_format: HH:mm:ss #时间格式</span><br><span class="line"></span><br><span class="line"># Pagination</span><br><span class="line">per_page: 10 #每页显示的文章量 (0关闭分页功能)</span><br><span class="line">pagination_dir: page #分页目录</span><br><span class="line"></span><br><span class="line"># Extensions</span><br><span class="line">theme: next #当前主题名称(本人使用的非默认主题)</span><br><span class="line"></span><br><span class="line"># Deployment</span><br><span class="line">deploy: #部署</span><br><span class="line">    type: git</span><br><span class="line">    repo: https:&#x2F;&#x2F;github.com&#x2F;username&#x2F;username.github.io.git #仓库地址</span><br><span class="line">    branch: master #分支名称</span><br></pre></td></tr></table></figure></li>
-<li><p>打开看看, 在<code>git bash</code>中使用 <code>hexo g</code> 命令生成文章,<code>hexo s</code>命令启动服务,下面提示访问<a href="http://localhost:4000" target="_blank" rel="noopener">localhost:4000</a>,访问一下看到使用默认主题的网站  </p>
+ <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># Site</span><br><span class="line">title: Hexo #标题</span><br><span class="line">subtitle: #副标题</span><br><span class="line">description: #描述</span><br><span class="line">author: #你的名字</span><br><span class="line">language: zh #网站使用的语言,注意使用主题下面的语言(themes--&gt;&lt;要使用的主题&gt;--&gt;languages)不然会出现未知结果</span><br><span class="line">timezone: Asia/Shanghai #网站时区 </span><br><span class="line"></span><br><span class="line"># URL</span><br><span class="line">url: https://dengbojing.com #地址(如果未申请域名则不需要填写)</span><br><span class="line">root: / #根目录</span><br><span class="line">permalink: :year/:month/:day/:title/ #文章的永久链接格式</span><br><span class="line">permalink_defaults: #</span><br><span class="line">    trailing_index: true # Set to false to remove trailing &#x27;index.html&#x27; from permalinks</span><br><span class="line">    trailing_html: true # Set to false to remove trailing &#x27;.html&#x27; from permalinks</span><br><span class="line"></span><br><span class="line"># Directory</span><br><span class="line">source_dir: source #资源文件夹</span><br><span class="line">public_dir: public #由资源文件夹生成而来</span><br><span class="line">tag_dir: tags #标签文件夹,默认是没有的需要使用hexo new page tags 自行创建</span><br><span class="line">archive_dir: archives #归档文件夹</span><br><span class="line">category_dir: categories #分类文件夹,默认是没有的需要使用hexo new page tags 自行创建</span><br><span class="line">code_dir: downloads/code #Include code 文件夹</span><br><span class="line">i18n_dir: :lang #国际化（i18n）文件夹</span><br><span class="line">skip_render: #跳过指定文件的解析</span><br><span class="line"></span><br><span class="line"># Writing</span><br><span class="line">new_post_name: title.md # 新文章的文件名称</span><br><span class="line">default_layout: post #预设布局</span><br><span class="line">titlecase: false # 把标题转换为单词首字母大写</span><br><span class="line">external_link: </span><br><span class="line">    enable: true # 在新标签中打开链接</span><br><span class="line">    field: site</span><br><span class="line">    exclude: &#x27;&#x27; #排除文件</span><br><span class="line">filename_case: 0 #把文件名称转换为 (1) 小写或 (2) 大写</span><br><span class="line">render_drafts: false #显示草稿</span><br><span class="line">post_asset_folder: false #启动 Asset 文件夹，为 true 时，每次建立文件时，Hexo 会自动建立一个与文章同名的文件夹</span><br><span class="line">relative_link: false #把链接改为与根目录的相对位址</span><br><span class="line">future: true #显示未来的文章</span><br><span class="line">highlight: #代码块高亮,很多主题要求此项为false</span><br><span class="line">    enable: true</span><br><span class="line">    line_number: true</span><br><span class="line">    auto_detect: true</span><br><span class="line">    tab_replace:</span><br><span class="line"></span><br><span class="line"># Category &amp; Tag</span><br><span class="line">default_category: uncategorized #默认分类</span><br><span class="line">category_map: #分类别名</span><br><span class="line">tag_map: #标签别名</span><br><span class="line"></span><br><span class="line"># Date / Time format</span><br><span class="line">date_format: YYYY-MM-DD #日期格式</span><br><span class="line">time_format: HH:mm:ss #时间格式</span><br><span class="line"></span><br><span class="line"># Pagination</span><br><span class="line">per_page: 10 #每页显示的文章量 (0关闭分页功能)</span><br><span class="line">pagination_dir: page #分页目录</span><br><span class="line"></span><br><span class="line"># Extensions</span><br><span class="line">theme: next #当前主题名称(本人使用的非默认主题)</span><br><span class="line"></span><br><span class="line"># Deployment</span><br><span class="line">deploy: #部署</span><br><span class="line">    type: git</span><br><span class="line">    repo: https://github.com/username/username.github.io.git #仓库地址</span><br><span class="line">    branch: master #分支名称</span><br></pre></td></tr></table></figure></li>
+<li><p>打开看看, 在<code>git bash</code>中使用 <code>hexo g</code> 命令生成文章,<code>hexo s</code>命令启动服务,下面提示访问<a href="http://localhost:4000/">localhost:4000</a>,访问一下看到使用默认主题的网站</p>
 </li>
 </ol>
-<h1 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h1><p>  使用<code>hexo new post &lt;filename&gt;</code> 创建自己的第一篇文章<br>  找到source–&gt;_post,打开<code>&lt;filename&gt;.md</code><br>  <strong><em>更多<a href="https://hexo.io/zh-cn/docs/writing" target="_blank" rel="noopener">写作</a>用法</em></strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: 使用hexo+github pages建立静态blog</span><br><span class="line">date: 2020-01-14 19:32:51</span><br><span class="line">tags: [git,hexo]</span><br><span class="line">categories: hexo</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<h1 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h1><p>  使用<code>hexo new post &lt;filename&gt;</code> 创建自己的第一篇文章<br>  找到source–&gt;_post,打开<code>&lt;filename&gt;.md</code><br>  <strong><em>更多<a href="https://hexo.io/zh-cn/docs/writing">写作</a>用法</em></strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: 使用hexo+github pages建立静态blog</span><br><span class="line">date: 2020-01-14 19:32:51</span><br><span class="line">tags: [git,hexo]</span><br><span class="line">categories: hexo</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
 <p>  在date下面添加分类和标签,可选<br>  在—下面写正文内容,可以使用<code>&lt;!--more--&gt;</code>分割  </p>
 <blockquote>
 <p>比如:   </p>
 </blockquote>
-<pre><code>简介  
-&lt;!--more--&gt;
-正文  </code></pre><h1 id="本地预览"><a href="#本地预览" class="headerlink" title="本地预览"></a>本地预览</h1><p>hexo g生成<br>hexo s启动<br>打开浏览器,输入<a href="localhost:4000">localhost:4000</a>看看吧  </p>
+<pre><code>    简介  
+    &lt;!--more--&gt;
+    正文  
+</code></pre>
+<h1 id="本地预览"><a href="#本地预览" class="headerlink" title="本地预览"></a>本地预览</h1><p>hexo g生成<br>hexo s启动<br>打开浏览器,输入<a href="localhost:4000">localhost:4000</a>看看吧  </p>
 <h1 id="部署到服务器"><a href="#部署到服务器" class="headerlink" title="部署到服务器"></a>部署到服务器</h1><p>  安装一键部署</p>
 <blockquote>
 <p>npm install hexo-deployer-git –save  </p>

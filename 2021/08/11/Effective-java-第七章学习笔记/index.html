@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dengbojing.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"manual"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="第七章：Lambdas 表达式 和 Streams流处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective-java-第七章学习笔记">
+<meta property="og:url" content="http://dengbojing.com/2021/08/11/Effective-java-%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="生活不易,砥砺前行">
+<meta property="og:description" content="第七章：Lambdas 表达式 和 Streams流处理">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-10T19:02:51.000Z">
+<meta property="article:modified_time" content="2023-01-22T15:37:18.240Z">
+<meta property="article:author" content="Dengbojing">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://dengbojing.com/2021/08/11/Effective-java-%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Effective-java-第七章学习笔记 | 生活不易,砥砺前行</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288627-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-156288627-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4cafee18f10a04bf0eed864b0bd7f623";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="生活不易,砥砺前行" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">生活不易,砥砺前行</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Keep farmed and carry hard</p>
+      <a>
+        <img class="custom-logo-image" src="/back.png" alt="生活不易,砥砺前行">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">3</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">23</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://dengbojing.com/2021/08/11/Effective-java-%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="Dengbojing">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="生活不易,砥砺前行">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Effective-java-第七章学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-11 03:02:51" itemprop="dateCreated datePublished" datetime="2021-08-11T03:02:51+08:00">2021-08-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-22 23:37:18" itemprop="dateModified" datetime="2023-01-22T23:37:18+08:00">2023-01-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>第七章：Lambdas 表达式 和 Streams流处理</p>
+<span id="more"></span>
+
+
+<h1 id="使用Lambads优先于匿名内部类"><a href="#使用Lambads优先于匿名内部类" class="headerlink" title="使用Lambads优先于匿名内部类"></a>使用<code>Lambads</code>优先于匿名内部类</h1><p>函数式接口： 只拥有一个抽象方法的接口(interface)被称作函数式接口。</p>
+<p>函数对象：只具有一个方法的接口的实例，代表一种方法或者具体的执行动作。</p>
+<p><code>Lambad</code>表达式减少了匿名内部类的样板代码，比如: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Thread</span>  <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="comment">//do sth</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>使用<code>Lambads</code>代替：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Thread</span>  <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;<span class="comment">//do sth&#125;);</span></span><br></pre></td></tr></table></figure>
+<p>当明白了<code>Lambads</code>的语法，会觉得上述写法非常简洁，也非常直观的知道这个线程的作用.</p>
+<ol>
+<li><p>当使用<code>Lambads</code>时，通常省略参数类型，除非参数类型的指定能让程序看起来更加清晰，如果编译器发出警告或者编译错误无法推断参数类型，此时你应该明确的指定参数类型。编译器的类型推断是根据传入参数，或者返回值的泛型类型来确定，所以一定要使用泛型来代替原始类型。</p>
+</li>
+<li><p><code>Lambads</code>最好不要超过3行，超过3行可读性就会非常差，超过3行就要进行重构</p>
+</li>
+<li><p><code>Lambads</code>没有名称和很好的文档注释，如果表达式不能自我表达，自我描述，或者超过行数限制，都不应该写<code>Lambads</code></p>
+</li>
+<li><p><code>Lambads</code>中<code>this</code>指代的是包含表达式的对象，匿名内部类中<code>this</code>代表该匿名内部类的实例。</p>
+</li>
+<li><p>使用泛型更好的实现枚举的constant-specific方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">Operation</span> &#123;</span><br><span class="line">    PLUS (<span class="string">&quot;+&quot;</span>, (x, y) -&gt; x + y),</span><br><span class="line">    MINUS (<span class="string">&quot;-&quot;</span>, (x, y) -&gt; x - y),</span><br><span class="line">    TIMES (<span class="string">&quot;*&quot;</span>, (x, y) -&gt; x * y),</span><br><span class="line">    DIVIDE(<span class="string">&quot;/&quot;</span>, (x, y) -&gt; x / y);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String symbol;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> DoubleBinaryOperator op;</span><br><span class="line">    Operation(String symbol, DoubleBinaryOperator op) &#123;</span><br><span class="line">    <span class="built_in">this</span>.symbol = symbol;</span><br><span class="line">    <span class="built_in">this</span>.op = op;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="使用方法引用优先于Lambads"><a href="#使用方法引用优先于Lambads" class="headerlink" title="使用方法引用优先于Lambads"></a>使用方法引用优先于<code>Lambads</code></h1><p>如果方法引用不能使代码更加清晰，降低了可读性，那么则应该使用<code>lambad</code>表达式。</p>
+<h1 id="优先使用标准的函数式接口"><a href="#优先使用标准的函数式接口" class="headerlink" title="优先使用标准的函数式接口"></a>优先使用标准的函数式接口</h1><ol>
+<li><p>如果有标准的函数式接口可以完成需求，那么就应该优先使用，而不是专门构建一个函数式接口。<code>java 8</code>内置了很多函数式接口在<code>java.util.function</code>包下，优先使用这些函数式接口。如果有以下情况除外：<br>  1.1. 需要一个通用的，具有描述性的名字的函数式接口.<br>  1.2. 拥有很强的约束关系.<br>  1.3. 讲受益于自定义的默认方法.</p>
+</li>
+<li><p>不要试图使用带有包装类型的基础函数式接口代替原始类型的函数式接口。</p>
+</li>
+<li><p>函数式接口必须要使用<code>@FunctionalInterface</code>注解。</p>
+</li>
+</ol>
+<h1 id="谨慎的使用-96-Streams·"><a href="#谨慎的使用-96-Streams·" class="headerlink" title="谨慎的使用&#96;Streams·"></a>谨慎的使用&#96;Streams·</h1><p><code>Stream</code>概念包含一组数据(<code>Steam</code>)和作用于数据上的一个或者多个操作(<code>Stream pipline</code>).</p>
+<p><code>Stream pipline</code>分为两种操作：中间操作(<code>intermediate operations</code>) 和 终止操作(<code>terminal operation</code>),中间操作可以有一个或者多个，而终止操作只能有一个，但是只有在调用了有了终止操作，整个<code>Stream pipline</code>才会被触发，如果没有终止操作，那么处理流的代码永远不会被执行。</p>
+<p>流的处理默认是串行的，只有当调用流的<code>parallel</code>方法时候流的处理才会被并行处理，但是很少这么做，并行处理需要注意很多地方，且并行处理并不一定都会使处理速度加快。</p>
+<p>过度是使用流操作也会是代码难以阅读和维护，比如: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Overuse of streams - don&#x27;t do this!</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Anagrams</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">Path</span> <span class="variable">dictionary</span> <span class="operator">=</span> Paths.get(args[<span class="number">0</span>]);</span><br><span class="line">        <span class="type">int</span> <span class="variable">minGroupSize</span> <span class="operator">=</span> Integer.parseInt(args[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">try</span> (Stream&lt;String&gt; words = Files.lines(dictionary)) &#123;</span><br><span class="line">            words.collect(</span><br><span class="line">            groupingBy(word -&gt; word.chars().sorted()</span><br><span class="line">            .collect(StringBuilder::<span class="keyword">new</span>,</span><br><span class="line">            (sb, c) -&gt; sb.append((<span class="type">char</span>) c),</span><br><span class="line">            StringBuilder::append).toString()))</span><br><span class="line">            .values().stream()</span><br><span class="line">            .filter(group -&gt; group.size() &gt;= minGroupSize)</span><br><span class="line">            .map(group -&gt; group.size() + <span class="string">&quot;: &quot;</span> + group)</span><br><span class="line">            .forEach(System.out::println);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码里面的<code>gourpingBy</code>函数的代码读对于没怎么使用过流的人来说读起来非常吃力。<br>建议讲<code>groupingBy</code>单独封装一个方法，单独封装一个方法，可以使用有涵义的方法名和良好的说明注释，这样可以使整个代码可读性和维护性有很大的提升。</p>
+<p>由于<code>lambdd</code>表达式没有显示的参数类型，所以参数的名称就非常重要，好的参数名称对于可读性来说是非常重要的，尽量不要使用单个字母来命名，使用单词或者合成单词来命名。  </p>
+<p>避免使用流来处理<code>char</code>数据，书中举例是因为<code>char</code>字符在输出时会使用对应的<code>int</code>值。</p>
+<p>除非有必要重构<code>for</code>循环代码为<code>Stream</code>，否则你应该保持克制，并不是所有的循环改为<code>Stream</code>都拥有很好的可读性和可维护性。复杂的任务进行重构时可能会带来过度使用<code>Stream</code>的问题。从而使代码的可读性和维护性降低。</p>
+<p><code>Stream</code>适用的场景：</p>
+<ul>
+<li>对元素进行一些列的变换</li>
+<li>过滤元素</li>
+<li>合并元素(添加，合并)</li>
+<li>元素聚集(合并为一个map,list等)</li>
+<li>按条件搜索元素</li>
+</ul>
+<h1 id="使用Streams中无额为影响的函数"><a href="#使用Streams中无额为影响的函数" class="headerlink" title="使用Streams中无额为影响的函数"></a>使用<code>Streams</code>中无额为影响的函数</h1><p>纯函数(pure function): 输出只依赖输入，不依赖其他任何阶段的状态，也不会改变其他任何东西的状态。</p>
+<p><strong><code>forEach</code>函数应该只用作输出<code>Stream</code>最后计算出来的结果，不应该执行具体的计算，偶尔可以用作其他目的，比如添加<code>Stream</code>计算的结果到一个集合中。</strong> </p>
+<p>应该静态导入<code>Collectors</code>类，提高<code>Stream</code>最终的可读性，永远不要直接使用<code>Collectors.collect(counting())</code>等其他方法(<code>suming,averaging,summarizing,filtering,reducing,mapping,flatmapping</code>等)，这些方法是为了<code>downStream</code>(Collectors许多方法都有<code>downStream</code>参数)设计，应该使用<code>Stream</code>自带的方法</p>
+<h1 id="优先使用集合作为返回值"><a href="#优先使用集合作为返回值" class="headerlink" title="优先使用集合作为返回值"></a>优先使用集合作为返回值</h1><p>问题很简单，因为所有集合都实现了<code>Iterable</code>接口，整个更加通用。</p>
+<p>如果返回的数据集特别大，不建议使用现有的集合类，而是自己实现<code>AbstractList</code>.</p>
+<p>如实现一个给定集合的全排列： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//The power set of &#123;a, b, c&#125; is &#123;&#123;&#125;, &#123;a&#125;, &#123;b&#125;, &#123;c&#125;, &#123;a, b&#125;, &#123;a, c&#125;, &#123;b, c&#125;, &#123;a, b, c&#125;&#125;.</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PowerSet</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> &lt;E&gt; Collection&lt;Set&lt;E&gt;&gt; <span class="title function_">of</span><span class="params">(Set&lt;E&gt; s)</span> &#123;</span><br><span class="line">        List&lt;E&gt; src = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(s);</span><br><span class="line">        <span class="keyword">if</span> (src.size() &gt; <span class="number">30</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Set too big &quot;</span> + s);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">AbstractList</span>&lt;Set&lt;E&gt;&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span> <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">size</span><span class="params">()</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span> &lt;&lt; src.size(); <span class="comment">// 2 to the power srcSize</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="meta">@Override</span> <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(Object o)</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> o <span class="keyword">instanceof</span> Set &amp;&amp; src.containsAll((Set)o);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="meta">@Override</span> <span class="keyword">public</span> Set&lt;E&gt; <span class="title function_">get</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">                Set&lt;E&gt; result = <span class="keyword">new</span> <span class="title class_">HashSet</span>&lt;&gt;();</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; index != <span class="number">0</span>; i++, index &gt;&gt;= <span class="number">1</span>)</span><br><span class="line">                    <span class="keyword">if</span> ((index &amp; <span class="number">1</span>) == <span class="number">1</span>)</span><br><span class="line">                        result.add(src.get(i));</span><br><span class="line">                <span class="keyword">return</span> result;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="Stream并行化的建议"><a href="#Stream并行化的建议" class="headerlink" title="Stream并行化的建议"></a><code>Stream</code>并行化的建议</h1><p>如果使用<code>Stream.iterate</code> 和 中间操作<code>limit</code>,并行化流并不会得到性能提升。</p>
+<p>在<code>ArrayList, HashMap, HashSet, and ConcurrentHashMap instances; arrays; int ranges; and long ranges</code>上使用并行流会有显著的性能提升。因为这些数据结构统一，可以被精确的分割，有利于并行化。另一重要的因素是这些数据结构有着很好的局部引用，数据引用在内存连续的，虽然这些也引用的数据对象在内存上是不连续的，不利于并行处理的；内存的连续性(局部的引用性)是并行处理的最关键因素，如果没有内存连续性的，线程大部分是空闲的，在等待cpu将内存数据获取到cpu缓存中。最好的内存连续性数据结构就是原始数据类型的数组，他们的分配都是在连续的内存上。</p>
+<p>使用并行流不止有可能导致性能降低，还有可能导致结果不正确(使用<code>forEachOrder</code>)和活锁(<code>limit</code>).</p>
+<p>只用在适当的情况下，使用并行流才会提升性能，所以建议是不要并行化，除非你有很好的理由非要这么做。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Dengbojing
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://dengbojing.com/2021/08/11/Effective-java-%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Effective-java-第七章学习笔记">http://dengbojing.com/2021/08/11/Effective-java-第七章学习笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/15/Effective-java-%E7%AC%AC%E5%85%AD%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="Effective-java-第六章学习笔记">
+      <i class="fa fa-chevron-left"></i> Effective-java-第六章学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/20/Effective-java-%E7%AC%AC%E5%85%AB%E7%AB%A0%E5%AD%A6%E4%B9%A0/" rel="next" title="Effective-java-第八章学习">
+      Effective-java-第八章学习 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Lambads%E4%BC%98%E5%85%88%E4%BA%8E%E5%8C%BF%E5%90%8D%E5%86%85%E9%83%A8%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">使用Lambads优先于匿名内部类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95%E5%BC%95%E7%94%A8%E4%BC%98%E5%85%88%E4%BA%8ELambads"><span class="nav-number">2.</span> <span class="nav-text">使用方法引用优先于Lambads</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E4%BD%BF%E7%94%A8%E6%A0%87%E5%87%86%E7%9A%84%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.</span> <span class="nav-text">优先使用标准的函数式接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%A8%E6%85%8E%E7%9A%84%E4%BD%BF%E7%94%A8-96-Streams%C2%B7"><span class="nav-number">4.</span> <span class="nav-text">谨慎的使用&#96;Streams·</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Streams%E4%B8%AD%E6%97%A0%E9%A2%9D%E4%B8%BA%E5%BD%B1%E5%93%8D%E7%9A%84%E5%87%BD%E6%95%B0"><span class="nav-number">5.</span> <span class="nav-text">使用Streams中无额为影响的函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E4%BD%BF%E7%94%A8%E9%9B%86%E5%90%88%E4%BD%9C%E4%B8%BA%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">6.</span> <span class="nav-text">优先使用集合作为返回值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Stream%E5%B9%B6%E8%A1%8C%E5%8C%96%E7%9A%84%E5%BB%BA%E8%AE%AE"><span class="nav-number">7.</span> <span class="nav-text">Stream并行化的建议</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dengbojing"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Dengbojing</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dengbojing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dengbojing" rel="noopener" target="_blank"><i class="fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/dengbojing@qq.com" title="E-Mail → dengbojing@qq.com"><i class="fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://dengbojing.com/" title="http:&#x2F;&#x2F;dengbojing.com">dengbojing</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">dengbojing</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

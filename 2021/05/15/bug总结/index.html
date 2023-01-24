@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.2.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="日常开发中遇到的bug总结.">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-05-15T11:00:27.000Z">
-<meta property="article:modified_time" content="2021-05-17T10:57:59.505Z">
+<meta property="article:modified_time" content="2023-01-22T15:37:18.225Z">
 <meta property="article:author" content="Dengbojing">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="bug">
@@ -150,7 +150,7 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">10</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">15</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
@@ -160,7 +160,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">13</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">23</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -244,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 18:57:59" itemprop="dateModified" datetime="2021-05-17T18:57:59+08:00">2021-05-17</time>
+                <time title="修改时间：2023-01-22 23:37:18" itemprop="dateModified" datetime="2023-01-22T23:37:18+08:00">2023-01-22</time>
               </span>
 
           
@@ -259,20 +259,31 @@
 
       
         <p>日常开发中遇到的bug总结.</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="2021年5月"><a href="#2021年5月" class="headerlink" title="2021年5月"></a>2021年5月</h2><h3 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h3><p>现象: <code>JPA</code> 中双向关联如果使用<code>mappedBy</code>会使<code>foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)</code>失效, 如果不使用<code>mappedBy</code> 则会生层一张中间表.<br>版本: <code>hiernate 5.x</code><br>临时解决方案: </p>
 <ol>
 <li>使用已被废弃的注解<code>@org.hiernate.annotations.ForeignKey</code>注解使外键失效. </li>
 <li>自行去除外键,并且<code>jpa.hibernate.dll-auto</code>设置为<code>none</code>.  </li>
-<li>去除<code>mappedBy</code>, 接受中间表.  </li>
+<li>去除<code>mappedBy</code>, 接受中间表.</li>
 </ol>
-<p>stackoverflow 地址: <a href="https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association" target="_blank" rel="noopener">https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association</a></p>
-<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>现象: <code>zipInputstream</code> 或者 <code>zip4j</code> 无法解压<code>7zip</code>软件打包的的压缩包<br>版本: 所有<br>临时解决方案: 无.<br>issue: <a href="https://github.com/srikanth-lingala/zip4j/issues/45" target="_blank" rel="noopener">https://github.com/srikanth-lingala/zip4j/issues/45</a>  </p>
-<h3 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a>0x03</h3><p>现象: <code>junrar</code> 无法解压<code>rar5</code>版本的压缩包,也就是新版本的<code>winrar</code>打包的压缩包是无法解压的<br>版本: 所有<br>临时解决方案: 无<br>issue: <a href="https://github.com/junrar/junrar/issues/23" target="_blank" rel="noopener">https://github.com/junrar/junrar/issues/23</a></p>
-<h3 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a>0x04</h3><p>现象: 文件上传时,使用<code>@RequestParam</code>, <code>swagger2</code>无法生成对应的文件参数文档.<br>版本: <code>swagger2 3.x</code>, 可能所有版本都有<br>解决方法: 使用<code>@RequsetPart</code> 注解<code>multipart</code>参数  </p>
-<h3 id="0x05"><a href="#0x05" class="headerlink" title="0x05"></a>0x05</h3><p>现象: Spring data JPA 不支持<code>hibernate</code>中的<code>@FetchMode</code>,无法通过该注解直接实现<code>join</code>查询来避免<code>N+1</code>问题<br>版本: 所有<br>解决方案: 使用<code>@EntityGraph</code>解决该问题,可以无限向下关联;或者使用原生<code>sql</code>查询;<code>spring data jpa</code>自带的一些方法无法做到多级<code>join</code>,即使使用的该注解,这个问题很奇怪.<br>stackoverflow: <a href="https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels" target="_blank" rel="noopener">https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels</a>  </p>
-<h3 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a>0x06</h3><p>现象: <code>Hibernate</code>或者<code>jpa</code> 实现多个实体类<code>join</code>, 如果是<code>hibernate</code> 则在使用<code>@FetchMode.JOIN</code>时候属性列指定为<code>List</code>会报错, 如果是 <code>spring data jpa</code> 多个属性列为<code>List</code> 则不能同时使用<code>FetchType.EAGRE</code><br>版本: 所有<br>解决方案: 使用<code>Set</code>作为属性的类型<br>stackoverflow:  <a href="https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl" target="_blank" rel="noopener">https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl</a>  </p>
+<p>stackoverflow 地址: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association">https://stackoverflow.com/questions/41729709/how-do-i-disable-hibernate-foreign-key-constraint-on-a-bidirectional-association</a></p>
+<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>现象: <code>zipInputstream</code> 或者 <code>zip4j</code> 无法解压<code>7zip</code>软件打包的的压缩包<br>版本: 2.4.2<br>解决方案: 无.<br>issue: <a target="_blank" rel="noopener" href="https://github.com/srikanth-lingala/zip4j/issues/45">https://github.com/srikanth-lingala/zip4j/issues/45</a>  </p>
+<h3 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a>0x03</h3><p>现象: <code>junrar</code> 无法解压<code>rar5</code>版本的压缩包,也就是新版本的<code>winrar</code>打包的压缩包是无法解压的<br>版本: 2.4.2<br>解决方案: 无<br>issue: <a target="_blank" rel="noopener" href="https://github.com/junrar/junrar/issues/23">https://github.com/junrar/junrar/issues/23</a></p>
+<h3 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a>0x04</h3><p>现象: 文件上传时,使用<code>@RequestParam</code>, <code>swagger2</code>无法生成对应的文件参数文档.<br>版本: <code>swagger2 3.x</code><br>解决方法: 使用<code>@RequsetPart</code> 注解<code>multipart</code>参数  </p>
+<h3 id="0x05"><a href="#0x05" class="headerlink" title="0x05"></a>0x05</h3><p>现象: <code>Spring data JPA 不支持</code>hibernate<code>中的</code>@FetchMode<code>,无法通过该注解直接实现</code>join<code>查询来避免</code>N+1<code>问题   版本: 2.4.2   解决方案: 使用</code>@EntityGraph<code>解决该问题,可以无限向下关联;或者使用原生</code>sql<code>查询;</code>spring data jpa<code>自带的一些方法无法做到多级</code>join&#96;,即使使用的该注解,这个问题很奇怪.<br>stackoverflow: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels">https://stackoverflow.com/questions/30479748/jpa-how-to-define-namedentitygraph-for-3-levels</a>  </p>
+<h3 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a>0x06</h3><p>现象: <code>Hibernate</code>或者<code>jpa</code> 实现多个实体类<code>join</code>, 如果是<code>hibernate</code> 则在使用<code>@FetchMode.JOIN</code>时候属性列指定为<code>List</code>会报错, 如果是 <code>spring data jpa</code> 多个属性列为<code>List</code> 则不能同时使用<code>FetchType.EAGRE</code><br>版本: 2.4.2<br>解决方案: 使用<code>Set</code>作为属性的类型<br>stackoverflow:  <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl">https://stackoverflow.com/questions/4334970/hibernate-throws-multiplebagfetchexception-cannot-simultaneously-fetch-multipl</a>  </p>
+<h2 id="2021年6月"><a href="#2021年6月" class="headerlink" title="2021年6月"></a>2021年6月</h2><h3 id="0x01-1"><a href="#0x01-1" class="headerlink" title="0x01"></a>0x01</h3><p>现象: <code>JPA</code> 对于非主键关联支持报错, <code>Tester</code>单向关联了<code>Project</code>类的<code>c_project_number</code>, </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Column(name = &quot;c_tester_name&quot;, columnDefinition = &quot;VARCHAR(20) NOT NULL COMMENT &#x27;测试者姓名&#x27;&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Column(name = &quot;c_tester_phoneNum&quot;, columnDefinition = &quot;VARCHAR(20) NOT NULL COMMENT &#x27;测试者联系电话&#x27;&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String phoneNum;</span><br><span class="line"></span><br><span class="line"><span class="meta">@ManyToOne</span></span><br><span class="line"><span class="meta">@JoinColumn(name = &quot;c_project_num&quot;, referencedColumnName = &quot;c_project_number&quot;, nullable = false , foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))</span></span><br><span class="line"><span class="keyword">private</span> Project project;</span><br></pre></td></tr></table></figure>
+<p>在根据项目编号和电话号码查询<code>Tester</code>对向时,如果不存在<code>Tester</code>对象,无任何问题,存在<code>Tester</code>对象则报错,报错如下:  </p>
+<blockquote>
+<p><code>com.xxx.entity.Project  is in unnamed module of loader &#39;app&#39;; java.io.Serializable is in module java.base of loader &#39;bootstrap&#39;</code> ,<br>版本: 2.4.2<br>解决方案: 初步判断为查找出<code>Tester</code>对象时,关联出<code>Project</code>对象, 此时被<code>app</code>这个<code>classLoader</code>加载, 导致问题,具体深层次原因未深究, 此处临时解决办法是不使用<code>c_project_number</code>字段关联, 使用<code>Project</code>类的主键进行关联.<br>stackoverflow: ttps:&#x2F;&#x2F;stackoverflow.com&#x2F;questions&#x2F;61862202&#x2F;using-jpa-elementcollection-for-a-string-collection-from-a-join-table</p>
+</blockquote>
+<h2 id="2022年6月"><a href="#2022年6月" class="headerlink" title="2022年6月"></a>2022年6月</h2><h3 id="0x01-2"><a href="#0x01-2" class="headerlink" title="0x01"></a>0x01</h3><p>现象<code>JPA</code>非主键关联，如果上级实体类和下级实体类同时包含另一个实体类，如下: <code>Patient</code>和<code>Recheck</code>都包含<code>Department</code>对象，同时<code>Recheck</code>又包含<code>Patient</code>对象，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Patient: </span><br><span class="line">    <span class="meta">@ManyToOne</span></span><br><span class="line">    <span class="meta">@JoinColumn(name = &quot;c_department_code&quot;,  referencedColumnName = &quot;c_code&quot; ,nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), columnDefinition = &quot;VARCHAR(20) COMMENT &#x27;部门code, 关联t_department表&#x27;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Department department;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Recheck: </span><br><span class="line"></span><br><span class="line">    <span class="meta">@ManyToOne</span></span><br><span class="line">    <span class="meta">@JoinColumn(name = &quot;c_patient_id&quot;, columnDefinition = &quot;int comment &#x27;病患id&#x27;&quot;, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))</span></span><br><span class="line">    <span class="keyword">private</span> Patient patient;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ManyToOne</span></span><br><span class="line">    <span class="meta">@JoinColumn(name = &quot;c_department_code&quot;,  referencedColumnName = &quot;c_code&quot; ,nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), columnDefinition = &quot;VARCHAR(20) COMMENT &#x27;部门code, 关联t_department表&#x27;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Department department;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>此时查询<code>Recheck</code>集合会出现多出查询问题，会单独出现一条语句，查询<code>Recheck</code>里面的<code>Department</code>对象，如果<code>List&lt;Rechck&gt;</code>都是同一个部门那么，只会查询一次<code>Deparment</code>对象，如果对应多个部门，则会查询多个部门.如果<code>Department</code>使用主键关联则不会出现这种问题.<br>怀疑和非主键关联无法lazy加载有关，但是又不像.<br>版本：spring-data-jpa 2.6.0, hibernate-core 5.6.3<br>解决方案：<code>EntityGraph</code>去除<code>patient</code>查询，或者使用主键关联<br>stackoverflow: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/30082281/manytoonefetch-fetchtype-lazy-doesnt-work-on-non-primary-key-referenced-co">https://stackoverflow.com/questions/30082281/manytoonefetch-fetchtype-lazy-doesnt-work-on-non-primary-key-referenced-co</a></p>
 
     </div>
 
@@ -313,7 +324,10 @@
     <a href="/2021/04/07/Effective-java-%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="Effective-java-第四章学习笔记">
       <i class="fa fa-chevron-left"></i> Effective-java-第四章学习笔记
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/25/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="学习笔记">
+      学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -372,7 +386,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#2021年5月"><span class="nav-number">1.</span> <span class="nav-text">2021年5月</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01"><span class="nav-number">1.1.</span> <span class="nav-text">0x01</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02"><span class="nav-number">1.2.</span> <span class="nav-text">0x02</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03"><span class="nav-number">1.3.</span> <span class="nav-text">0x03</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x04"><span class="nav-number">1.4.</span> <span class="nav-text">0x04</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x05"><span class="nav-number">1.5.</span> <span class="nav-text">0x05</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x06"><span class="nav-number">1.6.</span> <span class="nav-text">0x06</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#2021%E5%B9%B45%E6%9C%88"><span class="nav-number">1.</span> <span class="nav-text">2021年5月</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01"><span class="nav-number">1.1.</span> <span class="nav-text">0x01</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02"><span class="nav-number">1.2.</span> <span class="nav-text">0x02</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03"><span class="nav-number">1.3.</span> <span class="nav-text">0x03</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x04"><span class="nav-number">1.4.</span> <span class="nav-text">0x04</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x05"><span class="nav-number">1.5.</span> <span class="nav-text">0x05</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x06"><span class="nav-number">1.6.</span> <span class="nav-text">0x06</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2021%E5%B9%B46%E6%9C%88"><span class="nav-number">2.</span> <span class="nav-text">2021年6月</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01-1"><span class="nav-number">2.1.</span> <span class="nav-text">0x01</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2022%E5%B9%B46%E6%9C%88"><span class="nav-number">3.</span> <span class="nav-text">2022年6月</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01-2"><span class="nav-number">3.1.</span> <span class="nav-text">0x01</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -388,7 +402,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -399,7 +413,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -454,7 +468,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

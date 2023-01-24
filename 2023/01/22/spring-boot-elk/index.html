@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dengbojing.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"manual"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="spring boot 结合 ELK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring-boot+elk">
+<meta property="og:url" content="http://dengbojing.com/2023/01/22/spring-boot-elk/index.html">
+<meta property="og:site_name" content="生活不易,砥砺前行">
+<meta property="og:description" content="spring boot 结合 ELK">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-22T14:24:58.000Z">
+<meta property="article:modified_time" content="2023-01-22T15:31:25.708Z">
+<meta property="article:author" content="Dengbojing">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="spring-boot">
+<meta property="article:tag" content="elk">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://dengbojing.com/2023/01/22/spring-boot-elk/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spring-boot+elk | 生活不易,砥砺前行</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288627-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-156288627-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4cafee18f10a04bf0eed864b0bd7f623";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="生活不易,砥砺前行" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">生活不易,砥砺前行</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Keep farmed and carry hard</p>
+      <a>
+        <img class="custom-logo-image" src="/back.png" alt="生活不易,砥砺前行">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">3</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">23</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://dengbojing.com/2023/01/22/spring-boot-elk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="Dengbojing">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="生活不易,砥砺前行">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spring-boot+elk
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-22 22:24:58 / 修改时间：23:31:25" itemprop="dateCreated datePublished" datetime="2023-01-22T22:24:58+08:00">2023-01-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>spring boot 结合 ELK</p>
+<span id="more"></span>
+<h1 id="elasticsearch"><a href="#elasticsearch" class="headerlink" title="elasticsearch"></a>elasticsearch</h1><h2 id="install-elasticsearch"><a href="#install-elasticsearch" class="headerlink" title="install elasticsearch"></a>install elasticsearch</h2><ol start="0">
+<li><p><code>apt-get upgrade</code></p>
+</li>
+<li><p><code>wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -</code></p>
+</li>
+<li><p><code>apt-get install apt-transport-https</code></p>
+</li>
+<li><p><code>apt-get update</code></p>
+</li>
+<li><p><code>apt-get install elasticsearch</code></p>
+</li>
+</ol>
+<h2 id="configurate-elasticsearch"><a href="#configurate-elasticsearch" class="headerlink" title="configurate elasticsearch"></a>configurate elasticsearch</h2><ol>
+<li><p><code>vim  /etc/elasticsearch/elasticsearch.yml</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">network.host: 0.0.0.0  </span><br><span class="line">port: 9200  </span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/6.0/getting-started.html">其他配置</a></p>
+</li>
+<li><p>启动: <code>systemctl start elasticsearch.service</code></p>
+</li>
+<li><p>测试: <code>curl -X GET &quot;localhost:9200&quot;</code></p>
+</li>
+</ol>
+<h1 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h1><h2 id="install-kibana"><a href="#install-kibana" class="headerlink" title="install kibana"></a>install kibana</h2><ol>
+<li><code>apt-get install kibana</code></li>
+</ol>
+<h2 id="Configure-Kibana"><a href="#Configure-Kibana" class="headerlink" title="Configure Kibana"></a>Configure Kibana</h2><ol>
+<li><p><code>vim etc/kibana/kibana.yml</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server.port: 5601  </span><br><span class="line">server.host: &quot;localhost&quot;</span><br><span class="line">elasticsearch.hosts: [&quot;http://localhost:9200&quot;]</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/kibana/7.17/get-started.html">其他配置</a></p>
+</li>
+<li><p>启动: <code>systemctl start kibana</code></p>
+</li>
+<li><p>开机启动(可选): <code>systemctl enable kibana</code></p>
+</li>
+<li><p>开放防火墙, 浏览器测试访问 <code>http://localhost:5601</code></p>
+</li>
+</ol>
+<h1 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h1><h2 id="install-logstash"><a href="#install-logstash" class="headerlink" title="install logstash"></a>install logstash</h2><ol start="0">
+<li><p>主要作用: input 收集, filter过滤, output输出</p>
+</li>
+<li><p><code>apt-get install logstash</code></p>
+</li>
+<li><p>开机启动(可选): <code>systemctl enable logstash</code></p>
+</li>
+</ol>
+<h2 id="Configure-Logstash"><a href="#Configure-Logstash" class="headerlink" title="Configure Logstash"></a>Configure Logstash</h2><ol>
+<li><p><code>vim /etc/logstash/conf.d/logstash.conf</code><br><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/logstash/7.17/introduction.html">其他配置</a></p>
+</li>
+<li><p>配置说明: 以<code>beats</code>为例,下面使用<code>filebeat</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">  beats &#123;</span><br><span class="line">    port =&gt; 5044</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">  elasticsearch &#123;</span><br><span class="line">    hosts =&gt; [&quot;http://localhost:9200&quot;]</span><br><span class="line">    index =&gt; &quot;%&#123;[@metadata][beat]&#125;-%&#123;[@metadata][version]&#125;&quot; </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="FileBeat-可选"><a href="#FileBeat-可选" class="headerlink" title="FileBeat(可选)"></a>FileBeat(可选)</h1><h2 id="install-fileBeat"><a href="#install-fileBeat" class="headerlink" title="install fileBeat"></a>install fileBeat</h2><ol>
+<li><code>apt-get install filebeat</code></li>
+</ol>
+<h2 id="configure-filebeat"><a href="#configure-filebeat" class="headerlink" title="configure filebeat"></a>configure filebeat</h2><ol>
+<li><code>vim /etc/filebeat/filebeat.yml</code></li>
+</ol>
+<p>注释es配置,打开logstash配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># output.elasticsearch:</span><br><span class="line">   # Array of hosts to connect to.</span><br><span class="line">   # hosts: [&quot;localhost:9200&quot;]</span><br><span class="line">output.logstash</span><br><span class="line">   hosts: [&quot;localhost:5044&quot;]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><p>(可选)启动一个module(预设的一些日志处理模块): <code>filebeat modules enable system</code> system module在linux系统下会对&#x2F;var&#x2F;logs下面所有日志传输<br><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-installation-configuration.html">其他配置</a></p>
+</li>
+<li><p>加载日志: <code>filebeat setup -e</code></p>
+</li>
+<li><p>其他通用日志设置修改: </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- type: filestream</span><br><span class="line"></span><br><span class="line">  # Unique ID among all inputs, an ID is required.</span><br><span class="line">  id: my-filestream-id</span><br><span class="line"></span><br><span class="line">  # Change to true to enable this input configuration.</span><br><span class="line">  enabled: false</span><br><span class="line"></span><br><span class="line">  # Paths that should be crawled and fetched. Glob based paths.</span><br><span class="line">  paths:</span><br><span class="line">    - /var/log/*.log</span><br><span class="line">    #- c:\programdata\elasticsearch\logs\*</span><br></pre></td></tr></table></figure>
+<p>enable 设置为ture, paths设置为日志文件目录</p>
+</li>
+<li><p>启动: <code>systemctl start filebeat</code></p>
+</li>
+<li><p>开机启动(可选): systemctl enable filebeat</p>
+</li>
+</ol>
+<h1 id="spring-boot"><a href="#spring-boot" class="headerlink" title="spring-boot"></a>spring-boot</h1><h2 id="add-dependency"><a href="#add-dependency" class="headerlink" title="add dependency"></a>add dependency</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">implementation group: &#x27;net.logstash.logback&#x27;, name: &#x27;logstash-logback-encoder&#x27;, version: &#x27;7.2&#x27;</span><br></pre></td></tr></table></figure>
+
+<h2 id="configure-logstash"><a href="#configure-logstash" class="headerlink" title="configure logstash"></a>configure logstash</h2><p>input moule选择tcp, 其他不变, <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/logstash/current/plugins-inputs-tcp.html">详见文档</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">  tcp &#123;</span><br><span class="line">    id =&gt; &quot;tcp_1&quot;</span><br><span class="line">    port =&gt; 9250</span><br><span class="line">    mode =&gt; [&quot;server&quot;]</span><br><span class="line">    codec =&gt; json_lines</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="set-log-file"><a href="#set-log-file" class="headerlink" title="set log file"></a>set log file</h2><p>logback.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line"></span><br><span class="line">    &lt;property name=&quot;LOGS&quot; value=&quot;./logs&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;appender name=&quot;Console&quot;</span><br><span class="line">              class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;</span><br><span class="line">        &lt;layout class=&quot;ch.qos.logback.classic.PatternLayout&quot;&gt;</span><br><span class="line">            &lt;Pattern&gt;</span><br><span class="line">                %red(%d&#123;ISO8601&#125;) %highlight(%-5level) [%blue(%t)] %yellow(%C&#123;1.&#125;): %msg%n%throwable</span><br><span class="line">            &lt;/Pattern&gt;</span><br><span class="line">        &lt;/layout&gt;</span><br><span class="line">    &lt;/appender&gt;</span><br><span class="line">    &lt;appender name=&quot;stash&quot; class=&quot;net.logstash.logback.appender.LogstashTcpSocketAppender&quot;&gt;</span><br><span class="line">        &lt;destination&gt;localhost:9250&lt;/destination&gt;</span><br><span class="line">        &lt;!-- encoder is required --&gt;</span><br><span class="line">        &lt;encoder class=&quot;net.logstash.logback.encoder.LogstashEncoder&quot; /&gt;</span><br><span class="line">    &lt;/appender&gt;</span><br><span class="line"></span><br><span class="line">    &lt;appender name=&quot;RollingFile&quot;</span><br><span class="line">              class=&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;</span><br><span class="line">        &lt;file&gt;$&#123;LOGS&#125;/spring-boot-logger.log&lt;/file&gt;</span><br><span class="line">        &lt;encoder</span><br><span class="line">                class=&quot;ch.qos.logback.classic.encoder.PatternLayoutEncoder&quot;&gt;</span><br><span class="line">            &lt;Pattern&gt;%d %p %C&#123;1.&#125; [%t] %m%n&lt;/Pattern&gt;</span><br><span class="line">        &lt;/encoder&gt;</span><br><span class="line"></span><br><span class="line">        &lt;rollingPolicy</span><br><span class="line">                class=&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;</span><br><span class="line">            &lt;!-- rollover daily and when the file reaches 10 MegaBytes --&gt;</span><br><span class="line">            &lt;fileNamePattern&gt;$&#123;LOGS&#125;/archived/spring-boot-logger-%d&#123;yyyy-MM-dd&#125;.%i.log</span><br><span class="line">            &lt;/fileNamePattern&gt;</span><br><span class="line">            &lt;timeBasedFileNamingAndTriggeringPolicy</span><br><span class="line">                    class=&quot;ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP&quot;&gt;</span><br><span class="line">                &lt;maxFileSize&gt;10MB&lt;/maxFileSize&gt;</span><br><span class="line">            &lt;/timeBasedFileNamingAndTriggeringPolicy&gt;</span><br><span class="line">        &lt;/rollingPolicy&gt;</span><br><span class="line">    &lt;/appender&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- LOG everything at INFO level --&gt;</span><br><span class="line">    &lt;root level=&quot;info&quot;&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;stash&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;RollingFile&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;Console&quot; /&gt;</span><br><span class="line">    &lt;/root&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- LOG &quot;com.lotus*&quot; at TRACE level --&gt;</span><br><span class="line">    &lt;logger name=&quot;com.lotus&quot; level=&quot;trace&quot; additivity=&quot;false&quot;&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;stash&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;RollingFile&quot; /&gt;</span><br><span class="line">        &lt;appender-ref ref=&quot;Console&quot; /&gt;</span><br><span class="line">    &lt;/logger&gt;</span><br><span class="line"></span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Dengbojing
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://dengbojing.com/2023/01/22/spring-boot-elk/" title="spring-boot+elk">http://dengbojing.com/2023/01/22/spring-boot-elk/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+              <a href="/tags/spring-boot/" rel="tag"><i class="fa fa-tag"></i> spring-boot</a>
+              <a href="/tags/elk/" rel="tag"><i class="fa fa-tag"></i> elk</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/11/25/JVM-%E5%AD%A6%E4%B9%A0/" rel="prev" title="JVM-学习">
+      <i class="fa fa-chevron-left"></i> JVM-学习
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#elasticsearch"><span class="nav-number">1.</span> <span class="nav-text">elasticsearch</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#install-elasticsearch"><span class="nav-number">1.1.</span> <span class="nav-text">install elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configurate-elasticsearch"><span class="nav-number">1.2.</span> <span class="nav-text">configurate elasticsearch</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#kibana"><span class="nav-number">2.</span> <span class="nav-text">kibana</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#install-kibana"><span class="nav-number">2.1.</span> <span class="nav-text">install kibana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Configure-Kibana"><span class="nav-number">2.2.</span> <span class="nav-text">Configure Kibana</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Logstash"><span class="nav-number">3.</span> <span class="nav-text">Logstash</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#install-logstash"><span class="nav-number">3.1.</span> <span class="nav-text">install logstash</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Configure-Logstash"><span class="nav-number">3.2.</span> <span class="nav-text">Configure Logstash</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FileBeat-%E5%8F%AF%E9%80%89"><span class="nav-number">4.</span> <span class="nav-text">FileBeat(可选)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#install-fileBeat"><span class="nav-number">4.1.</span> <span class="nav-text">install fileBeat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configure-filebeat"><span class="nav-number">4.2.</span> <span class="nav-text">configure filebeat</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#spring-boot"><span class="nav-number">5.</span> <span class="nav-text">spring-boot</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#add-dependency"><span class="nav-number">5.1.</span> <span class="nav-text">add dependency</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configure-logstash"><span class="nav-number">5.2.</span> <span class="nav-text">configure logstash</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#set-log-file"><span class="nav-number">5.3.</span> <span class="nav-text">set log file</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dengbojing"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Dengbojing</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dengbojing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dengbojing" rel="noopener" target="_blank"><i class="fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/dengbojing@qq.com" title="E-Mail → dengbojing@qq.com"><i class="fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://dengbojing.com/" title="http:&#x2F;&#x2F;dengbojing.com">dengbojing</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">dengbojing</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

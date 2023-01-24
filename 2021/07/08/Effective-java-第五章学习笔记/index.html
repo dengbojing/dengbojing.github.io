@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"dengbojing.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"manual"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="第五章: 泛型使用注意事项">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective-java-第五章学习笔记">
+<meta property="og:url" content="http://dengbojing.com/2021/07/08/Effective-java-%E7%AC%AC%E4%BA%94%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="生活不易,砥砺前行">
+<meta property="og:description" content="第五章: 泛型使用注意事项">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-08T06:52:12.000Z">
+<meta property="article:modified_time" content="2023-01-22T15:37:18.230Z">
+<meta property="article:author" content="Dengbojing">
+<meta property="article:tag" content="java,读书笔记">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://dengbojing.com/2021/07/08/Effective-java-%E7%AC%AC%E4%BA%94%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Effective-java-第五章学习笔记 | 生活不易,砥砺前行</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288627-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-156288627-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?4cafee18f10a04bf0eed864b0bd7f623";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="生活不易,砥砺前行" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">生活不易,砥砺前行</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Keep farmed and carry hard</p>
+      <a>
+        <img class="custom-logo-image" src="/back.png" alt="生活不易,砥砺前行">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">3</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">23</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://dengbojing.com/2021/07/08/Effective-java-%E7%AC%AC%E4%BA%94%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="Dengbojing">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="生活不易,砥砺前行">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Effective-java-第五章学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-08 14:52:12" itemprop="dateCreated datePublished" datetime="2021-07-08T14:52:12+08:00">2021-07-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-01-22 23:37:18" itemprop="dateModified" datetime="2023-01-22T23:37:18+08:00">2023-01-22</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>第五章: 泛型使用注意事项</p>
+<span id="more"></span>
+
+<h1 id="泛型术语"><a href="#泛型术语" class="headerlink" title="泛型术语"></a>泛型术语</h1><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>写法</th>
+<th>翻译</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Parameterized type</td>
+<td>List<String></td>
+<td>参数化类型</td>
+</tr>
+<tr>
+<td>Actual type parameter</td>
+<td>String</td>
+<td>实际类型参数</td>
+</tr>
+<tr>
+<td>Generic type</td>
+<td>List<E></td>
+<td>泛型</td>
+</tr>
+<tr>
+<td>Formal type parameter</td>
+<td>E</td>
+<td>形式类型参数</td>
+</tr>
+<tr>
+<td>Unbounded wildcard type</td>
+<td>List&lt;?&gt;</td>
+<td>无界通配符类型</td>
+</tr>
+<tr>
+<td>Raw type</td>
+<td>List</td>
+<td>原始类型</td>
+</tr>
+<tr>
+<td>Bounded type parameter</td>
+<td>&lt;E extends Number&gt;</td>
+<td>有界类型参数</td>
+</tr>
+<tr>
+<td>Recursive type bound</td>
+<td>&lt;T extends Comparable&lt;T&gt;&gt;</td>
+<td>递归类型限制</td>
+</tr>
+<tr>
+<td>Bounded wildcard type</td>
+<td>List&lt;? extends Number&gt;</td>
+<td>有界通配符类型</td>
+</tr>
+<tr>
+<td>Generic method static</td>
+<td>static &lt;E&gt; List&lt;E&gt; asList(E[] a)</td>
+<td>泛型方法</td>
+</tr>
+<tr>
+<td>Type token</td>
+<td>String.class</td>
+<td>类型标记</td>
+</tr>
+</tbody></table>
+<h1 id="不要使用原始类型"><a href="#不要使用原始类型" class="headerlink" title="不要使用原始类型"></a>不要使用原始类型</h1><h2 id="为什么不该使用"><a href="#为什么不该使用" class="headerlink" title="为什么不该使用"></a>为什么不该使用</h2><p>每一个泛型类型定义都对应着原始类型,通俗来说就是不带泛型. 如:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">Collections</span> <span class="variable">stamps</span> <span class="operator">=</span> ...;</span><br></pre></td></tr></table></figure>
+
+<p>如果使用这种集合,你可以添加任何类型的对象,看名字其实只是想添加<code>Stamp</code>类的实例,他是不报错的.ide 工具会给出警告.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">stamps.add(<span class="keyword">new</span> <span class="title class_">Stamp</span>()); <span class="comment">//unchecked call add(e)</span></span><br><span class="line">stamps.add(<span class="keyword">new</span> <span class="title class_">String</span>());  <span class="comment">// unchecked call add(E)</span></span><br><span class="line">stamps.add(<span class="keyword">new</span> <span class="title class_">Integer</span>(<span class="number">1</span>)); <span class="comment">// unchecked call add(E)</span></span><br></pre></td></tr></table></figure>
+
+<p>在遍历取出的时候,编译期间还是不会报错,只有运行时候才会抛出异常.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">Iterator</span> <span class="variable">i</span> <span class="operator">=</span> stamps.iterator(); i.hasNext(); )</span><br><span class="line">  <span class="type">Stamp</span> <span class="variable">stamp</span> <span class="operator">=</span> (Stamp) i.next(); <span class="comment">// Throws ClassCastException</span></span><br><span class="line">  stamp.cancel();</span><br></pre></td></tr></table></figure>
+
+<p>编译期间发现不了问题就很可怕,如果这段代码一直没有执行,那么系统一直没有问题,知道有一天它执行了,boom!<br>这段代码就是个定时炸弹,所以千万不要用泛型的原始类型.<br>而且就修复来说,这种情况就很麻烦, 修复,重新编译, 测试, 发布.</p>
+<h2 id="替代原始类型的方式"><a href="#替代原始类型的方式" class="headerlink" title="替代原始类型的方式"></a>替代原始类型的方式</h2><p>如果你想一个容器添加任意类型的参数,那么可以使用<code>List&lt;Object&gt;</code>这种形式,这种形式处于泛型系统之内,只是显示的告诉了编译器,我何以接受任何类型的参数.<br>如果你使用原始类型的那么你将失类型安全,但是如果使用<code>List&lt;Object&gt;</code>并不会有这个问题.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; strings = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">unsafeAdd(Strings, Integer.valueOf(<span class="number">3</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unsafeAdd</span><span class="params">(List list, Object obj)</span>&#123;</span><br><span class="line">	list.add(obj); <span class="comment">// warning  unchecked call to  add()</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如上代码,编译器并不会报错,只会给出警告,如果你不在意这些警告,那么,运行时就会报错.但是如果我们换成以下代码:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; strings = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">unsafeAdd(strings, Integer.valueOf(<span class="number">2</span>)): <span class="comment">//compiler error</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unsafeAdd</span><span class="params">(List&lt;Object&gt; list, Object obj)</span>&#123;</span><br><span class="line">	list.add(obj):</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码会在编译期间就报错,有助于你提前发现问题,修复问题.</p>
+<h2 id="无界通配符-lt-gt"><a href="#无界通配符-lt-gt" class="headerlink" title="无界通配符 &lt;?&gt;"></a>无界通配符 &lt;?&gt;</h2><p>如果你在写一个对外的<code>api</code>但是返回值不确定,可能是<code>String</code>,可能是自定义类型,这取决与需求是什么样的,那么这个时候该怎么写呢:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Response&lt;?&gt; api(String str)&#123;</span><br><span class="line">	<span class="keyword">return</span> Response.success(someService.doSth(str));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> Response&lt;T&gt;&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Response&lt;T&gt; <span class="title function_">success</span><span class="params">(<span class="meta">@NotNull</span> T t)</span> &#123;</span><br><span class="line">	        <span class="keyword">return</span> of(t, ResponseState.SUCCESS);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>无界通配符不能用来的容器不能用来添加东西,<code>null</code>值例外,如:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">toAdd</span><span class="params">(List&lt;?&gt; list)</span>&#123;</span><br><span class="line">	list.add(<span class="literal">null</span>);</span><br><span class="line">	list.add(<span class="string">&quot;fda&quot;</span>); <span class="comment">//complier error</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个是编译器为了阻止改变参数的类型, 假设调用此方法传进来的参数是<code>List&lt;Integer&gt;</code>, 那么添加<code>String</code> 类型就会抛出异常, 所以编译器提前阻止了这种类型的改变.</p>
+<h2 id="只能使用原始类型的特殊情况"><a href="#只能使用原始类型的特殊情况" class="headerlink" title="只能使用原始类型的特殊情况"></a>只能使用原始类型的特殊情况</h2><ol>
+<li>代表<code>class</code>字面量, 比如<code>List.class</code></li>
+<li>使用<code>instanceof</code></li>
+</ol>
+<h1 id="消除unchecked警告"><a href="#消除unchecked警告" class="headerlink" title="消除unchecked警告"></a>消除<code>unchecked</code>警告</h1><h2 id="手动消除警告"><a href="#手动消除警告" class="headerlink" title="手动消除警告"></a>手动消除警告</h2><p>使用<code>@SuppressWarnings(&quot;unchecked&quot;)</code> 消除警告.注意一下几点:</p>
+<ul>
+<li>尽可能的缩小注解的作用范围.</li>
+<li>需要在注解上注释描述为什么这么做</li>
+</ul>
+<h1 id="优先使用泛型集合-而不使用数组"><a href="#优先使用泛型集合-而不使用数组" class="headerlink" title="优先使用泛型集合,而不使用数组"></a>优先使用泛型集合,而不使用数组</h1><h2 id="数组是协变的-而泛型集合是不变的"><a href="#数组是协变的-而泛型集合是不变的" class="headerlink" title="数组是协变的, 而泛型集合是不变的"></a>数组是协变的, 而泛型集合是不变的</h2><p>如果一个<code>sub</code> 是 <code>sup</code>的子类, 那么<code>sub[]</code> 也是 <code>sup[]</code>的子类型. 是兼容的.<br>但是,<code>List&lt;sub&gt;</code>却不是<code>List&lt;sup&gt;</code>的子类行,两者是不兼容的.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Fails at runtime!</span></span><br><span class="line">Object[] objectArray = <span class="keyword">new</span> <span class="title class_">Long</span>[<span class="number">1</span>];</span><br><span class="line">objectArray[<span class="number">0</span>] = <span class="string">&quot;I don&#x27;t fit in&quot;</span>; <span class="comment">// Throws ArrayStoreException</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Won&#x27;t compile!</span></span><br><span class="line">List&lt;Object&gt; ol = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Long&gt;(); <span class="comment">// Incompatible types</span></span><br><span class="line">ol.add(<span class="string">&quot;I don&#x27;t fit in&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以上代码可以看出第一段代码得等到运行时才会发现问题,如果代码得不到执行,那么程序就一直是正常运行,定时炸弹.<br>而第二段代码在编译期间就指出了错误.</p>
+<h2 id="为什么不能显示的创建泛型数组"><a href="#为什么不能显示的创建泛型数组" class="headerlink" title="为什么不能显示的创建泛型数组"></a>为什么不能显示的创建泛型数组</h2><p>数组是具体化的,数组不论是在编译期间还是运行期间都会强制要求数组中的元素类型一致.<br>而泛型在编译期间强制要求元素类型,但是在运行期间会进行泛型擦除.这么做的目的是为了兼容 <code>jdk5</code> 之前的代码.</p>
+<p>基于以上两点就很好解释为什么不能创建泛型数组了.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt;[] stringLists = <span class="keyword">new</span> <span class="title class_">List</span>&lt;String&gt;[<span class="number">1</span>]; <span class="comment">// (1)</span></span><br><span class="line">List&lt;Integer&gt; intList = List.of(<span class="number">42</span>); <span class="comment">// (2)</span></span><br><span class="line">Object[] objects = stringLists; <span class="comment">// (3)</span></span><br><span class="line">objects[<span class="number">0</span>] = intList; <span class="comment">// (4)</span></span><br><span class="line"><span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> stringLists[<span class="number">0</span>].get(<span class="number">0</span>); <span class="comment">// (5)</span></span><br></pre></td></tr></table></figure>
+
+<p>如上代码, 假设<code>(1)</code>是可以编译通过, <code>(3)</code>由于数组的协变是正确的语法,因为所有类都是<code>Object</code>的子类, <code>(4)</code> 由于泛型的擦除在运行期间<code>ListMString&gt;[]</code> 被擦除为<code>List[]</code>, <code>List&lt;Integer&gt;</code> 被擦除为<code>List</code> 因此不管编译还是运行都不会出错, <code>(5)</code>在运行期间会出现<code>ClassCastException</code> ,因为存进去的显然不是<code>String</code>; 因此在编译期间就阻止<code>(1)</code>编译通过.<br>如上所说<code>List&lt;E&gt;</code>, <code>List&lt;String&gt;</code>, <code>E</code>这些参数化类型,被称为不可具体化的类型,因为他们在运行期间会被泛型擦除,无法表达容器在运行时所需要的元素类型. 只有一种情况例外就是<code>&lt;?&gt;</code>无界通配符:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;?&gt;[] list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;?&gt;[<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+
+<p>这种是可以编译通过的, 但是问题来了, 无界通配符容器是不允许被改变的, 这么做毫无意义.</p>
+<h2 id="使用-List-代替-泛型数组定义-E"><a href="#使用-List-代替-泛型数组定义-E" class="headerlink" title="使用 List 代替 泛型数组定义 E[]"></a>使用 List<E> 代替 泛型数组定义 E[]</h2><p>简单来讲就是你无法创建一个泛型数组, 但是可以通过<code>Collection.toArray()</code>获得一个泛型数组:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">E[] e = (E[]) someCollection.toArray(); <span class="comment">//unchecked cast</span></span><br></pre></td></tr></table></figure>
+
+<p>这样我们就获得另一个泛型数组, 但是需要强转, 且这句话会出现警告, 因为在运行期间会出现泛型擦除, 所以编译器无法保证运行时类型转换正确, 所以会出现<code>unchecked cast</code>. 因此,我们需要稍微修改一下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;E&gt; lists = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(someCollection);</span><br></pre></td></tr></table></figure>
+
+<p>虽然丧失了一些性能, 但是编译器能保证正确的类型转换.</p>
+<h1 id="偏好使用泛型"><a href="#偏好使用泛型" class="headerlink" title="偏好使用泛型"></a>偏好使用泛型</h1><p>通俗来说就是,如果你在写一个容器类, 里面所需要容纳的元素类型,最好使用泛型来代替. 书中举例:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Stack</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Object[] elements;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Stack</span><span class="params">()</span> &#123;</span><br><span class="line">        elements = <span class="keyword">new</span> <span class="title class_">Object</span>[DEFAULT_INITIAL_CAPACITY];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">push</span><span class="params">(Object e)</span> &#123;</span><br><span class="line">        ensureCapacity();</span><br><span class="line">        elements[size++] = e;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">pop</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (size == <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">EmptyStackException</span>();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> elements[--size];</span><br><span class="line">        elements[size] = <span class="literal">null</span>; <span class="comment">// Eliminate obsolete reference</span></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isEmpty</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> size == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">ensureCapacity</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (elements.length == size)</span><br><span class="line">        elements = Arrays.copyOf(elements, <span class="number">2</span> * size + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>应该替换为:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Stack</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="keyword">private</span> E[] elements;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Stack</span><span class="params">()</span> &#123;</span><br><span class="line">        elements = (E[]) <span class="keyword">new</span> <span class="title class_">Object</span>[DEFAULT_INITIAL_CAPACITY];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">push</span><span class="params">(E e)</span> &#123;</span><br><span class="line">        ensureCapacity();</span><br><span class="line">        elements[size++] = e;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">pop</span><span class="params">()</span> <span class="keyword">throws</span> EmptyStackException &#123;</span><br><span class="line">        <span class="keyword">if</span> (size == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">EmptyStackException</span>();</span><br><span class="line">        <span class="type">E</span> <span class="variable">result</span> <span class="operator">=</span> elements[--size];</span><br><span class="line">        elements[size] = <span class="literal">null</span>; <span class="comment">// Eliminate obsolete reference</span></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isEmpty</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> size == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">ensureCapacity</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (elements.length == size)</span><br><span class="line">            elements = Arrays.copyOf(elements, <span class="number">2</span> * size + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这条看上去是和上面一条有些冲突,上面一条说明优先使用泛型集合,而这里又使用泛型数组了;因为,这里实现的是<code>Stack</code>容器类,类似<code>List</code>容器类,所以使用泛型数组,而且<code>List</code>容器类的实现也是泛型数组实现.</p>
+<h1 id="偏好使用泛型方法"><a href="#偏好使用泛型方法" class="headerlink" title="偏好使用泛型方法"></a>偏好使用泛型方法</h1><p>简单来说,就是任何容器实例,都应该使用泛型化来使用, 比如:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="title function_">add</span><span class="params">(set o, set  o2)</span>&#123;</span><br><span class="line">	o.addALL(o2);</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>应该改为:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;E&gt; <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Set&lt;E&gt; o, Set&lt;E&gt; o2)</span>&#123;</span><br><span class="line">	o.addAll(o2)</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><strong>在方法修饰符和返回值之间的<code>&lt;E&gt;</code>,被称为类型参数列表.</strong></p>
+<h2 id="泛型单例工厂"><a href="#泛型单例工厂" class="headerlink" title="泛型单例工厂"></a>泛型单例工厂</h2><p>返回一个<code>函数式对象</code>可以包含不同的<code>参数化类型</code>,例如: <code>Collections.reverseOrder()</code>和<code>Collections.emptySet()</code>. 下面是书中给的<code>恒等函数</code>示例: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Generic singleton factory pattern</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> UnaryOperator&lt;Object&gt; IDENTITY_FN = (t) -&gt; t;</span><br><span class="line"><span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; UnaryOperator&lt;T&gt; <span class="title function_">identityFunction</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (UnaryOperator&lt;T&gt;) IDENTITY_FN;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="递归类型界限"><a href="#递归类型界限" class="headerlink" title="递归类型界限"></a>递归类型界限</h2><p><code>&lt;E extends Comparable&lt;E&gt;&gt;</code>: 类型参数<code>(E)</code>被涉及到类型参数本身的表达式<code>(&lt;Comparable&lt;E&gt;&gt;)</code>限制.<br>这种用法很少用到,一般是用在有些自我表达,自我操作的方法. 比如: 一个集合里面的排序, 最大值,最小值.(自我比较)</p>
+<h1 id="使用界限通配符增减API的灵活性"><a href="#使用界限通配符增减API的灵活性" class="headerlink" title="使用界限通配符增减API的灵活性"></a>使用界限通配符增减API的灵活性</h1><p>为了使方法拥有最大的灵活性,可以在表示消费或者生产的方法的参数上使用通配符类型来代表</p>
+<ul>
+<li>上界通配符 <code>&lt;? extends E&gt;</code></li>
+<li>下界通配符 <code>&lt;? super E&gt;</code></li>
+<li>PECS – producers-extends and consumers-super. 代表生产时使用<code>extends</code>, 代表消费时使用<code>super</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;E&gt; <span class="keyword">void</span> <span class="title function_">add1</span><span class="params">(List&lt;? <span class="built_in">super</span> E&gt; list, E e)</span>&#123;</span><br><span class="line">    list.add(e);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;E&gt; E <span class="title function_">get</span><span class="params">(List&lt;? extends E&gt; list)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> list.get(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><strong>如果在方法定义的时候类型参数只出现一次,那么应该使用通配符来代替(有界或者无界)</strong>  </p>
+<p><strong>不要在返回值上使用通配符</strong>, 这将会迫使客户端也使用通配符.   </p>
+<p><strong>如果一个用户使用这个方法要考虑通配符类型,那么这个<code>api</code>可是是错的,好的<code>api</code>应该是让用户感觉不到通配符的存在</strong> </p>
+<h1 id="谨慎的将可变参数和泛型结合在一起"><a href="#谨慎的将可变参数和泛型结合在一起" class="headerlink" title="谨慎的将可变参数和泛型结合在一起"></a>谨慎的将可变参数和泛型结合在一起</h1><h2 id="将值存进可变泛型数组是不安全的"><a href="#将值存进可变泛型数组是不安全的" class="headerlink" title="将值存进可变泛型数组是不安全的"></a>将值存进可变泛型数组是不安全的</h2><p>在’为什么不能显示的创建泛型数组’中已经演示过,泛型数组的危害,这里稍微改变一下上述代码:  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">dangerous</span><span class="params">(List&lt;String&gt;... stringLists)</span> &#123;</span><br><span class="line">    List&lt;Integer&gt; intList = List.of(<span class="number">42</span>);</span><br><span class="line">    Object[] objects = stringLists;</span><br><span class="line">    objects[<span class="number">0</span>] = intList; <span class="comment">// Heap pollution</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> stringLists[<span class="number">0</span>].get(<span class="number">0</span>); <span class="comment">// ClassCastException</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里其实就是将之前的代码中显示的创建泛型数组,改为可变参数泛型数组. 因为可变参数实际上编译完成之后,是将可变参数存进一个临时数组里面,所以上述代码实际上就等于隐式的创建了一个可变参数泛型数组,但是最终导致类型装换错误,原因之前已经分析过了.  </p>
+<p><strong>结论1: 将值存入泛型数组是不安全的,泛型数组应该只是传递这些值,比如: Arrays.asList(T…t), 该方法只是将可变参数里面的值放到List里面然后返回该List</strong><br><strong>结论2: 返回泛型数组引用也是不安全的, 比如下列代码:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// UNSAFE - Exposes a reference to its generic parameter array!</span></span><br><span class="line"><span class="keyword">static</span> &lt;T&gt; T[] toArray(T... args) &#123;</span><br><span class="line">    <span class="keyword">return</span> args;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> &lt;T&gt; T[] pickTwo(T a, T b, T c) &#123;</span><br><span class="line">    <span class="keyword">switch</span>(ThreadLocalRandom.current().nextInt(<span class="number">3</span>)) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0</span>: <span class="keyword">return</span> toArray(a, b);</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> toArray(a, c);</span><br><span class="line">        <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> toArray(b, c);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">AssertionError</span>(); <span class="comment">// Can&#x27;t get here</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    String[] attributes = pickTwo(<span class="string">&quot;Good&quot;</span>, <span class="string">&quot;Fast&quot;</span>, <span class="string">&quot;Cheap&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>toArray</code>方法直接诶返回了泛型数组, 而<code>main</code>方法调用<code>pickTwo</code>方法编译器会推断出该方法返回<code>string[]</code>数组,所以在<code>return toArray(x,x)</code>处会出现一个隐式的转换转换为<code>Object[]</code>数组. 显然<code>string[]</code>数组不是<code>object[]</code>数组的超类. 所以出现<code>ClassCastException</code>, 由此可以看出返回一个泛型数组的引用是多么的不安全, 除非是受到控制的方法, 即不对外暴露的方法, 由<code>api</code>方法编写者确认这个使用是安全的, 并且使用<code>@SafaVarargs</code>注解.  </p>
+<h1 id="类型安全的异构容器"><a href="#类型安全的异构容器" class="headerlink" title="类型安全的异构容器"></a>类型安全的异构容器</h1><p>一个很有意思的写法:   </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Favorites</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;Class&lt;?&gt;, Object&gt; favorites = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="keyword">void</span> <span class="title function_">putFavorite</span><span class="params">(Class&lt;T&gt; type, T instance)</span> &#123;</span><br><span class="line">        favorites.put(Objects.requireNonNull(type), instance);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; T <span class="title function_">getFavorite</span><span class="params">(Class&lt;T&gt; type)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> type.cast(favorites.get(type));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以存入任意类型的<code>Class</code>(不能是原始类型), 然后获取对应的值.</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Dengbojing
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://dengbojing.com/2021/07/08/Effective-java-%E7%AC%AC%E4%BA%94%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Effective-java-第五章学习笔记">http://dengbojing.com/2021/07/08/Effective-java-第五章学习笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> java,读书笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/25/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="学习笔记">
+      <i class="fa fa-chevron-left"></i> 学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/15/Effective-java-%E7%AC%AC%E5%85%AD%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="Effective-java-第六章学习笔记">
+      Effective-java-第六章学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E6%9C%AF%E8%AF%AD"><span class="nav-number">1.</span> <span class="nav-text">泛型术语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E4%BD%BF%E7%94%A8%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">不要使用原始类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%AF%A5%E4%BD%BF%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">为什么不该使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%BF%E4%BB%A3%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">替代原始类型的方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E7%95%8C%E9%80%9A%E9%85%8D%E7%AC%A6-lt-gt"><span class="nav-number">2.3.</span> <span class="nav-text">无界通配符 &lt;?&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AA%E8%83%BD%E4%BD%BF%E7%94%A8%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B%E7%9A%84%E7%89%B9%E6%AE%8A%E6%83%85%E5%86%B5"><span class="nav-number">2.4.</span> <span class="nav-text">只能使用原始类型的特殊情况</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B6%88%E9%99%A4unchecked%E8%AD%A6%E5%91%8A"><span class="nav-number">3.</span> <span class="nav-text">消除unchecked警告</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%B6%88%E9%99%A4%E8%AD%A6%E5%91%8A"><span class="nav-number">3.1.</span> <span class="nav-text">手动消除警告</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E4%BD%BF%E7%94%A8%E6%B3%9B%E5%9E%8B%E9%9B%86%E5%90%88-%E8%80%8C%E4%B8%8D%E4%BD%BF%E7%94%A8%E6%95%B0%E7%BB%84"><span class="nav-number">4.</span> <span class="nav-text">优先使用泛型集合,而不使用数组</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E6%98%AF%E5%8D%8F%E5%8F%98%E7%9A%84-%E8%80%8C%E6%B3%9B%E5%9E%8B%E9%9B%86%E5%90%88%E6%98%AF%E4%B8%8D%E5%8F%98%E7%9A%84"><span class="nav-number">4.1.</span> <span class="nav-text">数组是协变的, 而泛型集合是不变的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E6%98%BE%E7%A4%BA%E7%9A%84%E5%88%9B%E5%BB%BA%E6%B3%9B%E5%9E%8B%E6%95%B0%E7%BB%84"><span class="nav-number">4.2.</span> <span class="nav-text">为什么不能显示的创建泛型数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-List-%E4%BB%A3%E6%9B%BF-%E6%B3%9B%E5%9E%8B%E6%95%B0%E7%BB%84%E5%AE%9A%E4%B9%89-E"><span class="nav-number">4.3.</span> <span class="nav-text">使用 List 代替 泛型数组定义 E[]</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%81%8F%E5%A5%BD%E4%BD%BF%E7%94%A8%E6%B3%9B%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">偏好使用泛型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%81%8F%E5%A5%BD%E4%BD%BF%E7%94%A8%E6%B3%9B%E5%9E%8B%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">偏好使用泛型方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E5%8D%95%E4%BE%8B%E5%B7%A5%E5%8E%82"><span class="nav-number">6.1.</span> <span class="nav-text">泛型单例工厂</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E7%B1%BB%E5%9E%8B%E7%95%8C%E9%99%90"><span class="nav-number">6.2.</span> <span class="nav-text">递归类型界限</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%95%8C%E9%99%90%E9%80%9A%E9%85%8D%E7%AC%A6%E5%A2%9E%E5%87%8FAPI%E7%9A%84%E7%81%B5%E6%B4%BB%E6%80%A7"><span class="nav-number">7.</span> <span class="nav-text">使用界限通配符增减API的灵活性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%A8%E6%85%8E%E7%9A%84%E5%B0%86%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E5%92%8C%E6%B3%9B%E5%9E%8B%E7%BB%93%E5%90%88%E5%9C%A8%E4%B8%80%E8%B5%B7"><span class="nav-number">8.</span> <span class="nav-text">谨慎的将可变参数和泛型结合在一起</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E5%80%BC%E5%AD%98%E8%BF%9B%E5%8F%AF%E5%8F%98%E6%B3%9B%E5%9E%8B%E6%95%B0%E7%BB%84%E6%98%AF%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84"><span class="nav-number">8.1.</span> <span class="nav-text">将值存进可变泛型数组是不安全的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E5%AE%89%E5%85%A8%E7%9A%84%E5%BC%82%E6%9E%84%E5%AE%B9%E5%99%A8"><span class="nav-number">9.</span> <span class="nav-text">类型安全的异构容器</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dengbojing"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Dengbojing</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/dengbojing" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;dengbojing" rel="noopener" target="_blank"><i class="fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/dengbojing@qq.com" title="E-Mail → dengbojing@qq.com"><i class="fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://dengbojing.com/" title="http:&#x2F;&#x2F;dengbojing.com">dengbojing</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a href="/">dengbojing</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
