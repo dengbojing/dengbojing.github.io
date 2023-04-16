@@ -2,6 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://dengbojing.com/2023/04/16/neovim-learn/</loc>
+    
+    <lastmod>2023-04-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://dengbojing.com/2020/10/22/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87%E8%BD%AC%E6%8D%A2/</loc>
+    
+    <lastmod>2023-04-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://dengbojing.com/2021/06/25/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
+    
+    <lastmod>2023-04-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://dengbojing.com/2021/08/20/Effective-java-%E7%AC%AC%E5%85%AB%E7%AB%A0%E5%AD%A6%E4%B9%A0/</loc>
+    
+    <lastmod>2023-04-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://dengbojing.com/2021/11/25/JVM-%E5%AD%A6%E4%B9%A0/</loc>
     
     <lastmod>2023-01-22</lastmod>
@@ -30,15 +66,6 @@
   
   <url>
     <loc>http://dengbojing.com/2021/08/25/Effective-java-%E7%AC%AC%E4%B9%9D%E7%AB%A0%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
-    
-    <lastmod>2023-01-22</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://dengbojing.com/2021/08/20/Effective-java-%E7%AC%AC%E5%85%AB%E7%AB%A0%E5%AD%A6%E4%B9%A0/</loc>
     
     <lastmod>2023-01-22</lastmod>
     
@@ -86,15 +113,6 @@
     <loc>http://dengbojing.com/2023/01/22/spring-boot-elk/</loc>
     
     <lastmod>2023-01-22</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://dengbojing.com/2021/06/25/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
-    
-    <lastmod>2021-07-06</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -149,15 +167,6 @@
     <loc>http://dengbojing.com/2020/09/21/Naming-Convention-%E5%91%BD%E5%90%8D%E8%A7%84%E8%8C%83/</loc>
     
     <lastmod>2020-12-22</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://dengbojing.com/2020/10/22/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87%E8%BD%AC%E6%8D%A2/</loc>
-    
-    <lastmod>2020-10-22</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -238,7 +247,7 @@
 
   <url>
     <loc>http://dengbojing.com/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -246,105 +255,119 @@
   
   <url>
     <loc>http://dengbojing.com/tags/git/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/hexo/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/docker/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/springboot/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/gradle/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/mockito/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/java/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/java11/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/java-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/bug/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/quarkus/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/graalvm/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/java-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/spring-boot/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/tags/elk/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://dengbojing.com/tags/vim/</loc>
+    <lastmod>2023-04-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://dengbojing.com/tags/neovim/</loc>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -353,21 +376,21 @@
   
   <url>
     <loc>http://dengbojing.com/categories/hexo/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/categories/java/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>http://dengbojing.com/categories/java-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</loc>
-    <lastmod>2023-01-24</lastmod>
+    <lastmod>2023-04-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>

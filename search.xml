@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title></title>
+    <url>/2023/04/16/neovim-learn/</url>
+    <content><![CDATA[<h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p>从18年开始一直使用<code>idea-vim</code>插件作为编辑工具, 日常使用虽然比较频繁, 但是很少做深入了解, 只是局限于一些简单的操作, 虽然速度提升了一些, 但是远远不够, <code>idea</code>号称内存黑洞, 所以一直在考虑是不是有一种很多好的工具能够替代<code>idea</code>,<br>最开始想到的是<code>eclipse</code>系列(<code>sts, myeclipse</code>等), 虽然现在<code>eclipse</code>也很强大,但是还是老问题, 如果<code>workspaces</code>打开项目多了,确实还是会卡, <code>idea</code>没有<code>workspaces</code>这个概念,一个项目开一个窗口,造成内存吃紧;后面队任何<code>IDE</code>都失去兴趣了,<br>就考虑是否能直接用<code>vim</code>, 问题在于<code>java</code>的提示和编译, 目前找到一个<code>lunarvim</code>, 使用感觉和<code>vs code</code>添加<code>java</code>插件差不多.至此,实验失败, 不过过程中收获很多, 让我对<code>打造一个自己的专属编辑器</code>这个概念产生了浓厚的兴趣, 而且确实<code>vim</code> 或者 <code>neovim</code>确实是简单,灵活,强大.  </p>
+<h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><pre><code>1. [官方安装包下载](https://github.com/neovim/neovim/releases) 
+2. `windows`下使用[chocolatey](https://chocolatey.org/install)安装, 命令为`choco install neovim --pre`, 此处`--per` 为安装`beta`版本(目前为`0.10.0), 默认安装版本为 `0.8.0`, `neovim 0.9.0`版本之后使用`lua`语言管理插件.  
+</code></pre>
+<h1 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h1><pre><code>1. 使用`choco`安装`nvim`默认是在`c:\tools`下面, 具体的安装位置, 可以通过环境变量`ChocolateyToolsLocation`来指定.  
+2. `windows`操作系统下,`neovim`的配置文件`$env:localappdata\nvim`(默认为`c:\user\&lt;username&gt;\appdata\local\nvim, 该目录也是大多数应用程序的配置文件所在目录, 详见[what&#39;s appdata](https://www.xda-developers.com/appdata/#:~:text=It&#39;s%20a%20hidden%20folder%20that,User%2Dspecific%20installations))`.   
+3. 创建`init.lua文件`, `0.8.0`之前是`init.vim`, 之后版本也兼容`init.vim`但是大部分使用`init.lua`.  
+4. 创建lua\user文件夹, `md lua\user`.  
+5. 进入lua\user目录, 创建`options.lua`文件, 用于做`vim`的通用配置, 创建`globals.lua`用于全局配置, 创建`plugins.lua` 用于加载插件.  
+6. `nvim init.lua` 然后写入一下信息   
+
+<figure class="highlight vim"><table><tr><td class="code"><pre><span class="line"><span class="keyword">vim</span>.g.mapleader = <span class="string">&#x27; &#x27;</span></span><br><span class="line">require(<span class="string">&#x27;user.plugins&#x27;</span>)</span><br><span class="line">require(<span class="string">&#x27;user.global&#x27;</span>)</span><br><span class="line">require(<span class="string">&#x27;user.options&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+此处一定要先加载插件文件,如果其他文件里面有用到插件配置,会导致插件未加载,配置不生效.  
+7. 添加插件管理, `git clone https://github.com/wbthomason/packer.nvim &quot;$env:LOCALAPPDATA\nvim-data\site\pack\packer\start\packer.nvim&quot;` 编辑插件配置文件 `nvim lua/user/plugins.lua` 添加nvim插件管理此处使用`packer`, 这个是之前没用用过的插件管理工具, 以前`vim`使用`vim-plug`感觉很简单,而且还可以指定插件位置, 这个工具初次接触有一点点难受.   
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim.cmd [[packadd packer.nvim]]</span><br><span class="line"></span><br><span class="line">vim.cmd([[</span><br><span class="line">  augroup packer_user_config</span><br><span class="line">    autocmd!</span><br><span class="line">    autocmd BufWritePost plugins.lua source &lt;afile&gt; | PackerSync</span><br><span class="line">  augroup end</span><br><span class="line">]])</span><br><span class="line"></span><br><span class="line">local status_ok, packer = pcall(require, &quot;packer&quot;)</span><br><span class="line">if not status_ok then</span><br><span class="line">  return</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">return require(&#x27;packer&#x27;).startup(function(use)</span><br><span class="line">  -- Packer can manage itself</span><br><span class="line">  use &#x27;wbthomason/packer.nvim&#x27;</span><br><span class="line">end)</span><br></pre></td></tr></table></figure>
+
+此处添加插件自身管理,具体使用方法可以看[`github`](https://github.com/wbthomason/packer.nvim)链接.  
+9. `nvim options.lua`文件, 添加一些之前`vim`的常用配置.  
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">local o = vim.opt       -- nvim 对vim的配置映射</span><br><span class="line">o.nu = true             -- 显示行号</span><br><span class="line">o.ignorecase = true     -- 忽略大小写</span><br><span class="line">o.cursorline = true     -- 鼠标行高亮</span><br><span class="line">o.langmenu = zh_CN      -- 中文菜单, 貌似没啥用</span><br><span class="line">o.encoding = &#x27;utf-8&#x27;    -- 文件编码</span><br><span class="line">o.bk = false            -- backfile 不生成</span><br><span class="line">o.udf = false           -- undofile 不生成, 可以指定undofie的目录 </span><br><span class="line">o.tabstop = 2           -- tab键多少个字宽</span><br><span class="line">o.shiftwidth = 2        -- &gt;&gt; 推进的字宽</span><br><span class="line">o.rnu = true            -- 行对行号</span><br><span class="line">o.syntax = &#x27;on&#x27;         -- 语法高亮</span><br><span class="line">o.bg = &#x27;dark&#x27;           -- 背景色</span><br></pre></td></tr></table></figure>
+</code></pre>
+<h1 id="Plugins-Config"><a href="#Plugins-Config" class="headerlink" title="Plugins Config"></a>Plugins Config</h1><pre><code>nvim真的是有很多插件, `nvm-tree` 文件树可以像文件资源管理器一样,管理文件,`telescope`文件搜索, 简直太强大了, 但是非常依赖, 键位记忆以及键位配置, 慢慢学习, 慢慢配置
+</code></pre>
+]]></content>
+      <tags>
+        <tag>vim</tag>
+        <tag>neovim</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>spring-boot+elk</title>
     <url>/2023/01/22/spring-boot-elk/</url>
     <content><![CDATA[<p>spring boot 结合 ELK</p>
@@ -437,6 +471,9 @@
 <h1 id="为所有导出的api元素编写注释"><a href="#为所有导出的api元素编写注释" class="headerlink" title="为所有导出的api元素编写注释"></a>为所有导出的api元素编写注释</h1><p>注释应该简洁的说明方法是做什么的，而不是怎么做；同时文档注释中应该包含该方法调用的前置条件和后置条件</p>
 <p><code>@param</code>: 描述参数，前置条件<br><code>@return</code>: 返回值<br><code>@throws</code>: 如果不满足前置条件会抛出什么异常，该描述应该包含一个”如果(if)”,表示异常条件什么时候会抛出<br><code>@code</code>: 在注释中使用代码时候使用。如<pre>{@code int index = 1; index++;}</pre><br><code>@literal</code>: 如果文档包含<code>html</code>元字符比如<code>&lt;</code>,<code>&gt;</code>可以使用该注释是java doc comment不解释该字符.<br><code>@link</code>: 链接到别的类或者方法，字段等.<br><code>@see</code>: 同<code>&#123;@link&#125;</code> 区别是需要单独一行，顶头写，不能混在注释里面。</p>
 ]]></content>
+      <tags>
+        <tag>java</tag>
+      </tags>
   </entry>
   <entry>
     <title>Effective-java-第七章学习笔记</title>
@@ -1201,12 +1238,12 @@
     <title>微信图片转换</title>
     <url>/2020/10/22/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87%E8%BD%AC%E6%8D%A2/</url>
     <content><![CDATA[<p>PC端微信图片转换</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>最近孩子去上早教班,老师在早教群里发了很多孩子的图片,我就想着把这些图片存起来,但是老师发一张我存一张这种模式对程序员来说是一种侮辱,所以我就想是不是存在了微信文件夹下面,一看果不其然,只是格式不是<code>jpg,png,gif</code>等,是<code>dat</code>格式,经过一番百度(ps:微信是国内的东西,所以还是百多搜索比较靠谱)终于找到了解码方法.特此记录.</p>
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="微信文件目录"><a href="#微信文件目录" class="headerlink" title="微信文件目录"></a>微信文件目录</h2><p>微信的图片文件地址这个不难找,具体目录为${wechatFilesDir}/{your_wechat_id}/FileStroage/image,占位符代表微信文件存储目录(微信设置-&gt;文件管理)和自己微信的微信号.</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="微信文件目录"><a href="#微信文件目录" class="headerlink" title="微信文件目录"></a>微信文件目录</h2><p>微信的图片文件地址这个不难找,具体目录为${wechatFilesDir}&#x2F;{your_wechat_id}&#x2F;FileStroage&#x2F;image,占位符代表微信文件存储目录(微信设置-&gt;文件管理)和自己微信的微信号.</p>
 <h2 id="所需图片知识"><a href="#所需图片知识" class="headerlink" title="所需图片知识"></a>所需图片知识</h2><ul>
-<li><p>jpg/jpeg<br>标识头: <code>0xff</code> <code>0xd8</code>  </p>
+<li><p>jpg&#x2F;jpeg<br>标识头: <code>0xff</code> <code>0xd8</code>  </p>
 </li>
 <li><p>png<br>标识头: <code>0x89</code> <code>0x50</code>  </p>
 </li>
@@ -1214,9 +1251,9 @@
 </li>
 </ul>
 <p>当然还有其他的图片格式可以自行谷歌.</p>
-<h2 id="微信-bat文件加密方式"><a href="#微信-bat文件加密方式" class="headerlink" title="微信.bat文件加密方式"></a>微信.bat文件加密方式</h2><p>定义一个key值,将图片转换为二进制流,然后每一位与这个key值进行异或(xor),得到新的byte值,然后写入.<br>所以我们反解就很明显了,假设图片为<code>jpg</code>,我们已知jpg图片前两位为<code>0xff</code>,<code>0xd8</code>,用<em>16进制</em>方式打开<code>.bat</code>文件,得到前两位为<code>x</code>,<code>x1</code>.只需<code>x^0xff</code>==<code>x^0xd8</code> 成立(因为<code>x=key^0xff</code>,<code>x1=key^0xd8</code>),那么这个图片就是jpg.  </p>
+<h2 id="微信-bat文件加密方式"><a href="#微信-bat文件加密方式" class="headerlink" title="微信.bat文件加密方式"></a>微信.bat文件加密方式</h2><p>定义一个key值,将图片转换为二进制流,然后每一位与这个key值进行异或(xor),得到新的byte值,然后写入.<br>所以我们反解就很明显了,假设图片为<code>jpg</code>,我们已知jpg图片前两位为<code>0xff</code>,<code>0xd8</code>,用<em>16进制</em>方式打开<code>.bat</code>文件,得到前两位为<code>x</code>,<code>x1</code>.只需<code>x^0xff</code>&#x3D;&#x3D;<code>x^0xd8</code> 成立(因为<code>x=key^0xff</code>,<code>x1=key^0xd8</code>),那么这个图片就是jpg.  </p>
 <h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><p>仅仅是一个示例,实际开发应当更严谨处理异常以及分支.</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> base = <span class="number">0xff</span>;</span><br><span class="line">    <span class="keyword">int</span> next = <span class="number">0xd8</span>;</span><br><span class="line">    <span class="keyword">int</span> pngBase = <span class="number">0x89</span>;</span><br><span class="line">    <span class="keyword">int</span> pngNext = <span class="number">0x50</span>;</span><br><span class="line">    <span class="keyword">byte</span>[] bs = Files.readAllBytes(Paths.get(<span class="string">"D:\\WebChat\\WeChat Files\\wxid_sxelod34kou321\\FileStorage\\Image\\2020-06\\0ce7898a35eb2a7ac9045480419e5902.dat"</span>));</span><br><span class="line">    <span class="keyword">int</span> firstByte = bs[<span class="number">0</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">    <span class="keyword">int</span> secondByte = bs[<span class="number">1</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">    <span class="keyword">int</span> key = base ^ firstByte;</span><br><span class="line">    String suffix = <span class="string">".jpg"</span>;</span><br><span class="line">    <span class="keyword">if</span>((pngBase ^ firstByte) == (pngNext ^ secondByte))&#123;</span><br><span class="line">        key = pngBase ^ firstByte;</span><br><span class="line">        suffix = <span class="string">".png"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span>(OutputStream os = Files.newOutputStream(Paths.get(<span class="string">"D:\\123"</span>+suffix),StandardOpenOption.CREATE))&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">byte</span> b : bs)&#123;</span><br><span class="line">            os.write(b ^ key);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">base</span> <span class="operator">=</span> <span class="number">0xff</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">next</span> <span class="operator">=</span> <span class="number">0xd8</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">pngBase</span> <span class="operator">=</span> <span class="number">0x89</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">pngNext</span> <span class="operator">=</span> <span class="number">0x50</span>;</span><br><span class="line">    <span class="type">byte</span>[] bs = Files.readAllBytes(Paths.get(<span class="string">&quot;D:\\WebChat\\WeChat Files\\wxid_sxelod34kou321\\FileStorage\\Image\\2020-06\\0ce7898a35eb2a7ac9045480419e5902.dat&quot;</span>));</span><br><span class="line">    <span class="type">int</span> <span class="variable">firstByte</span> <span class="operator">=</span> bs[<span class="number">0</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">secondByte</span> <span class="operator">=</span> bs[<span class="number">1</span>] &amp; <span class="number">0xff</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">key</span> <span class="operator">=</span> base ^ firstByte;</span><br><span class="line">    <span class="type">String</span> <span class="variable">suffix</span> <span class="operator">=</span> <span class="string">&quot;.jpg&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span>((pngBase ^ firstByte) == (pngNext ^ secondByte))&#123;</span><br><span class="line">        key = pngBase ^ firstByte;</span><br><span class="line">        suffix = <span class="string">&quot;.png&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span>(<span class="type">OutputStream</span> <span class="variable">os</span> <span class="operator">=</span> Files.newOutputStream(Paths.get(<span class="string">&quot;D:\\123&quot;</span>+suffix),StandardOpenOption.CREATE))&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">byte</span> b : bs)&#123;</span><br><span class="line">            os.write(b ^ key);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>通过对比发现一个问题,<code>key</code>值在我公司电脑和家里电脑完全相同.也就是说这个算<code>key</code>的过程应该是拿微信里面的一个固定信息算出来的.这个等在后面在研究一下具体是怎么算的.</p>
 ]]></content>
