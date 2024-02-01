@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title></title>
+    <title>neovim学习笔记</title>
     <url>/2023/04/16/neovim-learn/</url>
-    <content><![CDATA[<span id="more"></span>
-
-<h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p>从18年开始一直使用 <code>idea-vim</code> 插件作为编辑工具, 日常使用虽然比较频繁, 但是很少做深入了解, 只是局限于一些简单的操作, 虽然速度提升了一些, 但是远远不够, <code>idea</code> 号称内存黑洞, 所以一直在考虑是不是有一种很多好的工具能够替代它,<br>最开始想到的是<code>eclipse</code>系列(<code>sts, myeclipse</code>等), 虽然现在<code>eclipse</code>也很强大,但是还是老问题, 如果<code>workspaces</code>打开项目多了,确实还是会卡, <code>idea</code> 没有 <code>workspaces</code> 这个概念,一个项目开一个窗口,造成内存吃紧;后面队任何 <code>IDE</code> 都失去兴趣了,<br>就考虑是否能直接用<code>vim</code>, 问题在于 <code>java</code> 的提示和编译, 目前找到一个 <code>lunarvim</code>, 使用感觉和 <code>vs code</code> 添加 <code>java</code> 插件差不多.至此,实验失败, 不过过程中收获很多, 让我对 <code>打造一个自己的专属编辑器</code> 这个概念产生了浓厚的兴趣, 而且确实 <code>vim</code> 或者 <code>neovim</code> 确实是简单,灵活,强大.   </p>
+    <content><![CDATA[<p>nvim 学习以及配置</p>
+<span id="more"></span>  
+<h1 id="First"><a href="#First" class="headerlink" title="First"></a>First</h1><p>从18年开始一直使用 <code>idea-vim</code> 插件作为编辑工具, 日常使用虽然比较频繁, 但是很少做深入了解, 只是局限于一些简单的操作, 虽然速度提升了一些, 但是远远不够, <code>idea</code> 号称内存黑洞, 所以一直在考虑是不是有一种很多好的工具能够替代它,<br>最开始想到的是<code>eclipse</code>系列(<code>sts, myeclipse</code>等), 虽然现在<code>eclipse</code>也很强大,但是还是老问题, 如果<code>workspaces</code>打开项目多了,确实还是会卡, <code>idea</code> 没有 <code>workspaces</code> 这个概念,一个项目开一个窗口,造成内存吃紧;后面队任何 <code>IDE</code> 都失去兴趣了,<br>就考虑是否能直接用<code>vim</code>, 问题在于 <code>java</code> 的提示和编译, 目前找到一个 <code>lunarvim</code>, 使用感觉和 <code>vs code</code> 添加 <code>java</code> 插件差不多.至此,实验失败, 不过过程中收获很多, 让我对 <code>打造一个自己的专属编辑器</code> 这个概念产生了浓厚的兴趣, 而且确实 <code>vim</code> 或者 <code>neovim</code> 确实是简单,灵活,强大.   </p>
 <h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
 <li><a href="https://github.com/neovim/neovim/releases">官方安装包下载</a> </li>
-<li><code>windows</code>下使用<a href="https://chocolatey.org/install">chocolatey</a>安装, 命令为<code>choco install neovim --pre</code>, 此处<code>--per</code> 为安装<code>beta</code>版本(目前为<code>0.10.0), 默认安装版本为 </code>0.8.0<code>, </code>neovim 0.9.0<code>版本之后使用</code>lua&#96;语言管理插件.</li>
+<li><code>windows</code>下使用<a href="https://chocolatey.org/install">chocolatey</a>安装, 命令为<code>choco install neovim --pre</code>, 此处<code>--per</code> 为安装<code>beta</code>版本(目前为<code>0.10.0</code>), 默认安装版本为 <code>0.8.0</code>, <code>neovim 0.9.0</code> 版本之后使用 <code>lua</code> 语言管理插件.</li>
 </ol>
 <h1 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h1><ol>
 <li>使用<code>choco</code>安装<code>nvim</code>默认是在<code>c:\tools</code>下面, 具体的安装位置, 可以通过环境变量<code>ChocolateyToolsLocation</code>来指定.  </li>
